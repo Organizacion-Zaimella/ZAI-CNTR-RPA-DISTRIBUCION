@@ -1,0 +1,55 @@
+# Entornos y credenciales
+.env
+.env.*
+!.env.example
+*oauth*.json
+*token*
+*secret*
+*password*
+*.pem
+*.key
+*.p12
+*.pfx
+*.kdbx
+id_rsa*
+id_ed25519*
+
+# Datos y trazas de ejecución
+*.log
+logs/
+evidence/
+evidencias/
+captures/
+capturas/
+*.sqlite
+*.db
+*.db3
+*.dmp
+*.dump
+*.bak
+*.sql.gz
+*.csv
+*.xlsx
+*.pdf
+*.png
+*.jpg
+*.jpeg
+*.webp
+
+# Paquetes y código generado
+__pycache__/
+.pytest_cache/
+.venv/
+venv/
+build/
+dist/
+*.exe
+*.msi
+*.zip
+*.whl
+*.pyc
+
+# Perfiles y sistemas operativos
+desktop.ini
+Thumbs.db
+.DS_Store
