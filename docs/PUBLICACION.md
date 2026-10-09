@@ -7,4 +7,4 @@
 5. Promover canal TEST y luego Producción mediante PR revisado y checks definidos. El puntero firmado se actualiza solo después de que el asset existe y pasa los gates del canal.
 6. Documentar revocación y reversión. Una versión retirada no debe ejecutarse por estar en caché.
 
-La rama `main` alberga la documentación base. La rama draft de T07 incorpora un canal TEST de generación 2 y el prerelease candidato `cntr-rpa-1.0.0-test.2`; ambos se usan para QA anónimo de motor y adaptadores. Esto no certifica funcionalidad ni aprueba Producción. El control de branch y aprobadores se comprueba por separado; este documento no afirma que estén configurados.
+La rama `main` alberga la documentación base. La rama draft de T07 incorpora un canal TEST de generación 3 y el prerelease candidato `cntr-rpa-1.0.0-test.3`; ambos se usan para QA anónimo de motor y adaptadores. La actualización incluye una corrección del transporte del origen canónico al crear detalles ORDS. Esto no certifica funcionalidad ni aprueba Producción. El control de branch y aprobadores se comprueba por separado; este documento no afirma que estén configurados.

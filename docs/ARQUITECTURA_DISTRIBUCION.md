@@ -12,4 +12,4 @@ El motor 1.0.0 y cada adaptador tendrán versiones independientes. El contrato d
 
 ## Estado inicial
 
-No existen `channels/test.json`, `channels/production.json`, firmas ni releases certificados. No se publica todavía código de portales ni endpoints internos.
+En `main` no existen canales ni releases. La rama de tarea T07 mantiene un canal `TEST` firmado de generación 3 y un prerelease candidato para validar la descarga anónima; no hay canal de Producción ni releases certificados. No se publican sujetos, evidencias, secretos ni endpoints internos.

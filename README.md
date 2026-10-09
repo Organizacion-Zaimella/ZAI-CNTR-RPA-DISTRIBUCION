@@ -2,7 +2,7 @@
 
 Repositorio de distribución de software aprobado del proyecto CNTR RPA, propiedad de **Organizacion-Zaimella**. La descarga pública está prevista para clientes sin cuenta, token ni sesión de GitHub. El código en desarrollo, los datos operativos y las configuraciones permanecen en sus fuentes privadas.
 
-**Estado actual de la rama de prueba:** prerelease firmado TEST-only `cntr-rpa-1.0.0-test.2`, con motor 1.0.0 y cinco adaptadores `0.1.0-candidate`. Son candidatos de QA, **no módulos certificados ni una distribución de Producción**. `main` no se modifica desde esta rama; las pruebas usan un canal de tarea y un sandbox Windows aislado.
+**Estado actual de la rama de prueba:** prerelease firmado TEST-only [`cntr-rpa-1.0.0-test.3`](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-1.0.0-test.3), canal generación 3, motor `1.0.0-test.3` y cinco adaptadores `0.1.0-candidate`. Siguen siendo candidatos de QA, **no módulos certificados ni una distribución de Producción**. `main` no se modifica desde esta rama; las pruebas usan un sandbox Windows aislado.
 
 - [Arquitectura de distribución](docs/ARQUITECTURA_DISTRIBUCION.md)
 - [Publicación y aprobación](docs/PUBLICACION.md)
