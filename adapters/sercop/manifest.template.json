@@ -1,0 +1,10 @@
+{
+  "adapter_id": "sercop",
+  "version": "0.1.0-candidate",
+  "adapter_contract": 1,
+  "portal_id": 11,
+  "document_ids": [11],
+  "document_functions": {"11": "documento_11"},
+  "entrypoint": "adapter.py",
+  "status": "NOT_APPROVED"
+}
