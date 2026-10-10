@@ -12,6 +12,7 @@ import json
 import re
 import sys
 import time
+import unicodedata
 from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import urlparse
@@ -21,8 +22,11 @@ from playwright.async_api import async_playwright
 
 
 ADAPTER_ID = "sri"
-ADAPTER_VERSION = "0.1.3-candidate"
+ADAPTER_VERSION = "0.1.7-candidate"
 MIN_PACING_SECONDS = 5.0
+NAVIGATION_TIMEOUT_SECONDS = 45.0
+ELEMENT_TIMEOUT_SECONDS = 45.0
+RESULT_TIMEOUT_SECONDS = 120.0
 DOCUMENT_ROUTES = {
     3: "/sri-en-linea/SriDeclaracionesWeb/EstadoTributario/Consultas/consultaEstadoTributario",
     53: "/sri-en-linea/SriRucWeb/ConsultaRuc/Consultas/consultaRuc",
@@ -38,7 +42,7 @@ class WorkContext:
     identification: str
     evidence_dir: Path
     pacing_seconds: float = MIN_PACING_SECONDS
-    timeout_seconds: float = 45.0
+    timeout_seconds: float = RESULT_TIMEOUT_SECONDS
     headless: bool = True
 
     @classmethod
@@ -57,7 +61,7 @@ class WorkContext:
         if not identification:
             raise ValueError("identification requerida por el contexto autorizado")
         pacing = max(MIN_PACING_SECONDS, float(raw.get("pacing_seconds", MIN_PACING_SECONDS)))
-        timeout = min(120.0, max(10.0, float(raw.get("timeout_seconds", 45.0))))
+        timeout = min(RESULT_TIMEOUT_SECONDS, max(10.0, float(raw.get("timeout_seconds", RESULT_TIMEOUT_SECONDS))))
         return cls(document_id, entry_url, identification, Path(raw["evidence_dir"]), pacing, timeout,
                    bool(raw.get("headless", True)))
 
@@ -85,13 +89,29 @@ async def _visible_text(page) -> str:
     return (await page.locator("body").inner_text()).casefold()
 
 
-def _classify(document_id: int, text: str) -> str | None:
-    if re.search(r"no se encontraron resultados|no existen resultados", text):
+def _classify(document_id: int, text: str, identification: str,
+              baseline_text: str = "") -> str | None:
+    folded = unicodedata.normalize("NFKD", text.casefold())
+    normalized = "".join(char for char in folded if not unicodedata.combining(char))
+    baseline_folded = unicodedata.normalize("NFKD", baseline_text.casefold())
+    baseline = "".join(char for char in baseline_folded if not unicodedata.combining(char))
+    no_match = re.search(r"no se encontraron resultados|no existen resultados", normalized)
+    if no_match and no_match.group(0) not in baseline:
         return "NO_MATCH"
-    if document_id == 3 and re.search(r"al d[ií]a en sus obligaciones", text):
-        return "MATCH"
-    if document_id == 53 and re.search(r"\bactivo\b", text):
-        return "MATCH"
+    positive_marker = ("al dia en sus obligaciones" if document_id == 3 else "activo")
+    positive = positive_marker in normalized
+    if positive:
+        digits = re.sub(r"\D", "", identification)
+        if 10 <= len(digits) <= 13:
+            token = rf"(?<!\d)\d(?:[\s.-]?\d){{{len(digits) - 1}}}(?!\d)"
+            if any(re.sub(r"\D", "", item) == digits
+                   for item in re.findall(token, text)):
+                return "MATCH"
+        # SRI's static explanatory copy contains the same phrase as a possible
+        # status. It is not a result unless it appears after submission and is
+        # bound to the exact queried identifier.
+        if positive_marker not in baseline:
+            return "MATCH_NOT_ATTRIBUTED"
     return None
 
 
@@ -112,6 +132,28 @@ def _navigation_failure(exc: Exception) -> str:
     )
     return next((reason for marker, reason in markers if marker in message),
                 "PORTAL_OR_BROWSER_ERROR")
+
+
+async def _document_form_ready(page, context: WorkContext) -> bool:
+    """Recognize a route that finished loading despite a late navigation error.
+
+    This checks the already-open page only; it does not retry or reload the
+    public portal. It lets a valid browser checkpoint continue safely.
+    """
+    try:
+        landed = urlparse(page.url)
+        if (landed.hostname != SRI_HOST or
+                landed.path.rstrip("/") != DOCUMENT_ROUTES[context.document_id]):
+            return False
+        field = page.locator("#busquedaRucId")
+        deadline = time.monotonic() + min(5.0, context.timeout_seconds)
+        while time.monotonic() < deadline:
+            if await field.count() == 1 and await field.is_visible():
+                return True
+            await page.wait_for_timeout(250)
+        return False
+    except Exception:
+        return False
 
 
 async def _execute_work(work, services, document_id: int) -> dict[str, str | None]:
@@ -151,7 +193,7 @@ async def _execute_work(work, services, document_id: int) -> dict[str, str | Non
             _human_barrier = True
             return {"kind": "HUMAN_REQUIRED", "checkpoint": "PORTAL_CHALLENGE"}
         text = (await browser.text("body")).casefold()
-        status = _classify(document_id, text)
+        status = _classify(document_id, text, work.subject.identification)
         if status:
             evidence = Path(services["evidence_root"]) / f"sri-{document_id}-{work.detail_id}.png"
             await browser.screenshot(str(evidence), full_page=True)
@@ -189,14 +231,28 @@ async def _run_on_page(context: WorkContext, page) -> dict[str, str | int | None
     evidence_path = context.evidence_dir / f"sri-{context.document_id}-{time.time_ns()}.png"
     pacer = ActionPacer(context.pacing_seconds)
     try:
-        # SRI is client-rendered; wait for the response commit, then use
-        # document-specific controls to determine readiness.
+        # The document URL supplied by ORDS is the sole entry point. The portal
+        # base URL is informational and must never replace this document route.
         response = await page.goto(context.entry_url, wait_until="commit",
-                                   timeout=int(context.timeout_seconds * 1000))
+                                   timeout=int(NAVIGATION_TIMEOUT_SECONDS * 1000))
+    except Exception as exc:
+        # Preserve a usable SPA checkpoint if the navigation event reports an
+        # error after the exact document URL and its form have already loaded.
+        # Never send a second navigation request as an automatic retry.
+        if not await _document_form_ready(page, context):
+            return _result(context, "RETRYABLE", _navigation_failure(exc))
+        response = None
+    try:
         if response and response.status in (403, 429, 451):
             return _result(context, "BLOCKED", f"HTTP_{response.status}")
-    except Exception as exc:
-        return _result(context, "RETRYABLE", _navigation_failure(exc))
+        landed = urlparse(page.url)
+        if landed.hostname != SRI_HOST:
+            return _result(context, "RETRYABLE", "DOCUMENT_URL_REDIRECTED_OUTSIDE_PORTAL")
+        if landed.path.rstrip("/") != DOCUMENT_ROUTES[context.document_id]:
+            reason = "PORTAL_AUTH_REDIRECT" if landed.path.startswith("/auth/") else "DOCUMENT_URL_REDIRECTED"
+            return _result(context, "RETRYABLE", reason)
+    except Exception:
+        return _result(context, "RETRYABLE", "DOCUMENT_URL_NOT_READY")
     pacer.mark()
 
     if await page.locator('iframe[src*="captcha"], [class*="altcha"]').count():
@@ -206,46 +262,71 @@ async def _run_on_page(context: WorkContext, page) -> dict[str, str | int | None
                    else "Seleccionar búsqueda por RUC")
     mode_button = page.get_by_role("button", name=search_mode, exact=True)
     if await mode_button.count() == 1:
-        await mode_button.click(timeout=int(context.timeout_seconds * 1000))
+        await pacer.before_action()
+        await mode_button.click(timeout=int(ELEMENT_TIMEOUT_SECONDS * 1000))
+        pacer.mark()
 
     field = page.locator("#busquedaRucId")
     try:
-        await field.wait_for(state="visible", timeout=int(context.timeout_seconds * 1000))
+        await field.wait_for(state="visible", timeout=int(ELEMENT_TIMEOUT_SECONDS * 1000))
     except PlaywrightTimeoutError:
         return _result(context, "RETRYABLE", "FORM_FIELD_NOT_READY")
     if await field.count() != 1:
         return _result(context, "RETRYABLE", "EXPECTED_FIELD_NOT_UNIQUE")
     await pacer.before_action()
-    await field.fill("", timeout=int(context.timeout_seconds * 1000))
-    await field.click(timeout=int(context.timeout_seconds * 1000))
+    await field.fill("", timeout=int(ELEMENT_TIMEOUT_SECONDS * 1000))
+    await field.click(timeout=int(ELEMENT_TIMEOUT_SECONDS * 1000))
     await page.keyboard.type(context.identification, delay=100)
     pacer.mark()
 
     button = page.get_by_role("button", name="Consultar", exact=True)
-    await button.wait_for(state="visible", timeout=int(context.timeout_seconds * 1000))
-    await button.wait_for(state="attached", timeout=int(context.timeout_seconds * 1000))
+    await button.wait_for(state="visible", timeout=int(ELEMENT_TIMEOUT_SECONDS * 1000))
+    await button.wait_for(state="attached", timeout=int(ELEMENT_TIMEOUT_SECONDS * 1000))
     enable_deadline = time.monotonic() + min(context.timeout_seconds, 30)
     while not await button.is_enabled() and time.monotonic() < enable_deadline:
         await page.wait_for_timeout(250)
     if not await button.is_enabled():
         return _result(context, "RETRYABLE", "QUERY_NOT_ENABLED")
+    baseline_text = await _visible_text(page)
     await pacer.before_action()
-    await button.click(timeout=int(context.timeout_seconds * 1000))
+    await button.click(timeout=int(ELEMENT_TIMEOUT_SECONDS * 1000))
     pacer.mark()
 
     deadline = time.monotonic() + context.timeout_seconds
     status = None
+    stable_status = None
+    stable_since = None
+    unattributed_positive = False
     while time.monotonic() < deadline:
         text = await _visible_text(page)
-        if re.search(r"captcha|altcha|no soy un robot", text):
+        normalized_text = unicodedata.normalize("NFKD", text.casefold())
+        normalized_text = "".join(char for char in normalized_text
+                                  if not unicodedata.combining(char))
+        if re.search(r"captcha|altcha|no soy un robot", normalized_text):
             return _result(context, "HUMAN_REQUIRED", "PORTAL_CHALLENGE")
-        status = _classify(context.document_id, text)
-        if status:
-            break
+        if re.search(r"espere por favor|\bcargando\b|\bprocesando\b", normalized_text):
+            stable_status = None
+            stable_since = None
+            await page.wait_for_timeout(500)
+            continue
+        status = _classify(context.document_id, text, context.identification, baseline_text)
+        if status == "MATCH_NOT_ATTRIBUTED":
+            unattributed_positive = True
+            status = None
+        if status in {"MATCH", "NO_MATCH"}:
+            if status != stable_status:
+                stable_status = status
+                stable_since = time.monotonic()
+            elif time.monotonic() - stable_since >= 0.25:
+                break
+        else:
+            stable_status = None
+            stable_since = None
         await page.wait_for_timeout(500)
 
     if status is None:
-        return _result(context, "RETRYABLE", "RESULT_NOT_CONCLUSIVE")
+        reason = "MATCH_NOT_ATTRIBUTED" if unattributed_positive else "RESULT_NOT_CONCLUSIVE"
+        return _result(context, "RETRYABLE", reason)
 
     await page.screenshot(path=str(evidence_path), full_page=True)
     digest = hashlib.sha256(evidence_path.read_bytes()).hexdigest()
@@ -253,7 +334,11 @@ async def _run_on_page(context: WorkContext, page) -> dict[str, str | int | None
 
 
 async def _launch_browser(playwright, headless: bool):
-    for channel in ("msedge", "chrome"):
+    # For headed debugging, prefer Chrome because the live portal inspection
+    # for this candidate is performed in Chrome. Production headless keeps the
+    # engine's contracted Edge-first order.
+    channels = ("chrome", "msedge") if not headless else ("msedge", "chrome")
+    for channel in channels:
         try:
             return await playwright.chromium.launch(channel=channel, headless=headless)
         except Exception:
@@ -314,31 +399,34 @@ async def run(context: WorkContext) -> dict[str, str | int | None]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="SRI standalone TEST adapter")
-    parser.add_argument("--context", required=True, type=Path,
-                        help="JSON privado entregado por el harness autorizado TEST")
+    parser.add_argument("--context", required=True, type=Path, action="append",
+                        help="JSON privado entregado por el harness autorizado TEST; repeat for ORDS order")
     parser.add_argument("--headed", action="store_true", help="usar ventana de navegador para depuración")
     args = parser.parse_args()
     try:
         repo_root = Path(__file__).resolve().parents[2]
-        context_path = args.context.resolve()
-        if context_path.is_relative_to(repo_root):
-            raise ValueError("el contexto privado debe estar fuera del repositorio")
-        context = WorkContext.load(context_path)
-        if args.headed:
-            context = WorkContext(context.document_id, context.entry_url, context.identification,
-                                  context.evidence_dir, context.pacing_seconds,
-                                  context.timeout_seconds, False)
-        if context.evidence_dir.resolve().is_relative_to(repo_root):
-            raise ValueError("la evidencia privada debe estar fuera del repositorio")
-        result = asyncio.run(run(context))
+        contexts = []
+        for context_path in args.context:
+            context_path = context_path.resolve()
+            if context_path.is_relative_to(repo_root):
+                raise ValueError("el contexto privado debe estar fuera del repositorio")
+            context = WorkContext.load(context_path)
+            if args.headed:
+                context = WorkContext(context.document_id, context.entry_url, context.identification,
+                                      context.evidence_dir, context.pacing_seconds,
+                                      context.timeout_seconds, False)
+            if context.evidence_dir.resolve().is_relative_to(repo_root):
+                raise ValueError("la evidencia privada debe estar fuera del repositorio")
+            contexts.append(context)
+        results = asyncio.run(run_many(contexts))
     except Exception as exc:
         # Deliberately emit only a stable category, not exception text or input values.
         print(json.dumps({"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION,
                           "status": "ERROR", "reason_code": "INVALID_CONTEXT_OR_RUNTIME",
                           "exception_type": type(exc).__name__}, ensure_ascii=False))
         return 2
-    print(json.dumps(result, ensure_ascii=False))
-    return 0 if result["status"] in {"MATCH", "NO_MATCH"} else 1
+    print(json.dumps(results, ensure_ascii=False))
+    return 0 if all(result["status"] in {"MATCH", "NO_MATCH"} for result in results) else 1
 
 
 if __name__ == "__main__":

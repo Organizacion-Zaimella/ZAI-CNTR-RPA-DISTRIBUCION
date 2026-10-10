@@ -14,6 +14,7 @@ SPEC = importlib.util.spec_from_file_location("sri_standalone_app", APP_PATH)
 app = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = app
 SPEC.loader.exec_module(app)
+TEST_RUC = "1790000000001"
 
 
 def context():
@@ -58,6 +59,17 @@ def work(document_id, detail_id):
 
 def run(coro):
     return asyncio.run(coro)
+
+
+def test_positive_classification_requires_the_exact_queried_ruc():
+    assert app._classify(
+        3, f"RUC: 179-0000000001; AL DÍA EN SUS OBLIGACIONES", TEST_RUC) == "MATCH"
+    assert app._classify(
+        3, "AL DÍA EN SUS OBLIGACIONES", TEST_RUC) == "MATCH_NOT_ATTRIBUTED"
+    static_intro = "Conozca si se encuentra al día en sus obligaciones tributarias"
+    assert app._classify(3, static_intro, TEST_RUC, static_intro) is None
+    assert app._classify(
+        53, f"RUC: {TEST_RUC}; estado: ACTIVO", TEST_RUC) == "MATCH"
 
 
 def test_late_playwright_timeout_is_retryable_without_exception_text():
@@ -121,6 +133,82 @@ def test_navigation_timeout_is_sanitized_without_retrying_the_portal():
     assert "private portal URL" not in str(result)
 
 
+def test_navigation_error_resumes_only_from_loaded_document_form_checkpoint(tmp_path):
+    class Locator:
+        def __init__(self, *, visible=False, text="", on_click=None):
+            self.visible = visible
+            self.text = text
+            self.on_click = on_click
+
+        async def count(self):
+            return 1 if self.visible or self.text else 0
+
+        async def is_visible(self):
+            return self.visible
+
+        async def wait_for(self, **_kwargs):
+            pass
+
+        async def fill(self, _value, **_kwargs):
+            pass
+
+        async def click(self, **_kwargs):
+            if self.on_click:
+                self.on_click()
+
+        async def is_enabled(self):
+            return True
+
+        async def inner_text(self):
+            return self.text
+
+        @property
+        def first(self):
+            return self
+
+    class LoadedAfterErrorPage:
+        url = context().entry_url
+
+        def __init__(self):
+            self.goto_calls = 0
+            self.submitted = False
+            self.keyboard = SimpleNamespace(type=AsyncMock())
+
+        async def goto(self, *_args, **_kwargs):
+            self.goto_calls += 1
+            raise RuntimeError("net::ERR_CONNECTION_RESET")
+
+        def locator(self, selector):
+            if selector == "#busquedaRucId":
+                return Locator(visible=True)
+            if selector == "main":
+                return Locator()
+            if "captcha" in selector:
+                return Locator()
+            return Locator(text=("no se encontraron resultados" if self.submitted else "Consulta"))
+
+        def get_by_role(self, _role, name, **_kwargs):
+            return Locator(visible=name == "Consultar",
+                           on_click=lambda: setattr(self, "submitted", True))
+
+        async def wait_for_timeout(self, _duration):
+            pass
+
+        async def screenshot(self, *, path, **_kwargs):
+            Path(path).write_bytes(b"synthetic screenshot")
+
+    page = LoadedAfterErrorPage()
+    ctx = app.WorkContext(context().document_id, context().entry_url,
+                          context().identification, tmp_path)
+    with patch.object(app, "ActionPacer", return_value=SimpleNamespace(
+            before_action=AsyncMock(), mark=lambda: None)):
+        result = run(app._run_on_page(ctx, page))
+
+    assert result["status"] == "NO_MATCH"
+    assert page.goto_calls == 1
+    assert len(list(tmp_path.glob("sri-53-*.png"))) == 1
+
+
 def test_internet_disconnect_is_classified_and_does_not_retry_navigation():
     class FailedNavigation:
         calls = 0
@@ -137,6 +225,85 @@ def test_internet_disconnect_is_classified_and_does_not_retry_navigation():
     assert page.calls == 1
     assert "private.invalid" not in str(result)
     assert "123" not in str(result)
+
+
+def test_optional_search_mode_click_obeys_the_five_second_action_pacer(tmp_path):
+    class PacerSpy:
+        def __init__(self, _interval):
+            self.before_calls = 0
+
+        async def before_action(self):
+            self.before_calls += 1
+
+        def mark(self):
+            pass
+
+    class Locator:
+        def __init__(self, *, count=1, text="", on_click=None):
+            self.count_value = count
+            self.text = text
+            self.on_click = on_click
+
+        async def count(self):
+            return self.count_value
+
+        async def click(self, **_kwargs):
+            if self.on_click:
+                self.on_click()
+
+        async def wait_for(self, **_kwargs):
+            pass
+
+        async def is_enabled(self):
+            return True
+
+        async def fill(self, _value, **_kwargs):
+            pass
+
+        async def inner_text(self):
+            return self.text
+
+        @property
+        def first(self):
+            return self
+
+    class Page:
+        url = context().entry_url
+
+        def __init__(self):
+            self.keyboard = SimpleNamespace(type=AsyncMock())
+            self.submitted = False
+            self.mode = Locator()
+
+        async def goto(self, *_args, **_kwargs):
+            return None
+
+        def locator(self, selector):
+            if "captcha" in selector:
+                return Locator(count=0)
+            return Locator(text=("no se encontraron resultados" if self.submitted else "Consulta"))
+
+        def get_by_role(self, _role, name, **_kwargs):
+            if name.startswith("Seleccionar búsqueda"):
+                return self.mode
+            return Locator(on_click=lambda: setattr(self, "submitted", True))
+
+        async def wait_for_timeout(self, _duration):
+            pass
+
+        async def screenshot(self, *, path, **_kwargs):
+            Path(path).write_bytes(b"synthetic screenshot")
+
+    pacer = PacerSpy(5)
+    page = Page()
+    ctx = app.WorkContext(context().document_id, context().entry_url,
+                          context().identification, tmp_path)
+    with patch.object(app, "ActionPacer", return_value=pacer):
+        result = run(app._run_on_page(ctx, page))
+
+    assert result["status"] == "NO_MATCH"
+    # Search-mode click, field entry, and the one submit each have a paced wait.
+    assert pacer.before_calls == 3
 
 
 def test_sidecar_challenge_latch_skips_other_document_without_navigation():

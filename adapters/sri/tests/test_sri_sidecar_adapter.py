@@ -9,6 +9,7 @@ from types import SimpleNamespace
 
 
 ADAPTER_PATH = Path(__file__).resolve().parents[1] / "src" / "adapter.py"
+TEST_RUC = "1790000000001"
 SPEC = importlib.util.spec_from_file_location("sri_sidecar_under_test", ADAPTER_PATH)
 adapter = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = adapter
@@ -19,6 +20,8 @@ class Browser:
     def __init__(self):
         self.actions = []
         self.value = ""
+        self.result_text = "Formulario listo"
+        self.query_result_text = "No se encontraron resultados"
 
     async def goto(self, url, **options):
         self.actions.append(("goto", url, options))
@@ -58,9 +61,11 @@ class Browser:
 
     async def click_role(self, role, name, *, exact=False):
         self.actions.append(("submit", role, name, exact))
+        self.result_text = self.query_result_text
 
     async def text(self, selector):
-        return "No se encontraron resultados"
+        self.actions.append(("text", selector))
+        return self.result_text
 
     async def screenshot(self, path, *, full_page=True):
         Path(path).write_bytes(b"synthetic evidence")
@@ -70,8 +75,8 @@ def work(document_id):
     return SimpleNamespace(
         portal_id=3, document_id=document_id,
         entry_url="https://srienlinea.sri.gob.ec" + adapter.DOCUMENT_ROUTES[document_id],
-        deadline_seconds=10, detail_id=document_id,
-        subject=SimpleNamespace(identification="QA-ONLY"),
+        deadline_seconds=2, detail_id=document_id,
+        subject=SimpleNamespace(identification=TEST_RUC),
     )
 
 
@@ -94,6 +99,7 @@ def test_sidecar_uses_document_specific_search_mode_and_selector(tmp_path):
         assert ("fill", "#busquedaRucId", "") in browser.actions
         assert ("type", "#busquedaRucId") in browser.actions
         assert any(action[0] == "submit" for action in browser.actions)
+        assert ("text", "main") in browser.actions
 
 
 def test_sidecar_fails_closed_when_search_field_is_ambiguous(tmp_path):
@@ -127,4 +133,64 @@ def test_legacy_sidecar_falls_back_to_existing_goto_abi(tmp_path):
 
     browser, result = asyncio.run(scenario())
     assert result["kind"] == "NO_MATCH"
-    assert any(action[0] == "goto" and action[2] == {} for action in browser.actions)
+    assert any(action[0] == "goto" and action[2] == {"wait_until": "commit"}
+               for action in browser.actions)
+
+
+def test_sidecar_classifies_document_results_and_normalizes_spanish_accents(tmp_path):
+    async def scenario(document_id, result_text):
+        browser = Browser()
+        browser.query_result_text = result_text
+        services = {"browser": browser, "evidence_root": tmp_path}
+        await adapter.prepare(work(document_id), services)
+        result = await adapter.execute_document(work(document_id), services)
+        return browser, result
+
+    for document_id, result_text in (
+        (3, f"RUC {TEST_RUC}; Estado tributario: AL DÍA EN SUS OBLIGACIONES"),
+        (53, f"RUC {TEST_RUC}; Estado del contribuyente: ACTIVO"),
+    ):
+        browser, result = asyncio.run(scenario(document_id, result_text))
+        assert result["kind"] == "MATCH"
+        assert Path(result["evidence_path"]).is_file()
+        assert ("text", "main") in browser.actions
+
+
+def test_positive_heading_without_subject_identifier_stays_reintetable(tmp_path):
+    async def scenario():
+        browser = Browser()
+        browser.query_result_text = "Estado tributario: AL DÍA EN SUS OBLIGACIONES"
+        services = {"browser": browser, "evidence_root": tmp_path}
+        await adapter.prepare(work(3), services)
+        return browser, await adapter.execute_document(work(3), services)
+
+    browser, result = asyncio.run(scenario())
+    assert result == {"kind": "RETRYABLE", "reason_code": "MATCH_NOT_ATTRIBUTED"}
+    assert not list(tmp_path.glob("*.png"))
+    assert ("text", "main") in browser.actions
+
+
+def test_static_help_copy_present_before_query_is_not_a_result(tmp_path):
+    async def scenario():
+        browser = Browser()
+        browser.result_text = "Conozca si se encuentra AL DÍA EN SUS OBLIGACIONES"
+        browser.query_result_text = browser.result_text
+        services = {"browser": browser, "evidence_root": tmp_path}
+        await adapter.prepare(work(3), services)
+        return browser, await adapter.execute_document(work(3), services)
+
+    browser, result = asyncio.run(scenario())
+    assert result == {"kind": "RETRYABLE", "reason_code": "RESULT_NOT_CONCLUSIVE"}
+    assert not list(tmp_path.glob("*.png"))
+
+
+def test_loading_overlay_defers_result_classification(tmp_path):
+    async def scenario():
+        browser = Browser()
+        browser.query_result_text = "Espere por favor. Estado: AL DÍA EN SUS OBLIGACIONES"
+        services = {"browser": browser, "evidence_root": tmp_path}
+        await adapter.prepare(work(3), services)
+        return browser, await adapter.execute_document(work(3), services)
+
+    _browser, result = asyncio.run(scenario())
+    assert result == {"kind": "RETRYABLE", "reason_code": "RESULT_NOT_CONCLUSIVE"}
