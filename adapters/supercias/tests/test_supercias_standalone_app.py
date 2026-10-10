@@ -118,7 +118,9 @@ class PdfResponse:
 def test_context_rejects_person_or_unapproved_origin(tmp_path):
     context = tmp_path / "context.json"
     base = {"portal_id": 1, "evidence_dir": str(tmp_path / "evidence"), "works": [{
-        "document_id": 13, "entry_url": "https://appscvsgen.supercias.gob.ec/consulta/",
+        "document_id": 13, "entry_url": (
+            "https://appscvsgen.supercias.gob.ec/consultaCompanias/"
+            "societario/busquedaCompanias.jsf"),
         "execution_id": 1, "detail_id": 2,
         "subject": {"id": 1, "type": "EMPRESA", "identification": "test-id",
                     "display_name": "test entity"},

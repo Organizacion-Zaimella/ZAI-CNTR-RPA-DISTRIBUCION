@@ -6,4 +6,9 @@ Estado: `NOT_APPROVED`; versión candidata `0.1.0-candidate`; portal técnico 1;
 
 No se ha probado aquí una corrida real standalone de todos los documentos ni existe elegibilidad vigente para estos documentos en el snapshot TEST del checkpoint. La rama no tiene Release ni firma de módulo; no consumir desde el robot hasta aprobar la cobertura por documento.
 
-Las pruebas de contrato son sintéticas y no consultan portales ni ORDS. En el RPA fuente, `adapters/supercias/tests` obtuvo 17 pruebas PASS junto con Judicatura; esta evidencia no sustituye exploración real ni certificación.
+La ruta contractual es `/consultaCompanias/societario/busquedaCompanias.jsf`.
+La exploración pública vigente confirmó que responde con el formulario de
+búsqueda; no se ingresó identidad ni se ejecutó una consulta. Las pruebas de
+contrato son sintéticas y no consultan portales ni ORDS. La app aún no se ha
+probado en un documento porque no existe pareja elegible; por eso permanece
+`NOT_APPROVED` y sin release.

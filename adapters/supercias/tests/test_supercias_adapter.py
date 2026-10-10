@@ -43,7 +43,8 @@ class LateChallengeBrowser(FakeBrowser):
 def work(document_id=13):
     return SimpleNamespace(
         portal_id=1, document_id=document_id,
-        entry_url="https://appscvsgen.supercias.gob.ec/consulta/",
+        entry_url=("https://appscvsgen.supercias.gob.ec/consultaCompanias/"
+                   "societario/busquedaCompanias.jsf"),
         deadline_seconds=10, execution_id=1, detail_id=document_id,
         subject=SimpleNamespace(id=7, type=SimpleNamespace(value="EMPRESA"),
                                 identification="TEST-ONLY", display_name="TEST ONLY"),
