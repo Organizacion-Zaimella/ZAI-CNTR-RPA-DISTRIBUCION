@@ -103,8 +103,8 @@ def test_sidecar_uses_document_specific_search_mode_and_selector(tmp_path):
         assert result["kind"] == "NO_MATCH"
         assert any(action[0] == "goto_commit" for action in browser.actions)
         assert ("mode", mode, True) in browser.actions
-        assert ("fill", "#busquedaRucId", "") in browser.actions
-        assert ("type", "#busquedaRucId") in browser.actions
+        assert ("fill", "#busquedaRucId", TEST_RUC) in browser.actions
+        assert not any(action[0] in {"click", "type"} for action in browser.actions)
         assert any(action[0] == "submit" for action in browser.actions)
         assert ("text", "main") in browser.actions
 
@@ -125,10 +125,11 @@ def test_sidecar_waits_for_spa_controls_after_commit_before_counting(tmp_path):
     browser, result = asyncio.run(scenario())
     assert result["kind"] == "NO_MATCH"
     waits = [action for action in browser.actions if action[0] == "wait_for_selector"]
-    assert len(waits) == 2
+    assert len(waits) == 3
     assert "#busquedaRucId" in waits[0][1]
     assert waits[0][2] == {"state": "visible", "timeout": 2000}
     assert waits[1][1] == "#busquedaRucId"
+    assert waits[2][1] == 'button:has-text("Consultar")'
     mode_action = ("mode", "Seleccionar búsqueda por RUC o cédula", True)
     assert browser.actions.index(waits[0]) < browser.actions.index(mode_action)
 
@@ -212,6 +213,28 @@ def test_static_help_copy_present_before_query_is_not_a_result(tmp_path):
 
     browser, result = asyncio.run(scenario())
     assert result == {"kind": "RETRYABLE", "reason_code": "RESULT_NOT_CONCLUSIVE"}
+
+
+def test_navigation_failure_is_sanitized_and_diagnostic_is_private(tmp_path):
+    class ResetBrowser(Browser):
+        async def goto_commit(self, url):
+            raise RuntimeError("net::ERR_CONNECTION_RESET https://private.example/with-sensitive-query")
+
+    async def scenario():
+        browser = ResetBrowser()
+        services = {"browser": browser, "evidence_root": tmp_path}
+        await adapter.prepare(work(53), services)
+        return await adapter.execute_document(work(53), services)
+
+    result = asyncio.run(scenario())
+    assert result == {"kind": "RETRYABLE", "reason_code": "PORTAL_CONNECTION_RESET"}
+    reports = list((tmp_path / "diagnostics").glob("sri-53-*.json"))
+    assert len(reports) == 1
+    content = reports[0].read_text(encoding="utf-8")
+    assert '"navigation":' in content
+    assert "private.example" not in content
+    assert "sensitive-query" not in content
+    assert TEST_RUC not in content
     assert not list(tmp_path.glob("*.png"))
 
 
