@@ -183,6 +183,51 @@ def test_http_restriction_stops_batch_without_second_navigation(tmp_path, monkey
     assert browser.close_calls == 1
 
 
+def test_http_429_stops_batch_without_repeating_request(tmp_path, monkeypatch):
+    page = Page(status=429)
+    browser = Browser(page)
+    playwright = PlaywrightContext(browser)
+    monkeypatch.setattr(app, "async_playwright", lambda: playwright)
+
+    results = run(app.run_many([context(tmp_path), context(tmp_path)]))
+
+    assert [item["status"] for item in results] == ["BLOCKED"]
+    assert results[0]["reason_code"] == "HTTP_429"
+    assert page.navigations == 1
+    assert browser.new_page_calls == 1
+    assert browser.close_calls == 1
+
+
+def test_challenge_before_form_entry_never_submits_name(tmp_path, monkeypatch):
+    page = Page(body="Verify you are human")
+    browser = Browser(page)
+    playwright = PlaywrightContext(browser)
+    monkeypatch.setattr(app, "async_playwright", lambda: playwright)
+
+    results = run(app.run_many([context(tmp_path), context(tmp_path)]))
+
+    assert [item["status"] for item in results] == ["HUMAN_REQUIRED"]
+    assert results[0]["reason_code"] == "PORTAL_CHALLENGE"
+    assert page.actions == []
+    assert page.navigations == 1
+
+
+def test_missing_result_count_remains_retryable_without_evidence(tmp_path, monkeypatch):
+    page = Page(body="Search submitted; results are still loading")
+    browser = Browser(page)
+    playwright = PlaywrightContext(browser)
+    monkeypatch.setattr(app, "async_playwright", lambda: playwright)
+    item = context(tmp_path)
+    item["timeout"] = 0.01
+
+    results = run(app.run_many([item]))
+
+    assert results[0]["status"] == "RETRYABLE"
+    assert results[0]["reason_code"] == "RESULT_COUNT_NOT_CONCLUSIVE"
+    assert results[0]["evidence_sha256"] is None
+    assert list(tmp_path.iterdir()) == []
+
+
 def test_positive_result_saves_full_page_evidence_and_hash(tmp_path, monkeypatch):
     page = Page(body="Lookup Results: 2 Found")
     browser = Browser(page)
