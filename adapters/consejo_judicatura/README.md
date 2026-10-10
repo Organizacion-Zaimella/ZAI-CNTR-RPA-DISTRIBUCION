@@ -29,6 +29,11 @@ La fuente funcional corresponde al commit RPA `b6f77c1075fa81f4cfbab531f3f188cbe
 el asset incluye la aplicación, el handler y dependencias fijadas, con SBOM,
 SHA-256 y firma limitada al canal TEST.
 
+El canal TEST firmado de generación 17 y sus assets se comprobaron sin
+autenticación GitHub (`HTTP 200`). La instalación QA aislada `1.0.0-test.7`
+descargó el paquete desde esa rama y validó su inventario y `src/adapter.py`;
+esta comprobación no ejecutó consultas ni creó una ejecución ORDS.
+
 La lectura GET-only actual de ORDS no muestra asignación de adaptador ni pares
 elegibles para Judicatura. Por eso la publicación no afirma ejecución desde el
 robot, evidencia/ACK ORDS ni certificación integrada. El manifiesto fuente
