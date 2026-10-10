@@ -12,3 +12,11 @@ búsqueda; no se ingresó identidad ni se ejecutó una consulta. Las pruebas de
 contrato son sintéticas y no consultan portales ni ORDS. La app aún no se ha
 probado en un documento porque no existe pareja elegible; por eso permanece
 `NOT_APPROVED` y sin release.
+
+En la inspección visible del 2026-10-10 se confirmó una sola entrada de RUC,
+tres opciones de búsqueda, un botón Consultar inicialmente deshabilitado y
+cero widgets ALTCHA en la pantalla inicial. No se ingresaron datos ni se
+ejecutó la búsqueda. La observación valida la carga del formulario, no la
+consulta documental, la descarga PDF ni la ausencia de un desafío posterior.
+La ruta es la que usa el candidato; falta cotejarla en vivo con el paso 1 de
+ORDS cuando exista una pareja elegible para esos documentos.
