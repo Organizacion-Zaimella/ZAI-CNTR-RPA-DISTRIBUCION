@@ -25,6 +25,7 @@ def _failure_code(exc: Exception) -> str:
         ("ERR_NAME_NOT_RESOLVED", "PORTAL_DNS_FAILURE"),
         ("ERR_CONNECTION_TIMED_OUT", "PORTAL_CONNECTION_TIMEOUT"),
         ("ERR_TIMED_OUT", "PORTAL_CONNECTION_TIMEOUT"),
+        ("ERR_ADDRESS_UNREACHABLE", "PORTAL_UNREACHABLE"),
     )
     if type(exc).__name__.casefold() == "timeouterror":
         return "PORTAL_TIMEOUT"

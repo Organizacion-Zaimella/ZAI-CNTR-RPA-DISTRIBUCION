@@ -73,3 +73,17 @@ def test_wrong_host_fails_closed_before_browser_navigation():
         work(1, url="https://example.invalid/Search.aspx"),
         {"browser": NeverUseBrowser()}))
     assert result == {"kind": "ERROR", "reason_code": "UNAUTHORIZED_ENTRY_URL"}
+
+
+def test_network_failure_codes_are_bounded_and_sanitized():
+    cases = {
+        "net::ERR_NETWORK_CHANGED https://private.invalid/x": "NETWORK_CHANGED",
+        "net::ERR_CONNECTION_RESET https://private.invalid/x": "PORTAL_CONNECTION_RESET",
+        "net::ERR_NAME_NOT_RESOLVED private.invalid": "PORTAL_DNS_FAILURE",
+        "net::ERR_ADDRESS_UNREACHABLE private.invalid": "PORTAL_UNREACHABLE",
+        "opaque failure containing private.invalid": "PORTAL_ACTION_FAILED",
+    }
+    for message, expected in cases.items():
+        result = adapter._failure_code(RuntimeError(message))
+        assert result == expected
+        assert "private.invalid" not in result
