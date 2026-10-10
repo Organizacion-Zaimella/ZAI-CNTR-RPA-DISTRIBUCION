@@ -18,10 +18,12 @@ def pdf_bytes() -> bytes:
 
 
 class Browser:
-    def __init__(self, *, pdf=pdf_bytes(), challenge=False, timeout=False):
+    def __init__(self, *, pdf=pdf_bytes(), challenge=False, timeout=False,
+                 download_timeout=False):
         self.pdf = pdf
         self.challenge = challenge
         self.timeout = timeout
+        self.download_timeout = download_timeout
         self.value = None
         self.actions = []
 
@@ -38,8 +40,11 @@ class Browser:
         self.actions.append(("fill", role, name, kwargs))
         self.value = value
 
-    async def pdf_response_by_click_role(self, role, name, destination, **kwargs):
-        self.actions.append(("click", role, name, kwargs))
+    async def download_by_click(self, selector, destination, **kwargs):
+        self.actions.append(("download", selector, kwargs))
+        if self.download_timeout:
+            Path(destination).write_bytes(b"partial")
+            raise TimeoutError("synthetic download timeout with private URL")
         Path(destination).write_bytes(self.pdf)
 
 
@@ -61,7 +66,9 @@ def test_sidecar_adapter_acquires_and_validates_native_pdf(tmp_path):
 
     assert result == {"kind": "MATCH", "evidence_path": str(tmp_path / "iess-991.pdf")}
     assert browser.actions[2] == ("fill", "textbox", None, {})
-    assert browser.actions[-1] == ("click", "button", "CONSULTAR", {"exact": True})
+    assert browser.actions[-1] == (
+        "download", 'button:has-text("CONSULTAR")', {}
+    )
     assert adapter.valid_pdf_for_ords(Path(result["evidence_path"]))
 
 
@@ -86,6 +93,16 @@ def test_sidecar_adapter_sanitizes_timeout_as_retryable(tmp_path):
     result = run(adapter.documento_2(work(), {"browser": browser, "evidence_root": tmp_path}))
 
     assert result == {"kind": "RETRYABLE", "reason_code": "NATIVE_PDF_NOT_ACQUIRED"}
+    assert "private URL" not in repr(result)
+
+
+def test_download_timeout_is_retryable_and_does_not_resubmit(tmp_path):
+    browser = Browser(download_timeout=True)
+    result = run(adapter.documento_2(work(), {"browser": browser, "evidence_root": tmp_path}))
+
+    assert result == {"kind": "RETRYABLE", "reason_code": "NATIVE_PDF_NOT_ACQUIRED"}
+    assert [action[0] for action in browser.actions].count("download") == 1
+    assert not (tmp_path / "iess-991.pdf").exists()
     assert "private URL" not in repr(result)
 
 

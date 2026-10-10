@@ -174,7 +174,10 @@ async def documento_2(work, services):
         if await browser.is_visible('iframe[src*="captcha"], [class*="altcha"]'):
             return {"kind": "HUMAN_REQUIRED", "checkpoint": "PORTAL_CHALLENGE"}
         await browser.fill_role("textbox", "Cédula / RUC", work.subject.identification)
-        await browser.pdf_response_by_click_role("button", "CONSULTAR", str(target), exact=True)
+        # Match the historic PDF acquisition workflow through the installed
+        # facade's download event. Do not submit the form a second time as a
+        # speculative fallback after a timeout.
+        await browser.download_by_click('button:has-text("CONSULTAR")', str(target))
         if not valid_pdf_for_ords(target):
             target.unlink(missing_ok=True)
             return {"kind": "RETRYABLE", "reason_code": "NATIVE_PDF_STRUCTURE_INVALID"}

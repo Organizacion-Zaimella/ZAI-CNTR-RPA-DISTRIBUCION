@@ -37,8 +37,12 @@ async def documento_2(work, services):
         # None leaves the accessible-name filter unset, matching the exact
         # unique textbox check used by the independently tested app.py.
         await browser.fill_role("textbox", None, work.subject.identification)
-        await browser.pdf_response_by_click_role(
-            "button", "CONSULTAR", str(target), exact=True
+        # The legacy successful IESS workflow used pdf.acquire, whose first
+        # capture strategy is the browser-owned download event. Preserve that
+        # behavior through the stable sidecar facade; never click twice to try
+        # another transport after a timeout.
+        await browser.download_by_click(
+            'button:has-text("CONSULTAR")', str(target)
         )
         if not valid_pdf_for_ords(target):
             target.unlink(missing_ok=True)
