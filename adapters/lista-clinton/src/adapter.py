@@ -1,4 +1,6 @@
-"""Motor ABI for Lista Clinton document 33; implementation is in app.py."""
+"""Motor ABI for Lista Clinton document 33."""
+from __future__ import annotations
+
 from app import DOCUMENT_FUNCTIONS, documento_33
 
 

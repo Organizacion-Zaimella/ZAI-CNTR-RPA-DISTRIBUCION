@@ -34,6 +34,10 @@ def test_normalization_ignores_visual_spacing_punctuation_and_accents():
     assert app.normalize("Ácme, Holdings S.A.") == "acmeholdingssa"
 
 
+def test_adapter_id_matches_existing_signed_channel_identity():
+    assert app.ADAPTER_ID == "lista_clinton"
+
+
 def test_url_contract_rejects_unapproved_hosts_and_query_parameters():
     for url in (
         "https://treasury.gov/ofac/downloads/sdnlist.pdf",
@@ -93,6 +97,17 @@ def test_historical_3229_page_register_completes_and_keeps_bundle_bounded(tmp_pa
     assert result["pages_checked"] == 3229
     assert result["matched_pages"] == [3000]
     assert Path(result["evidence_path"]).stat().st_size <= app.MAX_PDF_BYTES
+
+
+def test_common_phrase_caps_returned_page_numbers_but_keeps_total_count(tmp_path):
+    source = pdf_bytes(tuple("Common public notice entry" for _ in range(45)))
+
+    result = app.search_and_bundle(source, "Common public notice", tmp_path, 735)
+
+    assert result["status"] == "MATCH"
+    assert result["match_count"] == 45
+    assert result["matched_pages"] == list(range(1, 31))
+    assert result["matched_pages_truncated"] is True
 
 
 def test_sidecar_uses_ords_ordered_identity_and_binary_pdf_request(tmp_path, monkeypatch):

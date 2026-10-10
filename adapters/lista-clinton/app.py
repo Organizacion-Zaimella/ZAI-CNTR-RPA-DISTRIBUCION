@@ -14,6 +14,7 @@ from urllib.parse import urlsplit
 
 PORTAL_ID = 5
 DOCUMENT_ID = 33
+ADAPTER_ID = "lista_clinton"
 ALLOWED_HOST = "www.treasury.gov"
 ALLOWED_PATH = "/ofac/downloads/sdnlist.pdf"
 MAX_PDF_BYTES = 25 * 1024 * 1024
@@ -21,7 +22,7 @@ MAX_PAGES = 10_000
 NAVIGATION_START_TIMEOUT_SECONDS = 30
 PDF_TRANSFER_TIMEOUT_SECONDS = 60
 PDF_TOTAL_TIMEOUT_SECONDS = NAVIGATION_START_TIMEOUT_SECONDS + PDF_TRANSFER_TIMEOUT_SECONDS
-ADAPTER_VERSION = "0.1.3-candidate"
+ADAPTER_VERSION = "0.1.4-candidate"
 PDF_REQUEST_INTERVAL_SECONDS = 5.0
 _PDF_REQUEST_LOCK = asyncio.Lock()
 _LAST_PDF_REQUEST_AT: float | None = None
@@ -141,7 +142,8 @@ def search_and_bundle(pdf_bytes: bytes, query: str, evidence_dir: Path,
         return {"status": business_status, "evidence_path": str(target),
                 "evidence_sha256": hashlib.sha256(target.read_bytes()).hexdigest(),
                 "source_pdf_sha256": digest, "match_count": len(matches),
-                "pages_checked": page_count, "matched_pages": matches}
+                "pages_checked": page_count, "matched_pages": matches[:30],
+                "matched_pages_truncated": len(matches) > 30}
     except Exception:
         target.unlink(missing_ok=True)
         return {"status": "RETRYABLE", "reason_code": "PDF_SEARCH_FAILED"}
@@ -226,14 +228,14 @@ async def run(context: dict) -> dict:
         body, failure = await _download_pdf(context["url"], context["timeout_seconds"])
         if failure:
             status = "BLOCKED" if failure.startswith("HTTP_") else "RETRYABLE"
-            return {"adapter_id": "lista-clinton", "adapter_version": ADAPTER_VERSION,
+            return {"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION,
                     "status": status, "reason_code": failure}
         result = search_and_bundle(body, context["query"], context["evidence_dir"],
                                    context["detail_id"])
-        return {"adapter_id": "lista-clinton", "adapter_version": ADAPTER_VERSION,
+        return {"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION,
                 **result}
     except Exception:
-        return {"adapter_id": "lista-clinton", "adapter_version": ADAPTER_VERSION,
+        return {"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION,
                 "status": "RETRYABLE", "reason_code": "PORTAL_OR_BROWSER_ERROR"}
 
 
@@ -270,7 +272,7 @@ def main() -> int:
     try:
         result = asyncio.run(run(_context(args.context.resolve())))
     except Exception:
-        result = {"adapter_id": "lista-clinton", "adapter_version": ADAPTER_VERSION,
+        result = {"adapter_id": ADAPTER_ID, "adapter_version": ADAPTER_VERSION,
                   "status": "ERROR", "reason_code": "INVALID_CONTEXT"}
     print(json.dumps(result, separators=(",", ":"), ensure_ascii=True))
     return 0 if result["status"] in {"MATCH", "NO_MATCH"} else 1
