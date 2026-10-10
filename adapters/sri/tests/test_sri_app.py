@@ -133,6 +133,65 @@ def test_navigation_timeout_is_sanitized_without_retrying_the_portal():
     assert "private portal URL" not in str(result)
 
 
+def test_query_button_replacement_does_not_trigger_playwright_default_timeout():
+    class Button:
+        def __init__(self):
+            self.enabled_checks = 0
+            self.timeouts = []
+
+        async def count(self):
+            return 1
+
+        async def is_visible(self, **_kwargs):
+            return True
+
+        async def is_enabled(self, *, timeout=None):
+            self.timeouts.append(timeout)
+            self.enabled_checks += 1
+            if self.enabled_checks == 1:
+                raise app.PlaywrightTimeoutError("detached during Angular update")
+            return True
+
+    class Page:
+        def __init__(self):
+            self.waits = []
+
+        async def wait_for_timeout(self, duration):
+            self.waits.append(duration)
+
+    async def scenario():
+        button, page = Button(), Page()
+        enabled = await app._wait_query_button_enabled(page, button, 1)
+        return enabled, button, page
+
+    enabled, button, page = run(scenario())
+
+    assert enabled is True
+    assert button.enabled_checks == 2
+    assert button.timeouts == [250, 250]
+    assert page.waits == [250]
+
+
+def test_query_button_absence_returns_within_operation_deadline():
+    class Button:
+        async def count(self):
+            return 0
+
+        async def is_visible(self, **_kwargs):
+            raise AssertionError("hidden button must not be queried")
+
+        async def is_enabled(self, **_kwargs):
+            raise AssertionError("missing button must not wait implicitly")
+
+    class Page:
+        async def wait_for_timeout(self, duration):
+            await asyncio.sleep(duration / 1000)
+
+    enabled = run(app._wait_query_button_enabled(Page(), Button(), 0.02))
+
+    assert enabled is False
+
+
 def test_navigation_error_resumes_only_from_loaded_document_form_checkpoint(tmp_path):
     class Locator:
         def __init__(self, *, visible=False, text="", on_click=None):
@@ -156,7 +215,7 @@ def test_navigation_error_resumes_only_from_loaded_document_form_checkpoint(tmp_
             if self.on_click:
                 self.on_click()
 
-        async def is_enabled(self):
+        async def is_enabled(self, **_kwargs):
             return True
 
         async def inner_text(self):
@@ -254,7 +313,7 @@ def test_optional_search_mode_click_obeys_the_five_second_action_pacer(tmp_path)
         async def wait_for(self, **_kwargs):
             pass
 
-        async def is_enabled(self):
+        async def is_enabled(self, **_kwargs):
             return True
 
         async def fill(self, _value, **_kwargs):

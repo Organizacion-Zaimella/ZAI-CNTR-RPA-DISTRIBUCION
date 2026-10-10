@@ -1,6 +1,6 @@
-# Aplicación independiente SRI — candidato 0.1.9
+# Aplicación independiente SRI — candidato 0.1.10
 
-Estado: **candidato privado 0.1.9, no certificado**. `app.py` ejecuta
+Estado: **candidato privado 0.1.10, no certificado**. `app.py` ejecuta
 documentos 3 y 53 con Playwright sin importar el motor CNTR. El motor no debe
 recompilarse por esta aplicación.
 
@@ -46,36 +46,20 @@ exacta del documento y su formulario único está visible, el adaptador continú
 desde ese checkpoint sin volver a navegar. Si el formulario no está cargado,
 conserva la causa reintentable y avanza al siguiente trabajo.
 
-## Esperas: implementación y propuesta de calibración
-
-La implementación candidata actual tiene estos topes: navegación `commit` 45
-s, visibilidad/interacción con controles 45 s, habilitación del botón 30 s,
-respuesta del portal 120 s y estabilidad visual del resultado 250 ms. El motor
-instalado mantiene hasta 120 s para adquirir un PDF. Son límites máximos del
-código; no son pausas que se consuman siempre. Corridas SRI anteriores dieron
-7.864–12 s de duración total, pero no conservaron duración por etapa, por lo
-que no prueban que esos topes sean óptimos.
-
-Propuesta operativa para validar con telemetría saneada por etapa:
-
-| Operación | Espera inicial | Extensión máxima | Señal de avance |
-|---|---:|---:|---|
-| Navegar o refrescar el URL del documento | 30 s a `commit` | 30 s adicionales, total 60 s | URL exacta confirmada y luego control del documento visible |
-| Esperar controles dinámicos | 20 s | 10 s adicionales, total 30 s | Control visible/habilitado y valor persistido |
-| Respuesta de consulta | 60 s | Dos extensiones de 30 s, total 120 s | Cambio del resultado visible, carga activa o respuesta de red pertinente |
-| Inicio de PDF | 60 s | Hasta 120 s total si hay progreso | Evento de descarga o apertura de PDF |
-| Completar/guardar PDF | 60 s | Hasta 120 s total si el archivo avanza | Descarga completada y archivo validable |
-
-Estos valores son una propuesta inicial, no una certificación estadística. Se
-deben ajustar por documento cuando haya suficientes duraciones reales; la
-telemetría no debe incluir URL completa, identificación, nombres, texto del
-portal, cookies ni rutas privadas. Playwright permite interactuar cuando los
-controles están listos y las descargas distinguen el evento de inicio de la
-finalización del archivo. Los errores de red explícitos se clasifican de
-inmediato y una consulta no concluyente vence como `RETRYABLE`, nunca como
-ausencia. La app ignora el indicador visible `Espere por favor`/carga. El texto
-explicativo fijo no cuenta como resultado; una coincidencia positiva debe
-mostrar el identificador consultado en el contenido del resultado.
+Los límites se separan por operación: navegación hasta `commit` 45 s;
+visibilidad/interacción con controles 30 s; espera de habilitación del botón
+30 s; respuesta del portal hasta 120 s; y estabilidad visual del resultado
+250 ms. PDF usa el máximo genérico de adquisición de artefacto de 120 s. No
+son pausas fijas: la app avanza en cuanto observa la postcondición. El límite
+de 30 s evita la espera implícita de Playwright (que podía agregar otros 30 s
+al botón si Angular lo reemplazaba). Las corridas SRI exitosas registradas
+duraron 7.864–12 s; ese historial sustenta el máximo de 30 s para controles y
+el mayor margen de 120 s solo para una respuesta asíncrona o un artefacto. Una
+desconexión explícita se clasifica de inmediato; una consulta no concluyente
+al vencer su límite devuelve `RETRYABLE`, nunca ausencia. La app ignora el
+indicador visible `Espere por favor`/carga. El texto explicativo fijo no cuenta
+como resultado; una coincidencia positiva debe mostrar el identificador
+consultado en el contenido del resultado.
 
 En la ABI del sidecar, una barrera CAPTCHA/ALTCHA queda marcada durante el
 lote: los otros documentos SRI del mismo lote se devuelven como
@@ -88,12 +72,27 @@ contenido. El marcador sin identificación correlacionable queda
 La navegación espera `commit` para que la aplicación Angular no dependa de que
 `DOMContentLoaded` termine.
 
-La aplicación standalone usa tecleo pausado para activar los eventos Angular;
-el sidecar usa `fill` en una acción y comprueba el valor de entrada. Ambos
-esperan a que `Consultar` quede habilitado antes del único envío. Una barrera
-detectada antes o después de ingresar el valor se recuerda durante el lote y no
-se envía el formulario. Esta interfaz se cubre con pruebas sintéticas y aún
-requiere una corrida integrada positiva.
+El adaptador del sidecar también usa `type_text` pausado para activar los
+eventos Angular, comprueba el valor de entrada y espera a que `Consultar` quede
+habilitado antes del único envío. Una barrera detectada antes o después de
+teclear se recuerda durante el lote y no se envía el formulario. Esta interfaz
+se cubre con pruebas sintéticas y aún requiere una corrida integrada positiva.
+
+## Retest TEST independiente 0.1.10
+
+El 2026-10-10, la aplicación Python `0.1.10-candidate` recorrió los documentos
+3 y 53 en ese orden, con una sola sesión/página headed de Chrome, y obtuvo
+`MATCH` para ambos. Generó PNG completas privadas (67,566 bytes y 106,364
+bytes); no se incluyen en este repositorio. El intervalo entre capturas fue
+32.4 s y no representa la duración individual de cada página. El registro
+saneado de resultados está en [RUN5 del PR de integración RPA](https://github.com/Organizacion-Zaimella/ZAI-RPA-CTRL-CAPTURA-INFORMACION-PUBLICA/blob/codex/cntr-rpa-1.0.0-integration/docs/v1.0.0/tareas/P01_SRI_RETEST_20261010_RUN5.json).
+
+La ejecución identificó que Angular podía reemplazar el botón y que una
+consulta `is_enabled()` heredaba el timeout implícito de Playwright. La versión
+0.1.10 limita controles y habilitación a 30 s, con observaciones cada 250 ms;
+la suite del adaptador pasó 21 pruebas. La liberación firmada de este candidato
+está pendiente. ORDS aún pide `0.1.8-candidate`, por lo que no se ejecutó el
+robot con `0.1.10` ni se registró ACK para esta versión.
 
 ## Estado de certificación
 

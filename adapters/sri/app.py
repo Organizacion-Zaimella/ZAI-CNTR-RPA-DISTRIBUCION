@@ -22,10 +22,10 @@ from playwright.async_api import async_playwright
 
 
 ADAPTER_ID = "sri"
-ADAPTER_VERSION = "0.1.9-candidate"
+ADAPTER_VERSION = "0.1.10-candidate"
 MIN_PACING_SECONDS = 5.0
 NAVIGATION_TIMEOUT_SECONDS = 45.0
-ELEMENT_TIMEOUT_SECONDS = 45.0
+ELEMENT_TIMEOUT_SECONDS = 30.0
 RESULT_TIMEOUT_SECONDS = 120.0
 DOCUMENT_ROUTES = {
     3: "/sri-en-linea/SriDeclaracionesWeb/EstadoTributario/Consultas/consultaEstadoTributario",
@@ -156,6 +156,28 @@ async def _document_form_ready(page, context: WorkContext) -> bool:
         return False
 
 
+async def _wait_query_button_enabled(page, button, timeout_seconds: float) -> bool:
+    """Wait a bounded interval without Playwright's implicit 30 s locator wait.
+
+    Angular may replace the button while it validates keyboard input. Polling
+    count/visibility/enabled state lets that transition settle without letting
+    a detached locator stall beyond the operation deadline.
+    """
+    deadline = time.monotonic() + timeout_seconds
+    while time.monotonic() < deadline:
+        try:
+            if await button.count() == 1:
+                if await button.is_enabled(timeout=250):
+                    return True
+        except PlaywrightTimeoutError:
+            # A control replaced during Angular rendering is transient; retry
+            # the observation, never the document navigation or query.
+            pass
+        remaining_ms = max(1, int((deadline - time.monotonic()) * 1000))
+        await page.wait_for_timeout(min(250, remaining_ms))
+    return False
+
+
 async def _execute_work(work, services, document_id: int) -> dict[str, str | None]:
     """Entry point used by the stable motor's generic external-adapter ABI."""
     global _human_barrier
@@ -280,13 +302,9 @@ async def _run_on_page(context: WorkContext, page) -> dict[str, str | int | None
     pacer.mark()
 
     button = page.get_by_role("button", name="Consultar", exact=True)
-    await button.wait_for(state="visible", timeout=int(ELEMENT_TIMEOUT_SECONDS * 1000))
-    await button.wait_for(state="attached", timeout=int(ELEMENT_TIMEOUT_SECONDS * 1000))
-    enable_deadline = time.monotonic() + min(context.timeout_seconds, 30)
-    while not await button.is_enabled() and time.monotonic() < enable_deadline:
-        await page.wait_for_timeout(250)
-    if not await button.is_enabled():
-        return _result(context, "RETRYABLE", "QUERY_NOT_ENABLED")
+    if not await _wait_query_button_enabled(
+            page, button, min(context.timeout_seconds, ELEMENT_TIMEOUT_SECONDS)):
+        return _result(context, "RETRYABLE", "QUERY_BUTTON_NOT_READY")
     baseline_text = await _visible_text(page)
     await pacer.before_action()
     await button.click(timeout=int(ELEMENT_TIMEOUT_SECONDS * 1000))
