@@ -8,9 +8,11 @@ plan.
 The sidecar validates the HTTPS host and document route, selects the
 document-specific search mode, checks the search field is unique, types through
 the motor's paced browser API, and returns sanitized retryable outcomes for
-timeouts or uncertain results. CAPTCHA and other human challenges are never
-solved or bypassed. Positive matches remain retryable until attributable to the
-subject from visible portal content.
+timeouts or uncertain results. It uses the optional `goto_commit` capability
+for the SRI client-rendered form and falls back to the existing `goto` ABI when
+running under an older installed 1.0.0 engine. CAPTCHA and other human
+challenges are never solved or bypassed. Positive matches remain retryable
+until attributable to the subject from visible portal content.
 
 Run synthetic contract checks with `python -m pytest adapters/sri/tests -q`.
 They use fake browser services and make no network requests. The package still

@@ -20,8 +20,11 @@ class Browser:
         self.actions = []
         self.value = ""
 
-    async def goto(self, url):
-        self.actions.append(("goto", url))
+    async def goto(self, url, **options):
+        self.actions.append(("goto", url, options))
+
+    async def goto_commit(self, url):
+        self.actions.append(("goto_commit", url))
 
     async def is_visible(self, selector):
         return False
@@ -86,6 +89,7 @@ def test_sidecar_uses_document_specific_search_mode_and_selector(tmp_path):
     ):
         browser, result = asyncio.run(scenario(document_id))
         assert result["kind"] == "NO_MATCH"
+        assert any(action[0] == "goto_commit" for action in browser.actions)
         assert ("mode", mode, True) in browser.actions
         assert ("fill", "#busquedaRucId", "") in browser.actions
         assert ("type", "#busquedaRucId") in browser.actions
@@ -108,3 +112,19 @@ def test_sidecar_fails_closed_when_search_field_is_ambiguous(tmp_path):
     browser, result = asyncio.run(scenario())
     assert result == {"kind": "RETRYABLE", "reason_code": "EXPECTED_FIELD_NOT_UNIQUE"}
     assert not any(action[0] == "submit" for action in browser.actions)
+
+
+def test_legacy_sidecar_falls_back_to_existing_goto_abi(tmp_path):
+    class LegacyBrowser(Browser):
+        goto_commit = None
+
+    async def scenario():
+        browser = LegacyBrowser()
+        services = {"browser": browser, "evidence_root": tmp_path}
+        await adapter.prepare(work(53), services)
+        result = await adapter.execute_document(work(53), services)
+        return browser, result
+
+    browser, result = asyncio.run(scenario())
+    assert result["kind"] == "NO_MATCH"
+    assert any(action[0] == "goto" and action[2] == {} for action in browser.actions)

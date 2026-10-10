@@ -26,7 +26,13 @@ async def _execute_document(work, services, expected_document_id):
             parsed.path.rstrip("/") != DOCUMENT_ROUTES[expected_document_id]):
         return {"kind": "ERROR", "reason_code": "UNAUTHORIZED_ENTRY_URL"}
     browser = services["browser"]
-    await browser.goto(work.entry_url)
+    # Newer generic sidecars expose goto_commit for SPAs. Keep compatibility
+    # with the installed 1.0.0 ABI, which only offers goto/domcontentloaded.
+    goto_commit = getattr(browser, "goto_commit", None)
+    if callable(goto_commit):
+        await goto_commit(work.entry_url)
+    else:
+        await browser.goto(work.entry_url)
     challenge = 'iframe[src*="captcha"], [class*="altcha"]'
     if await browser.is_visible(challenge):
         _human_barrier = True
