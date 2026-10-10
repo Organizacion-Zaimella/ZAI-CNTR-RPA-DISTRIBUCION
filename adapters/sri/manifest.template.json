@@ -1,6 +1,6 @@
 {
   "adapter_id": "sri",
-  "version": "1.0.0",
+  "version": "0.1.11-candidate",
   "adapter_contract": 1,
   "portal_id": 3,
   "document_ids": [3, 53],

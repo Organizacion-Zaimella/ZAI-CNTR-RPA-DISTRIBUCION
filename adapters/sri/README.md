@@ -1,6 +1,6 @@
-# Aplicación independiente SRI — candidato 0.1.10
+# Aplicación independiente SRI — candidato 0.1.11
 
-Estado: **candidato privado 0.1.10, no certificado**. `app.py` ejecuta
+Estado: **candidato privado 0.1.11, no certificado**. `app.py` ejecuta
 documentos 3 y 53 con Playwright sin importar el motor CNTR. El motor no debe
 recompilarse por esta aplicación.
 
@@ -46,20 +46,19 @@ exacta del documento y su formulario único está visible, el adaptador continú
 desde ese checkpoint sin volver a navegar. Si el formulario no está cargado,
 conserva la causa reintentable y avanza al siguiente trabajo.
 
-Los límites se separan por operación: navegación hasta `commit` 45 s;
-visibilidad/interacción con controles 30 s; espera de habilitación del botón
-30 s; respuesta del portal hasta 120 s; y estabilidad visual del resultado
-250 ms. PDF usa el máximo genérico de adquisición de artefacto de 120 s. No
-son pausas fijas: la app avanza en cuanto observa la postcondición. El límite
-de 30 s evita la espera implícita de Playwright (que podía agregar otros 30 s
-al botón si Angular lo reemplazaba). Las corridas SRI exitosas registradas
-duraron 7.864–12 s; ese historial sustenta el máximo de 30 s para controles y
-el mayor margen de 120 s solo para una respuesta asíncrona o un artefacto. Una
-desconexión explícita se clasifica de inmediato; una consulta no concluyente
-al vencer su límite devuelve `RETRYABLE`, nunca ausencia. La app ignora el
-indicador visible `Espere por favor`/carga. El texto explicativo fijo no cuenta
-como resultado; una coincidencia positiva debe mostrar el identificador
-consultado en el contenido del resultado.
+Los límites se separan por operación: navegación hasta `commit` 30 s;
+visibilidad/interacción con controles 15 s; espera de habilitación del botón
+hasta 15 s; respuesta del portal 45 s iniciales, ampliable en tramos de 15 s
+cuando cambie el DOM o aparezca una señal explícita de carga, hasta un máximo
+absoluto de 120 s; y estabilidad del resultado terminal durante 1 s. No son
+pausas fijas: la app avanza en cuanto observa la postcondición. Las mediciones
+SRI disponibles incluyen una corrida total de 28.7 s para docs. 3/53 pero no
+desglosan tiempos por etapa; por eso estos son límites iniciales, no percentiles
+estadísticos. Una desconexión explícita se clasifica de inmediato; una consulta
+no concluyente al vencer su límite devuelve `RETRYABLE`, nunca ausencia. Un
+resultado anterior o el texto explicativo fijo no cuenta como progreso; una
+coincidencia positiva debe mostrar el identificador consultado en el contenido
+del resultado.
 
 En la ABI del sidecar, una barrera CAPTCHA/ALTCHA queda marcada durante el
 lote: los otros documentos SRI del mismo lote se devuelven como
@@ -101,3 +100,12 @@ cargan. Aún faltan lectura de la configuración elegible vigente de ORDS TEST,
 consultas reales autorizadas de las rutas positivas/negativas, revisión de la
 atribución del resultado al sujeto y el ciclo con el motor instalado/ACK. Por
 ello no crear release ni promover este candidato como certificado.
+
+## Candidato 0.1.11 — perfil de espera adaptativo
+
+El código Python ahora aplica el perfil por operación indicado arriba. Una
+navegación posterior en la pestaña SRI persistente llegó a Keycloak y devolvió
+`ERR_CONNECTION_RESET` antes de mostrar el formulario; no se ingresó sujeto ni
+se volvió a enviar una consulta. El retest real de 0.1.11 queda pendiente de
+conectividad. Las ejecuciones standalone `MATCH` de 0.1.10 anteriores no se
+atribuyen a este candidato ni se invalidan por el error de navegación posterior.

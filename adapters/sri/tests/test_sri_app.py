@@ -72,6 +72,16 @@ def test_positive_classification_requires_the_exact_queried_ruc():
         53, f"RUC: {TEST_RUC}; estado: ACTIVO", TEST_RUC) == "MATCH"
 
 
+def test_wait_profile_uses_short_initial_window_and_progress_extensions():
+    assert app.NAVIGATION_TIMEOUT_SECONDS == 30
+    assert app.ELEMENT_TIMEOUT_SECONDS == 15
+    assert app.RESULT_INITIAL_SECONDS == 45
+    assert app.RESULT_EXTENSION_SECONDS == 15
+    assert app.RESULT_TIMEOUT_SECONDS == 120
+    assert app.RESULT_BUSY.search("cargando información")
+    assert app.RESULT_BUSY.search("procesando consulta")
+
+
 def test_late_playwright_timeout_is_retryable_without_exception_text():
     async def timeout(_context):
         raise app.PlaywrightTimeoutError("private portal response")

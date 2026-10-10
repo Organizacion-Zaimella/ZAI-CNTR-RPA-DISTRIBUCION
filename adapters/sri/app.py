@@ -22,11 +22,14 @@ from playwright.async_api import async_playwright
 
 
 ADAPTER_ID = "sri"
-ADAPTER_VERSION = "0.1.10-candidate"
+ADAPTER_VERSION = "0.1.11-candidate"
 MIN_PACING_SECONDS = 5.0
-NAVIGATION_TIMEOUT_SECONDS = 45.0
-ELEMENT_TIMEOUT_SECONDS = 30.0
+NAVIGATION_TIMEOUT_SECONDS = 30.0
+ELEMENT_TIMEOUT_SECONDS = 15.0
+RESULT_INITIAL_SECONDS = 45.0
+RESULT_EXTENSION_SECONDS = 15.0
 RESULT_TIMEOUT_SECONDS = 120.0
+RESULT_BUSY = re.compile(r"espere por favor|\bcargando\b|\bprocesando\b", re.I)
 DOCUMENT_ROUTES = {
     3: "/sri-en-linea/SriDeclaracionesWeb/EstadoTributario/Consultas/consultaEstadoTributario",
     53: "/sri-en-linea/SriRucWeb/ConsultaRuc/Consultas/consultaRuc",
@@ -310,11 +313,14 @@ async def _run_on_page(context: WorkContext, page) -> dict[str, str | int | None
     await button.click(timeout=int(ELEMENT_TIMEOUT_SECONDS * 1000))
     pacer.mark()
 
-    deadline = time.monotonic() + context.timeout_seconds
+    started = time.monotonic()
+    absolute_deadline = started + min(context.timeout_seconds, RESULT_TIMEOUT_SECONDS)
+    deadline = min(absolute_deadline, started + RESULT_INITIAL_SECONDS)
     status = None
     stable_status = None
     stable_since = None
     unattributed_positive = False
+    previous_text = baseline_text
     while time.monotonic() < deadline:
         text = await _visible_text(page)
         normalized_text = unicodedata.normalize("NFKD", text.casefold())
@@ -322,11 +328,18 @@ async def _run_on_page(context: WorkContext, page) -> dict[str, str | int | None
                                   if not unicodedata.combining(char))
         if re.search(r"captcha|altcha|no soy un robot", normalized_text):
             return _result(context, "HUMAN_REQUIRED", "PORTAL_CHALLENGE")
-        if re.search(r"espere por favor|\bcargando\b|\bprocesando\b", normalized_text):
+        now = time.monotonic()
+        if RESULT_BUSY.search(normalized_text):
             stable_status = None
             stable_since = None
+            deadline = min(absolute_deadline,
+                           max(deadline, now + RESULT_EXTENSION_SECONDS))
             await page.wait_for_timeout(500)
             continue
+        if text != previous_text:
+            deadline = min(absolute_deadline,
+                           max(deadline, now + RESULT_EXTENSION_SECONDS))
+        previous_text = text
         status = _classify(context.document_id, text, context.identification, baseline_text)
         if status == "MATCH_NOT_ATTRIBUTED":
             unattributed_positive = True
@@ -334,8 +347,10 @@ async def _run_on_page(context: WorkContext, page) -> dict[str, str | int | None
         if status in {"MATCH", "NO_MATCH"}:
             if status != stable_status:
                 stable_status = status
-                stable_since = time.monotonic()
-            elif time.monotonic() - stable_since >= 0.25:
+                stable_since = now
+                deadline = min(absolute_deadline,
+                               max(deadline, now + 1.0))
+            elif now - stable_since >= 1.0:
                 break
         else:
             stable_status = None
