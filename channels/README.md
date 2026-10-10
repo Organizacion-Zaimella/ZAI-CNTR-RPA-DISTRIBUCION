@@ -1,5 +1,5 @@
 # Canales
 
-`test.json` y `test.json.sig` de esta rama apuntan a la generación 10 del canal TEST: prerelease firmado [`cntr-rpa-1.0.0-test.12`](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-1.0.0-test.12), motor `1.0.0-test.5` y adaptadores IESS `0.1.3-candidate`, OFAC `0.1.1-candidate` y SRI `0.1.3-candidate`. Todos permanecen como candidatos; la firma asegura origen e integridad, no certificación funcional.
+La rama `codex/sri-0.1.7-test13` prepara el canal TEST firmado generación 11 para validar `sri@0.1.7-candidate` junto al motor `1.0.0-test.5` y los adaptadores previamente asignados. El candidato incluye la app standalone, sidecar y dependencias fijadas. No es certificación ni habilitación de Producción. El puntero se mantiene en rama de QA; `main` y `production.json` no se modifican.
 
-El canal está en una rama de tarea para validar lectura anónima, descarga del motor/adaptadores y ejecución desde un ejecutable instalado. ORDS mantiene IESS y SRI fijados a `0.1.0-candidate`, por lo que estas versiones no se seleccionan en los planes vigentes. No se modifica `main` ni se publica `production.json`. Cada promoción posterior requiere un PR, revisión, firma y generación superior.
+La generación 10 previa queda como base verificable en `codex/sri-0.1.3-test12`. Cada promoción requiere una generación superior, firma TEST, release inmutable y revisión del PR correspondiente.
