@@ -52,6 +52,14 @@ async def _state(browser) -> str | None:
     return None
 
 
+async def _search_idle(browser) -> bool:
+    """Detectar cola JSF inactiva antes de la única recuperación histórica."""
+    check = getattr(browser, "search_idle", None)
+    if check is None:
+        return False
+    return bool(await check())
+
+
 async def prepare(_work, _services):
     """Reset the portal barrier once for a new sidecar batch/session."""
     global _human_barrier
@@ -91,6 +99,8 @@ async def _execute_document(work, services, expected_document_id):
         await browser.click(SEARCH)
         loop = asyncio.get_running_loop()
         deadline = loop.time() + min(work.deadline_seconds, 60)
+        first_click = loop.time()
+        recovery_click_used = False
         while loop.time() < deadline:
             state = await _state(browser)
             if state == "HUMAN_REQUIRED":
@@ -99,9 +109,20 @@ async def _execute_document(work, services, expected_document_id):
                 root = Path(services["evidence_root"])
                 path = root / f"judicial-{work.execution_id}-{work.detail_id}.png"
                 await browser.screenshot(str(path), full_page=True)
-                return {"kind": state, "evidence_path": str(path)}
+                return {"kind": state, "evidence_path": str(path),
+                        "recovery_click_used": recovery_click_used}
+            if (not recovery_click_used and loop.time() - first_click >= 3
+                    and await _search_idle(browser)
+                    and await browser.input_value(field) == value.strip()):
+                # Historialmente JSF/PrimeFaces podía dejar el formulario
+                # intacto aunque el primer click no hubiera iniciado la cola.
+                # Recuperar una sola vez solo si el dato sigue intacto y la
+                # cola está vacía; nunca duplicar una búsqueda ya en curso.
+                await browser.click(SEARCH)
+                recovery_click_used = True
             await asyncio.sleep(.5)
-        return {"kind": "RETRYABLE", "reason_code": "RESULT_UNVERIFIED"}
+        return {"kind": "RETRYABLE", "reason_code": "RESULT_UNVERIFIED",
+                "recovery_click_used": recovery_click_used}
     except PlaywrightTimeoutError:
         # El sidecar conserva el navegador abierto; el motor confirma el intento
         # como reintentable y continúa con el siguiente detalle de ORDS.

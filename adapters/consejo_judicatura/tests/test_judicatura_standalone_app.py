@@ -71,6 +71,46 @@ def test_context_keeps_the_received_document_order_and_private_paths(tmp_path):
     assert root == evidence.resolve()
 
 
+def test_standalone_context_uses_local_correlation_without_fabricating_ords_ids(tmp_path):
+    context = tmp_path / "context.json"
+    context.write_text(json.dumps({
+        "portal_id": 6,
+        "standalone_mode": True,
+        "evidence_dir": str(tmp_path / "evidence"),
+        "works": [{
+            "document_id": 73,
+            "entry_url": "https://consultas.funcionjudicial.gob.ec/informacionjudicial/public/informacion.jsf",
+            "subject": {"identification": "local-private", "display_name": "Local Private"},
+        }],
+    }), encoding="utf-8")
+
+    works, _ = app.load_context(context)
+
+    assert works[0].execution_id == "standalone"
+    assert works[0].detail_id == "73-001"
+
+
+def test_standalone_evidence_names_are_unique_across_documents(tmp_path):
+    context = tmp_path / "context.json"
+    context.write_text(json.dumps({
+        "portal_id": 6,
+        "standalone_mode": True,
+        "evidence_dir": str(tmp_path / "evidence"),
+        "works": [
+            {"document_id": document_id,
+             "entry_url": "https://consultas.funcionjudicial.gob.ec/informacionjudicial/public/informacion.jsf",
+             "subject": {"identification": "local-private", "display_name": "Local Private"}}
+            for document_id in (73, 74)
+        ],
+    }), encoding="utf-8")
+
+    works, _ = app.load_context(context)
+
+    names = [f"judicial-{work.execution_id}-{work.detail_id}.png" for work in works]
+    assert names == ["judicial-standalone-73-001.png", "judicial-standalone-74-002.png"]
+    assert len(set(names)) == len(names)
+
+
 def test_runner_keeps_one_browser_page_and_continues_after_isolated_failure(tmp_path, monkeypatch):
     playwright = Playwright()
     monkeypatch.setattr(app, "async_playwright", lambda: playwright)

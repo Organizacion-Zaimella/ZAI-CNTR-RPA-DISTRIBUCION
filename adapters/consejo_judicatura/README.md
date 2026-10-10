@@ -1,22 +1,43 @@
-# Consejo de la Judicatura — candidato Python independiente
+# Consejo de la Judicatura — adaptador Python independiente
 
-Estado: `NOT_APPROVED`; versión candidata `0.1.0-candidate`; portal técnico 6; documentos 73–76. Deriva del handler histórico `judicatura_v1.py` (commit `627842b77dd582798917a410c929d96c635e8540`, rama `codex/judicatura-handler-v1`) y del candidato mantenido en el PR RPA #11.
+Versión candidata `0.1.1`; portal técnico 6; documentos 73–76. `adapter.py`
+implementa `DOCUMENT_FUNCTIONS` para actor/demandado por identificación y por
+nombres. `app.py --context <JSON-privado>` ofrece ejecución standalone con
+Playwright; conserva una página durante el lote, respeta el orden recibido,
+aplica al menos cinco segundos entre interacciones y guarda capturas PNG
+completas fuera del repositorio.
 
-`adapter.py` implementa `DOCUMENT_FUNCTIONS`; `app.py --context <JSON-privado>` ejecuta documentos por identificación/nombre con Playwright, conserva la página durante el lote y guarda PNG íntegro fuera del repositorio. Un reCAPTCHA visible produce `HUMAN_REQUIRED` y bloquea búsquedas posteriores en la misma sesión; no se resuelve ni evade. Timeout o postcondición no verificada queda `RETRYABLE`, nunca `NO_MATCH`.
+El adaptador usa la URL del paso 1 del documento, valida el host/ruta de eSATJE,
+comprueba que el dato permanezca en el campo y solo acepta un resultado positivo
+cuando hay una fila judicial con fecha. Acepta `NO_MATCH` únicamente ante el
+mensaje explícito del portal. Ante un resultado no verificado devuelve
+`RETRYABLE`; un reCAPTCHA visible devuelve `HUMAN_REQUIRED` y no se resuelve ni
+se evade. Una recuperación de clic único ocurre solo si el valor sigue intacto
+y PrimeFaces confirma que su cola AJAX está vacía.
 
-No se ha completado aquí una corrida real standalone por documento ni existe elegibilidad vigente para estos documentos en el snapshot TEST del checkpoint. La rama no tiene Release ni firma de módulo; no consumir desde el robot hasta aprobar la cobertura por documento.
+## Estado de validación
 
-Las pruebas sintéticas verifican los cuatro handlers, clasificación positiva/negativa, barrera humana y timeout; no consultan portales ni ORDS. En el RPA fuente, `adapters/supercias/tests` y `adapters/consejo_judicatura/tests` obtuvieron juntas 17 pruebas PASS. Esta evidencia no sustituye exploración real ni certificación.
+Gate A standalone ejecutado en TEST para los cuatro documentos: 73 y 74 dieron
+`NO_MATCH` con capturas completas; 75 y 76 dieron `MATCH` con capturas
+completas. Se emplearon sujetos ya existentes y una sesión por lote; los datos,
+capturas, rutas y hashes privados no se incluyen aquí. El resultado saneado está
+en el expediente RPA `P04_JUDICATURA_STANDALONE_20261010_R1.json`.
 
-## Exploración visible — 2026-10-10
+La última lectura ORDS no mostró asignación de adaptador ni pareja elegible para
+Judicatura. Por eso esta versión todavía no tiene ejecución robot/ACK. El
+manifiesto permanece `NOT_APPROVED`; esta actualización de código no constituye
+un Release firmado ni una certificación integrada.
 
-En una sesión de navegador persistente se abrió una vez la ruta de documento
-usada por el candidato. La página de Consulta de Procesos mostró los cuatro
-campos esperados (actor por identificación/nombre y demandado por
-identificación/nombre), el botón BUSCAR y la tabla de resultados. El DOM tenía
-dos iframes de reCAPTCHA, ambos ocultos en ese estado inicial. No se ingresó
-identificación o nombre, no se pulsó BUSCAR y no se verificó cómo se comporta
-el portal después de consultar. La observación confirma solo la carga inicial
-de la pantalla; la pareja actual no es elegible en el plan TEST y la URL aún
-debe cotejarse con la URL de paso 1 que entregue ORDS cuando haya una pareja
-ejecutable.
+## Uso standalone
+
+El contexto privado debe incluir `portal_id=6`, `standalone_mode=true`,
+`evidence_dir` y una lista `works[]` ordenada con `document_id` (73–76),
+`entry_url` y `subject` con `identification` y `display_name`. No guardar ese
+contexto ni las evidencias en Git.
+
+```powershell
+python app.py --context C:\ruta-privada\judicatura-plan.json --headed
+```
+
+Las pruebas locales son sintéticas y están en `tests/`; no consultan portales ni
+ORDS.

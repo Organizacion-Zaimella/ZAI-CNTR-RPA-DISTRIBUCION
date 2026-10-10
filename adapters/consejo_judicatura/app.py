@@ -41,8 +41,9 @@ def load_context(path: Path) -> tuple[list[SimpleNamespace], Path]:
     evidence_root.mkdir(parents=True, exist_ok=True)
     if not 1 <= len(raw["works"]) <= 20:
         raise ValueError("lote fuera de límites")
+    standalone_mode = raw.get("standalone_mode") is True
     works = []
-    for item in raw["works"]:
+    for ordinal, item in enumerate(raw["works"], start=1):
         if type(item.get("document_id")) is not int or item["document_id"] not in adapter.FIELDS:
             raise ValueError("documento no soportado")
         subject = item.get("subject")
@@ -51,12 +52,21 @@ def load_context(path: Path) -> tuple[list[SimpleNamespace], Path]:
         if any(not isinstance(subject.get(field), str) or not subject[field].strip()
                for field in ("identification", "display_name")):
             raise ValueError("datos de consulta incompletos")
+        if standalone_mode and "execution_id" not in item and "detail_id" not in item:
+            # Local-only filenames; these values are never sent to ORDS and
+            # must not be mistaken for CNTR execution/detail identifiers.
+            execution_id, detail_id = "standalone", f"{item['document_id']}-{ordinal:03d}"
+        else:
+            try:
+                execution_id, detail_id = int(item["execution_id"]), int(item["detail_id"])
+            except (KeyError, TypeError, ValueError):
+                raise ValueError("correlación inválida") from None
         work = SimpleNamespace(
             portal_id=6,
             document_id=item["document_id"],
             entry_url=adapter._safe_entry(item["entry_url"]),
-            execution_id=int(item["execution_id"]),
-            detail_id=int(item["detail_id"]),
+            execution_id=execution_id,
+            detail_id=detail_id,
             deadline_seconds=min(3600, max(1, int(item.get("deadline_seconds", 300)))),
             subject=SimpleNamespace(
                 id=int(subject.get("id", 0)),
@@ -68,8 +78,9 @@ def load_context(path: Path) -> tuple[list[SimpleNamespace], Path]:
                 surnames=subject.get("surnames"),
             ),
         )
-        if work.execution_id <= 0 or work.detail_id <= 0:
-            raise ValueError("correlación inválida")
+        if not standalone_mode or "execution_id" in item or "detail_id" in item:
+            if not isinstance(work.execution_id, int) or not isinstance(work.detail_id, int) or work.execution_id <= 0 or work.detail_id <= 0:
+                raise ValueError("correlación inválida")
         works.append(work)
     return works, evidence_root
 
@@ -123,6 +134,12 @@ class BrowserFacade:
     async def text(self, selector: str):
         return await self.locator(selector).inner_text()
 
+    async def search_idle(self):
+        return bool(await self.page.evaluate("""() => {
+            const queue = window.PrimeFaces?.ajax?.Queue;
+            return Boolean(queue && queue.isEmpty());
+        }"""))
+
     async def screenshot(self, path: str, *, full_page: bool = True):
         target = Path(path)
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -153,7 +170,8 @@ async def run_context(works: list[SimpleNamespace], evidence_root: Path,
                 except Exception:
                     result = {"kind": "RETRYABLE", "reason_code": "PORTAL_INTERACTION_FAILED"}
                 item = {"document_id": work.document_id, "status": result["kind"],
-                        "reason_code": result.get("reason_code")}
+                        "reason_code": result.get("reason_code"),
+                        "recovery_click_used": result.get("recovery_click_used", False)}
                 evidence = result.get("evidence_path")
                 if evidence:
                     payload = Path(evidence).read_bytes()

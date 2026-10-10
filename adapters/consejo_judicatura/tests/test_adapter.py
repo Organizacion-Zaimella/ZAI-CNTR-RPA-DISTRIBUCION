@@ -64,6 +64,20 @@ class PendingBrowser(Browser):
     def __init__(self):
         super().__init__("pending")
 
+    async def search_idle(self):
+        return False
+
+
+class IdleQueueBrowser(PendingBrowser):
+    def __init__(self, state="pending"):
+        super().__init__()
+        self.state = state
+        self.idle_checks = 0
+
+    async def search_idle(self):
+        self.idle_checks += 1
+        return True
+
 
 class LateChallengeBrowser(Browser):
     async def click(self, selector):
@@ -93,6 +107,7 @@ class AdapterTests(unittest.IsolatedAsyncioTestCase):
                 await adapter.prepare(work(73), {"browser": browser, "evidence_root": root})
                 result = await adapter.execute_document(work(73), {"browser": browser, "evidence_root": root})
                 self.assertEqual(result["kind"], expected)
+                self.assertFalse(result["recovery_click_used"])
                 self.assertTrue(Path(result["evidence_path"]).is_file())
                 self.assertEqual([name for name, _ in browser.actions], ["goto", "fill", "click"])
 
@@ -156,8 +171,37 @@ class AdapterTests(unittest.IsolatedAsyncioTestCase):
         with patch.object(adapter.asyncio, "get_running_loop", return_value=clock), \
                 patch.object(adapter.asyncio, "sleep", side_effect=advance):
             result = await adapter.execute_document(item, services)
-        self.assertEqual(result, {"kind": "RETRYABLE", "reason_code": "RESULT_UNVERIFIED"})
+        self.assertEqual(result["kind"], "RETRYABLE")
+        self.assertEqual(result["reason_code"], "RESULT_UNVERIFIED")
+        self.assertFalse(result["recovery_click_used"])
         self.assertEqual([name for name, _ in browser.actions], ["goto", "fill", "click"])
+
+    async def test_idle_jsf_queue_allows_exactly_one_bounded_recovery_click(self):
+        class Clock:
+            now = 0.0
+
+            def time(self):
+                return self.now
+
+        clock = Clock()
+
+        async def advance(seconds):
+            clock.now += seconds
+
+        item = work(74)
+        item.deadline_seconds = 8
+        browser = IdleQueueBrowser()
+        services = {"browser": browser, "evidence_root": "."}
+        await adapter.prepare(item, services)
+        with patch.object(adapter.asyncio, "get_running_loop", return_value=clock), \
+                patch.object(adapter.asyncio, "sleep", side_effect=advance):
+            result = await adapter.execute_document(item, services)
+        self.assertEqual(result["kind"], "RETRYABLE")
+        self.assertEqual(result["reason_code"], "RESULT_UNVERIFIED")
+        self.assertTrue(result["recovery_click_used"])
+        self.assertEqual([name for name, _ in browser.actions],
+                         ["goto", "fill", "click", "click"])
+        self.assertEqual(browser.idle_checks, 1)
 
     async def test_rejects_unapproved_entry_url(self):
         with tempfile.TemporaryDirectory() as root:
