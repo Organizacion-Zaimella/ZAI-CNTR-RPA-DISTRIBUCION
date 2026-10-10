@@ -15,6 +15,16 @@ PORTAL_BUSY = re.compile(r"please wait|searching|loading|espere por favor|\bcarg
 RESULT_STABLE_SAMPLES = 2
 OFAC_HOST = "sanctionssearch.ofac.treas.gov"
 _human_barrier = False
+RESULT_INITIAL_TIMEOUT_SECONDS = 45.0
+RESULT_EXTENSION_SECONDS = 15.0
+RESULT_MAX_TIMEOUT_SECONDS = 120.0
+
+
+def _extend_result_deadline(deadline, max_deadline, now, has_progress):
+    """Extend the result wait only while the page shows progress."""
+    if not has_progress:
+        return deadline
+    return min(max_deadline, max(deadline, now + RESULT_EXTENSION_SECONDS))
 
 
 def _failure_code(exc: Exception) -> str:
@@ -57,16 +67,24 @@ async def documento_5(work, services):
         await browser.fill_role("textbox", "Enter name as search criteria.",
                                 work.subject.display_name, exact=True)
         await browser.click_role("button", "Search", exact=True)
-        deadline = time.monotonic() + min(work.deadline_seconds, 120)
+        started = time.monotonic()
+        max_deadline = started + min(work.deadline_seconds, RESULT_MAX_TIMEOUT_SECONDS)
+        deadline = min(max_deadline, started + RESULT_INITIAL_TIMEOUT_SECONDS)
         stable_count = None
         stable_samples = 0
+        previous_text = None
         while time.monotonic() < deadline:
             if await browser.is_visible('iframe[src*="captcha"], [class*="altcha"]'):
                 _human_barrier = True
                 return {"kind": "HUMAN_REQUIRED", "checkpoint": "PORTAL_CHALLENGE",
                         "reason_code": "PORTAL_CHALLENGE"}
             text = await browser.text("body")
-            if PORTAL_BUSY.search(text):
+            busy = bool(PORTAL_BUSY.search(text))
+            changed = previous_text is not None and text != previous_text
+            previous_text = text
+            deadline = _extend_result_deadline(deadline, max_deadline,
+                                               time.monotonic(), busy or changed)
+            if busy:
                 stable_count = None
                 stable_samples = 0
                 await asyncio.sleep(0.5)

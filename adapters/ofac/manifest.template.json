@@ -9,6 +9,6 @@
   "document_functions": {
     "5": "documento_5"
   },
-  "entrypoint": "adapter.py",
+  "entrypoint": "src/adapter.py",
   "status": "NOT_APPROVED"
 }
