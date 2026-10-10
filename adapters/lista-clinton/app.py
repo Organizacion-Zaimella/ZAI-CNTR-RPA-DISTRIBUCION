@@ -17,6 +17,10 @@ ALLOWED_HOST = "www.treasury.gov"
 ALLOWED_PATH = "/ofac/downloads/sdnlist.pdf"
 MAX_PDF_BYTES = 25 * 1024 * 1024
 MAX_PAGES = 10_000
+NAVIGATION_START_TIMEOUT_SECONDS = 30
+PDF_TRANSFER_TIMEOUT_SECONDS = 60
+PDF_TOTAL_TIMEOUT_SECONDS = NAVIGATION_START_TIMEOUT_SECONDS + PDF_TRANSFER_TIMEOUT_SECONDS
+ADAPTER_VERSION = "0.1.1-candidate"
 
 
 def _network_failure_code(exc: Exception) -> str:
@@ -141,7 +145,9 @@ def _context(path: Path) -> dict:
         raise ValueError("contexto y evidencia deben permanecer fuera del repositorio")
     return {"url": url, "query": query, "evidence_dir": evidence_dir,
             "detail_id": int(raw.get("detail_id", 1)),
-            "timeout_seconds": min(3600, max(15, int(raw.get("timeout_seconds", 300))))}
+            "timeout_seconds": min(PDF_TOTAL_TIMEOUT_SECONDS,
+                                    max(NAVIGATION_START_TIMEOUT_SECONDS,
+                                        int(raw.get("timeout_seconds", PDF_TOTAL_TIMEOUT_SECONDS))))}
 
 
 async def _download_pdf(url: str, timeout_seconds: int) -> tuple[bytes | None, str | None]:
@@ -160,7 +166,11 @@ async def _download_pdf(url: str, timeout_seconds: int) -> tuple[bytes | None, s
         try:
             page = await browser.new_page(accept_downloads=True)
             try:
-                response = await page.goto(url, wait_until="commit", timeout=timeout_seconds * 1000)
+                total_budget = min(PDF_TOTAL_TIMEOUT_SECONDS,
+                                   max(NAVIGATION_START_TIMEOUT_SECONDS, int(timeout_seconds)))
+                navigation_budget = min(NAVIGATION_START_TIMEOUT_SECONDS, total_budget)
+                response = await page.goto(url, wait_until="commit",
+                                           timeout=navigation_budget * 1000)
             except Exception as exc:
                 return None, _network_failure_code(exc)
             if response is None:
@@ -169,7 +179,11 @@ async def _download_pdf(url: str, timeout_seconds: int) -> tuple[bytes | None, s
                 return None, f"HTTP_{response.status}"
             if response.status != 200:
                 return None, "PDF_HTTP_RESPONSE_INVALID"
-            body = await response.body()
+            transfer_budget = min(PDF_TRANSFER_TIMEOUT_SECONDS,
+                                  max(1, total_budget - navigation_budget))
+            body, body_failure = await _read_pdf_body(response, transfer_budget)
+            if body_failure:
+                return None, body_failure
             if not body.startswith(b"%PDF-"):
                 return None, "PDF_SIGNATURE_INVALID"
             return body, None
@@ -177,19 +191,27 @@ async def _download_pdf(url: str, timeout_seconds: int) -> tuple[bytes | None, s
             await browser.close()
 
 
+async def _read_pdf_body(response, timeout_seconds: int) -> tuple[bytes | None, str | None]:
+    """Bound PDF transfer after navigation; partial bytes are never evidence."""
+    try:
+        return await asyncio.wait_for(response.body(), timeout=timeout_seconds), None
+    except asyncio.TimeoutError:
+        return None, "PDF_TRANSFER_TIMEOUT"
+
+
 async def run(context: dict) -> dict:
     try:
         body, failure = await _download_pdf(context["url"], context["timeout_seconds"])
         if failure:
             status = "BLOCKED" if failure.startswith("HTTP_") else "RETRYABLE"
-            return {"adapter_id": "lista-clinton", "adapter_version": "0.1.0-candidate",
+            return {"adapter_id": "lista-clinton", "adapter_version": ADAPTER_VERSION,
                     "status": status, "reason_code": failure}
         result = search_and_bundle(body, context["query"], context["evidence_dir"],
                                    context["detail_id"])
-        return {"adapter_id": "lista-clinton", "adapter_version": "0.1.0-candidate",
+        return {"adapter_id": "lista-clinton", "adapter_version": ADAPTER_VERSION,
                 **result}
     except Exception:
-        return {"adapter_id": "lista-clinton", "adapter_version": "0.1.0-candidate",
+        return {"adapter_id": "lista-clinton", "adapter_version": ADAPTER_VERSION,
                 "status": "RETRYABLE", "reason_code": "PORTAL_OR_BROWSER_ERROR"}
 
 
@@ -210,7 +232,9 @@ async def documento_33(work, services):
             return {"kind": "RETRYABLE", "reason_code": f"HTTP_{response.status}"}
         if response.status != 200:
             return {"kind": "RETRYABLE", "reason_code": "PDF_HTTP_RESPONSE_INVALID"}
-        body = await response.body()
+        body, body_failure = await _read_pdf_body(response, PDF_TRANSFER_TIMEOUT_SECONDS)
+        if body_failure:
+            return {"kind": "RETRYABLE", "reason_code": body_failure}
         result = search_and_bundle(body, work.subject.display_name,
                                    Path(services["evidence_root"]), work.detail_id)
         kind = result["status"]
@@ -232,7 +256,7 @@ def main() -> int:
     try:
         result = asyncio.run(run(_context(args.context.resolve())))
     except Exception:
-        result = {"adapter_id": "lista-clinton", "adapter_version": "0.1.0-candidate",
+        result = {"adapter_id": "lista-clinton", "adapter_version": ADAPTER_VERSION,
                   "status": "ERROR", "reason_code": "INVALID_CONTEXT"}
     print(json.dumps(result, separators=(",", ":"), ensure_ascii=True))
     return 0 if result["status"] in {"MATCH", "NO_MATCH"} else 1

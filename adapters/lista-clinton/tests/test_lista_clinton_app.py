@@ -176,3 +176,17 @@ def test_network_failure_classification_never_returns_exception_text():
         result = app._network_failure_code(RuntimeError(message + " private.invalid"))
         assert result == expected
         assert "private.invalid" not in result
+
+
+def test_pdf_wait_budget_is_bounded_and_transfer_timeout_is_retryable():
+    class SlowResponse:
+        async def body(self):
+            await asyncio.sleep(1)
+            return b"%PDF-"
+
+    assert app.PDF_TOTAL_TIMEOUT_SECONDS == 90
+    assert app.NAVIGATION_START_TIMEOUT_SECONDS == 30
+    assert app.PDF_TRANSFER_TIMEOUT_SECONDS == 60
+    body, failure = asyncio.run(app._read_pdf_body(SlowResponse(), 0.01))
+    assert body is None
+    assert failure == "PDF_TRANSFER_TIMEOUT"
