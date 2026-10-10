@@ -1,0 +1,10 @@
+{
+  "adapter_id": "lista_clinton",
+  "version": "0.1.4-candidate",
+  "adapter_contract": 1,
+  "portal_id": 5,
+  "document_ids": [33],
+  "document_functions": {"33": "documento_33"},
+  "entrypoint": "adapter.py",
+  "status": "NOT_APPROVED"
+}

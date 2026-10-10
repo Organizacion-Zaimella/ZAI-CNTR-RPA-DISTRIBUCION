@@ -8,3 +8,14 @@
 6. Documentar revocación y reversión. Una versión retirada no debe ejecutarse por estar en caché.
 
 La rama `main` albergará documentación y, en el futuro, manifest públicos revisados. El control de branch y aprobadores se comprueba por separado; este documento no afirma que estén configurados. No existe un release publicable en el estado inicial.
+
+## Lista Clinton 0.1.4 — candidato TEST
+
+La fuente RPA `1f24b164aa7f46ec463bbe459f3d3c8a5091e7b1` genera el paquete
+firmado `lista_clinton@0.1.4-candidate` en la generación TEST 21. El cambio
+limita a 30 los números de página en la salida JSON, conserva el total e indica
+truncamiento. La suite local obtuvo 15 resultados aprobados y una comprobación
+local sobre un PDF público completo de 3.232 páginas validó el bundle. Esa
+comprobación no usó sujeto CNTR ni produjo ejecución/ACK. ORDS TEST aún no asigna
+función ni pareja elegible al documento 33; esta publicación es candidata y no
+autoriza su ejecución desde ORDS ni Producción.
