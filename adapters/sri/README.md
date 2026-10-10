@@ -1,7 +1,9 @@
 # SRI adapter candidate 0.1.3
 
-TEST candidate for SRI portal 3, documents 3 and 53. This package is **not
-certified** and is not pinned by the current ORDS TEST plan.
+TEST candidate for SRI portal 3, documents 3 and 53. `app.py` is the
+independent Playwright entrypoint; `src/adapter.py` is the isolated motor ABI.
+This package is **not certified** and is not pinned by the current ORDS TEST
+plan.
 
 The sidecar validates the HTTPS host and document route, selects the
 document-specific search mode, checks the search field is unique, types through
