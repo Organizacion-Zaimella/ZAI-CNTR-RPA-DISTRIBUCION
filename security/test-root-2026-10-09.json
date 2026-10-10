@@ -1,0 +1,7 @@
+{
+  "key_id": "cntr-test-a37738608946",
+  "algorithm": "Ed25519",
+  "channel_scope": ["TEST"],
+  "public_key_base64": "0IbODGytIK+0j8pcY5m5bM2hH37tbiuy8r3u3ZaMmZE=",
+  "private_key_distribution": "prohibited"
+}

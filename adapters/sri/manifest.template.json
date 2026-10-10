@@ -1,0 +1,10 @@
+{
+  "adapter_id": "sri",
+  "version": "0.1.12-candidate",
+  "adapter_contract": 1,
+  "portal_id": 3,
+  "document_ids": [3, 53],
+  "document_functions": {"3": "documento_3", "53": "documento_53"},
+  "entrypoint": "src/adapter.py",
+  "status": "NOT_APPROVED"
+}

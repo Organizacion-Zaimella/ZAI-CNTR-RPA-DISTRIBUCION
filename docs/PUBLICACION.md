@@ -7,4 +7,49 @@
 5. Promover canal TEST y luego Producción mediante PR revisado y checks definidos. El puntero firmado se actualiza solo después de que el asset existe y pasa los gates del canal.
 6. Documentar revocación y reversión. Una versión retirada no debe ejecutarse por estar en caché.
 
-La rama `main` albergará documentación y, en el futuro, manifest públicos revisados. El control de branch y aprobadores se comprueba por separado; este documento no afirma que estén configurados. No existe un release publicable en el estado inicial.
+La rama `main` alberga la documentación base. La rama draft de T07 incorpora un canal TEST de generación 3 y el prerelease candidato `cntr-rpa-1.0.0-test.3`; ambos se usan para QA anónimo de motor y adaptadores. La actualización incluye una corrección del transporte del origen canónico al crear detalles ORDS. Esto no certifica funcionalidad ni aprueba Producción. El control de branch y aprobadores se comprueba por separado; este documento no afirma que estén configurados.
+
+## Candidato TEST generación 7 — 2026-10-09
+
+La rama `codex/sri-0.1.1-test9` prepara el prerelease firmado `cntr-rpa-1.0.0-test.9` desde el canal TEST verificado de generación 6. El canal resultante conserva el motor `1.0.0-test.5` y añade `sri@0.1.1-candidate`; conserva además los candidatos IESS `0.1.2` y OFAC `0.1.1`. El asset SRI incluye `app.py`, `adapter.py`, `dependencies.lock` y manifiesto con punto de entrada standalone declarado, SBOM, firma y hash.
+
+Este candidato corrige la clasificación local de desconexión de red y pasa pruebas sintéticas. La versión ORDS vigente continúa fijada a `sri@0.1.0-candidate`, por lo que la generación 7 no se activa ni prueba su descarga por el robot. La publicación TEST no certifica resultado real del portal, PDF/ACK en ORDS ni Producción. `main` y los canales de Producción no se modifican.
+
+## Candidato TEST generación 8 — SRI 0.1.2 — 2026-10-09
+
+La rama `codex/sri-0.1.2-test10` parte del canal firmado generación 7 y crea generación 8, manteniendo el motor `1.0.0-test.5`, IESS `0.1.2-candidate` y OFAC `0.1.1-candidate`; SRI `0.1.1` se sustituye por `0.1.2-candidate` en este canal inactivo. El nuevo `adapter.py` usa el `type_text` pausado del motor, valida la persistencia del campo y espera a que el botón quede habilitado antes de una sola consulta. Conserva CAPTCHA/ALTCHA como intervención humana. El prerelease `cntr-rpa-1.0.0-test.10` contiene app, sidecar, dependencia fijada, manifiesto, SBOM, hash y firmas TEST.
+
+La compatibilidad corregida pasó pruebas sintéticas del adaptador y standalone. No se hizo E2E de navegación en esta versión ni se produjo evidencia/ACK de esta versión. ORDS sigue fijado a `sri@0.1.0-candidate`; el canal generación 8 no es seleccionable y no se activó. La generación 7 y `sri@0.1.1` permanecen en la rama/historial anterior y no se declara certificación. `main`, ORDS y Producción no se modifican.
+
+## Candidato TEST generación 11 — SRI 0.1.7 — 2026-10-10
+
+El candidato `cntr-rpa-1.0.0-test.13` se construyó desde el commit RPA `298a0e77ca39af58e089187706817ee736fbb66c`. Incluye `app.py`, `adapter.py` y dependencias bloqueadas. El canal TEST parte de la generación 10 de `cntr-rpa-1.0.0-test.12`; la generación 11 conserva los demás pines y actualiza únicamente SRI a `0.1.7-candidate`. El builder verificó las firmas TEST y hashes del paquete y el manifiesto; las pruebas del paquete pasaron. Es un candidato de QA, no certificación: falta validar descarga desde el canal de QA, ejecución integrada, evidencia y ACK de esta versión.
+
+## Candidato TEST generación 12 — SRI 0.1.8 — 2026-10-10
+
+El candidato `cntr-rpa-1.0.0-test.14` se construyó desde el commit RPA `92915997b0a235f182787d4ba3440a81e7e2efbe`. Corrige el sidecar para esperar los controles visibles de la aplicación Angular después de la navegación `commit`, antes de consultar el DOM. El canal TEST parte de la generación 11 de `cntr-rpa-1.0.0-test.13` y actualiza únicamente el pin SRI a `0.1.8-candidate`. Las 20 pruebas del paquete pasan y el builder verifica firma y hashes. Es candidato, no certificación; falta integración instalada y ACK de esta versión.
+
+## Candidato TEST generación 9 — IESS 0.1.3 — 2026-10-10
+
+La rama `codex/iess-0.1.3-candidate` incorpora `iess@0.1.3-candidate` al canal firmado generación 9 y al prerelease `cntr-rpa-1.0.0-test.11`. El paquete incluye la aplicación independiente y el punto de entrada sidecar. El sidecar delega en esa aplicación para mantener una sola implementación de adquisición y validación PDF. La aplicación standalone obtuvo `MATCH` con PDF nativo estructuralmente válido en una corrida TEST desde el inicio; la suite local terminó 8/8.
+
+Esto es una publicación candidata para QA, no certificación integrada. El pin ORDS vigente continúa en `iess@0.1.0-candidate`; la ejecución del paquete desde el motor instalado con evidencia y ACK ORDS sigue pendiente. `main`, elegibilidad, reglas y Producción no se modifican.
+
+## Candidato TEST generación 10 — SRI 0.1.3 — 2026-10-10
+
+La rama `codex/sri-0.1.3-test12` agrega `sri@0.1.3-candidate` y el prerelease firmado `cntr-rpa-1.0.0-test.12` sobre la generación 9. El cambio aplica la pausa mínima entre navegación y clic del modo de búsqueda; la suite local terminó 11/11. No hubo una consulta pública nueva después de observar `ERR_CONNECTION_RESET`, así que el paquete queda como candidato para QA, sin afirmar que el cambio resuelva ese resultado.
+
+ORDS conserva el pin SRI `0.1.0-candidate`. Esta publicación no cambia elegibilidad ni reglas, no ejecuta el adaptador desde el robot y no cambia `main` ni Producción.
+# SRI 0.1.12 — TEST candidate
+
+RPA source commit `4290c2edb6f774268b5541be57808dc69650ea71` builds signed TEST
+release `cntr-rpa-sri-0.1.12-test20`; channel generation 20 is derived from the
+verified generation 19 channel. The package includes the standalone Playwright
+app and motor ABI entrypoint. Independent headed TEST returned `MATCH` for docs
+3 and 53 in ORDS order, with private PNG evidence. Distribution tests: 26
+passed.
+
+This is a TEST prerelease, not Production approval. Current ORDS TEST assigns
+`sri@0.1.8-candidate`; no assignment was changed. Do not run the robot/updater
+against this channel as a substitute for an exact compatible assignment. Gate B
+and ACK for 0.1.12 remain pending.
