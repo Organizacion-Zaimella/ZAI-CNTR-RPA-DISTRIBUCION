@@ -15,8 +15,13 @@ from playwright.async_api import TimeoutError as PlaywrightTimeoutError
 from playwright.async_api import async_playwright
 
 ADAPTER_ID = "ofac"
-ADAPTER_VERSION = "0.1.2-candidate"
+ADAPTER_VERSION = "0.1.3-candidate"
 OFAC_HOST = "sanctionssearch.ofac.treas.gov"
+NAVIGATION_TIMEOUT_SECONDS = 30.0
+CONTROL_TIMEOUT_SECONDS = 30.0
+RESULT_INITIAL_TIMEOUT_SECONDS = 60.0
+RESULT_EXTENSION_SECONDS = 30.0
+RESULT_MAX_TIMEOUT_SECONDS = 120.0
 RESULT_COUNT = re.compile(r"Lookup Results:\s*(\d+)\s*Found", re.I)
 CHALLENGE = re.compile(r"captcha|altcha|verify you are human|no soy un robot", re.I)
 PORTAL_BUSY = re.compile(r"please wait|searching|loading|espere por favor|\bcargando\b", re.I)
@@ -39,7 +44,16 @@ def load_context(path: Path) -> dict:
         raise ValueError("contexto y evidencia deben quedar fuera del repositorio")
     return {"url": str(raw["entry_url"]), "name": str(raw["display_name"]).strip(),
             "evidence_dir": evidence_dir,
-            "timeout": min(120, max(20, int(raw.get("timeout_seconds", 60)))),
+            # Keep the legacy setting as the total cap while exposing separate
+            # operation budgets for deployments that need a measured override.
+            "timeout": min(RESULT_MAX_TIMEOUT_SECONDS,
+                           max(20, float(raw.get("timeout_seconds", RESULT_MAX_TIMEOUT_SECONDS)))),
+            "navigation_timeout": min(NAVIGATION_TIMEOUT_SECONDS,
+                                      max(10, float(raw.get("navigation_timeout_seconds", NAVIGATION_TIMEOUT_SECONDS)))),
+            "control_timeout": min(CONTROL_TIMEOUT_SECONDS,
+                                   max(10, float(raw.get("control_timeout_seconds", CONTROL_TIMEOUT_SECONDS)))),
+            "result_timeout": min(RESULT_MAX_TIMEOUT_SECONDS,
+                                  max(20, float(raw.get("result_timeout_seconds", RESULT_MAX_TIMEOUT_SECONDS)))),
             "pacing": max(5.0, float(raw.get("pacing_seconds", 5)))}
 
 
@@ -69,10 +83,21 @@ def _navigation_failure(exc: Exception) -> str:
                 "PORTAL_NAVIGATION_ERROR")
 
 
+def _extend_result_deadline(deadline: float, max_deadline: float,
+                            now: float, has_progress: bool) -> float:
+    """Extend the result window only on observed page progress, up to a cap."""
+    if not has_progress:
+        return deadline
+    return min(max_deadline, max(deadline, now + RESULT_EXTENSION_SECONDS))
+
+
 async def _run_on_page(ctx: dict, page) -> dict:
     ctx["evidence_dir"].mkdir(parents=True, exist_ok=True)
     try:
-        response = await page.goto(ctx["url"], wait_until="domcontentloaded", timeout=ctx["timeout"] * 1000)
+        response = await page.goto(
+            ctx["url"], wait_until="domcontentloaded",
+            timeout=int(min(ctx.get("navigation_timeout", NAVIGATION_TIMEOUT_SECONDS),
+                            ctx["timeout"]) * 1000))
     except Exception as exc:
         return output("RETRYABLE", _navigation_failure(exc))
     if response and response.status in (403, 429, 451):
@@ -82,25 +107,39 @@ async def _run_on_page(ctx: dict, page) -> dict:
     field = page.get_by_role("textbox", name="Enter name as search criteria.", exact=True)
     button = page.get_by_role("button", name="Search", exact=True)
     try:
-        await field.wait_for(state="visible", timeout=ctx["timeout"] * 1000)
-        await button.wait_for(state="visible", timeout=ctx["timeout"] * 1000)
+        control_timeout_ms = int(min(ctx.get("control_timeout", CONTROL_TIMEOUT_SECONDS),
+                                     ctx["timeout"]) * 1000)
+        await field.wait_for(state="visible", timeout=control_timeout_ms)
+        await button.wait_for(state="visible", timeout=control_timeout_ms)
     except PlaywrightTimeoutError:
         return output("RETRYABLE", "SEARCH_CONTROLS_NOT_READY")
     if await field.count() != 1 or await button.count() != 1:
         return output("RETRYABLE", "SEARCH_CONTROLS_NOT_UNIQUE")
     await page.wait_for_timeout(round(ctx["pacing"] * 1000))
-    await field.fill(ctx["name"], timeout=ctx["timeout"] * 1000)
+    await field.fill(ctx["name"], timeout=control_timeout_ms)
     await page.wait_for_timeout(round(ctx["pacing"] * 1000))
-    await button.click(timeout=ctx["timeout"] * 1000)
-    deadline = time.monotonic() + ctx["timeout"]
+    await button.click(timeout=control_timeout_ms)
+    search_started = time.monotonic()
+    max_deadline = search_started + min(
+        RESULT_MAX_TIMEOUT_SECONDS,
+        ctx.get("result_timeout", ctx["timeout"]))
+    deadline = min(max_deadline,
+                   search_started + min(RESULT_INITIAL_TIMEOUT_SECONDS,
+                                        ctx.get("result_timeout", ctx["timeout"])))
     count = None
     stable_count = None
     stable_samples = 0
+    previous_text = None
     while time.monotonic() < deadline:
         text = await page.locator("body").inner_text()
         if CHALLENGE.search(text):
             return output("HUMAN_REQUIRED", "PORTAL_CHALLENGE")
-        if PORTAL_BUSY.search(text):
+        busy = bool(PORTAL_BUSY.search(text))
+        changed = previous_text is not None and text != previous_text
+        previous_text = text
+        deadline = _extend_result_deadline(deadline, max_deadline,
+                                           time.monotonic(), busy or changed)
+        if busy:
             stable_count = None
             stable_samples = 0
             await page.wait_for_timeout(500)

@@ -7,7 +7,10 @@ from pathlib import Path
 from types import SimpleNamespace
 
 
-MODULE = Path(__file__).resolve().parents[1] / "adapter.py"
+ADAPTER_DIR = Path(__file__).resolve().parents[1]
+MODULE = ADAPTER_DIR / "src" / "adapter.py"
+if not MODULE.is_file():
+    MODULE = ADAPTER_DIR / "adapter.py"
 SPEC = importlib.util.spec_from_file_location("ofac_sidecar_candidate", MODULE)
 adapter = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(adapter)
@@ -89,6 +92,12 @@ def test_network_failure_codes_are_bounded_and_sanitized():
         assert "private.invalid" not in result
 
 
+def test_sidecar_deadline_extends_only_on_progress_and_is_capped():
+    assert adapter._extend_result_deadline(60, 120, 60, False) == 60
+    assert adapter._extend_result_deadline(60, 120, 60, True) == 90
+    assert adapter._extend_result_deadline(100, 120, 105, True) == 120
+
+
 def test_result_count_must_stabilize_before_evidence(tmp_path):
     class ChangingResultBrowser(Browser):
         def __init__(self):
@@ -136,3 +145,9 @@ def test_busy_result_count_is_not_classified(tmp_path):
     result = asyncio.run(scenario())
     assert result == {"kind": "RETRYABLE", "reason_code": "RESULT_NOT_CONCLUSIVE"}
     assert not list(tmp_path.glob("*.png"))
+
+
+def test_sidecar_deadline_extends_only_on_progress_and_is_capped():
+    assert adapter._extend_result_deadline(60, 120, 60, False) == 60
+    assert adapter._extend_result_deadline(60, 120, 60, True) == 90
+    assert adapter._extend_result_deadline(100, 120, 105, True) == 120

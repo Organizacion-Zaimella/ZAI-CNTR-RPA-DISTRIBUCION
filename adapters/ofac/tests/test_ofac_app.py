@@ -50,12 +50,14 @@ class Page:
         self.challenge_after_search = challenge_after_search
         self.body_sequence = []
         self.navigations = 0
+        self.navigation_options = []
         self.actions = []
         self.waits = []
         self.ready_checks = []
 
     async def goto(self, url, **kwargs):
         self.navigations += 1
+        self.navigation_options.append(kwargs)
         if self.first_navigation_timeout and self.navigations == 1:
             raise app.PlaywrightTimeoutError("synthetic timeout")
         if self.first_navigation_error and self.navigations == 1:
@@ -281,6 +283,32 @@ def test_positive_result_saves_full_page_evidence_and_hash(tmp_path, monkeypatch
     assert results[0]["evidence_type"] == "PNG"
     evidence = next(tmp_path.glob("ofac-document-5-*.png"))
     assert results[0]["evidence_sha256"] == hashlib.sha256(evidence.read_bytes()).hexdigest()
+
+
+def test_navigation_controls_and_results_have_separate_wait_budgets(tmp_path, monkeypatch):
+    page = Page(body="Lookup Results: 0 Found")
+    browser = Browser(page)
+    playwright = PlaywrightContext(browser)
+    monkeypatch.setattr(app, "async_playwright", lambda: playwright)
+    item = context(tmp_path)
+    item.update({"timeout": 120, "navigation_timeout": 30,
+                 "control_timeout": 30, "result_timeout": 120})
+
+    result = run(app.run_many([item]))[0]
+
+    assert result["status"] == "NO_MATCH"
+    assert page.navigation_options[0]["wait_until"] == "domcontentloaded"
+    assert page.navigation_options[0]["timeout"] == 30_000
+    assert all(options["timeout"] == 30_000 for _, options in page.ready_checks)
+    assert app.RESULT_INITIAL_TIMEOUT_SECONDS == 60
+    assert app.RESULT_EXTENSION_SECONDS == 30
+    assert app.RESULT_MAX_TIMEOUT_SECONDS == 120
+
+
+def test_search_deadline_extends_only_with_progress_and_never_past_cap():
+    assert app._extend_result_deadline(60, 120, 60, False) == 60
+    assert app._extend_result_deadline(60, 120, 60, True) == 90
+    assert app._extend_result_deadline(100, 120, 105, True) == 120
 
 
 def test_challenge_after_search_stops_batch_without_requery(tmp_path, monkeypatch):
