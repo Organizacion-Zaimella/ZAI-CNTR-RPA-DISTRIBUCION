@@ -1,0 +1,10 @@
+{
+  "adapter_id": "consejo_judicatura",
+  "version": "0.1.2-candidate",
+  "adapter_contract": 1,
+  "portal_id": 6,
+  "document_ids": [73, 74, 75, 76],
+  "document_functions": {"73": "documento_73", "74": "documento_74", "75": "documento_75", "76": "documento_76"},
+  "entrypoint": "src/adapter.py",
+  "status": "NOT_APPROVED"
+}
