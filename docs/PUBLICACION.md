@@ -8,3 +8,9 @@
 6. Documentar revocación y reversión. Una versión retirada no debe ejecutarse por estar en caché.
 
 La rama `main` alberga la documentación base. La rama draft de T07 incorpora un canal TEST de generación 3 y el prerelease candidato `cntr-rpa-1.0.0-test.3`; ambos se usan para QA anónimo de motor y adaptadores. La actualización incluye una corrección del transporte del origen canónico al crear detalles ORDS. Esto no certifica funcionalidad ni aprueba Producción. El control de branch y aprobadores se comprueba por separado; este documento no afirma que estén configurados.
+
+## Candidato TEST generación 7 — 2026-10-09
+
+La rama `codex/sri-0.1.1-test9` prepara el prerelease firmado `cntr-rpa-1.0.0-test.9` desde el canal TEST verificado de generación 6. El canal resultante conserva el motor `1.0.0-test.5` y añade `sri@0.1.1-candidate`; conserva además los candidatos IESS `0.1.2` y OFAC `0.1.1`. El asset SRI incluye `app.py`, `adapter.py`, `dependencies.lock` y manifiesto con punto de entrada standalone declarado, SBOM, firma y hash.
+
+Este candidato corrige la clasificación local de desconexión de red y pasa pruebas sintéticas. La versión ORDS vigente continúa fijada a `sri@0.1.0-candidate`, por lo que la generación 7 no se activa ni prueba su descarga por el robot. La publicación TEST no certifica resultado real del portal, PDF/ACK en ORDS ni Producción. `main` y los canales de Producción no se modifican.

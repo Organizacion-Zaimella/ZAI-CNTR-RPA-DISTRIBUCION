@@ -13,3 +13,5 @@ El motor 1.0.0 y cada adaptador tendrán versiones independientes. El contrato d
 ## Estado inicial
 
 En `main` no existen canales ni releases. La rama de tarea T07 mantiene un canal `TEST` firmado de generación 3 y un prerelease candidato para validar la descarga anónima; no hay canal de Producción ni releases certificados. No se publican sujetos, evidencias, secretos ni endpoints internos.
+
+El corte candidato posterior `codex/sri-0.1.1-test9` firma el canal TEST generación 7 con motor `1.0.0-test.5` y candidatos versionados de IESS, OFAC y SRI. Ese canal es opt-in por referencia de rama; no cambia `main`, el pin SRI `0.1.0` de ORDS ni el canal de Producción. La descarga anónima del asset y las firmas se validan tras crear el prerelease; su estado funcional sigue siendo candidato.
