@@ -17,3 +17,9 @@ and 429, challenges before and after sending, network loss with ordered
 continuation, evidence hashing, and inconclusive results without evidence. Real
 TEST certification still requires an authorized browser run, signed
 distribution and evidence plus ACK from the installed motor.
+
+Read-only browser inspection (2026-10-09): the public Sanctions List Search page
+loaded and exposed the name textbox (`Enter name as search criteria.`) and
+`Search` button used by the adapter. No subject was entered, no search was sent,
+and no terms were accepted. This verifies the visible entry controls only; it
+does not certify a result workflow or produce evidence/ACK.
