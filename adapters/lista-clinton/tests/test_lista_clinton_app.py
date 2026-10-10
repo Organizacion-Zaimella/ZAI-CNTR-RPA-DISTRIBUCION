@@ -139,3 +139,40 @@ def test_sidecar_classifies_403_without_retrying_or_bypassing(tmp_path):
 
     assert result == {"kind": "RETRYABLE", "reason_code": "HTTP_403"}
     assert len(browser.calls) == 1
+
+
+def test_network_disconnect_is_sanitized_and_next_work_uses_same_browser(tmp_path):
+    class SequenceBrowser:
+        def __init__(self):
+            self.calls = []
+
+        async def goto(self, url, **kwargs):
+            self.calls.append((url, kwargs))
+            if len(self.calls) == 1:
+                raise RuntimeError("net::ERR_INTERNET_DISCONNECTED https://private.invalid/subject")
+            return Response(pdf_bytes(("ACME Holdings",)))
+
+    browser = SequenceBrowser()
+    services = {"browser": browser, "evidence_root": tmp_path}
+    first = asyncio.run(app.documento_33(work(), services))
+    second = asyncio.run(app.documento_33(work(), services))
+
+    assert first == {"kind": "RETRYABLE", "reason_code": "NETWORK_DISCONNECTED"}
+    assert second["kind"] == "MATCH"
+    assert len(browser.calls) == 2
+    assert "private.invalid" not in repr(first)
+    assert "subject" not in repr(first)
+
+
+def test_network_failure_classification_never_returns_exception_text():
+    cases = {
+        "net::ERR_NETWORK_CHANGED": "NETWORK_CHANGED",
+        "net::ERR_CONNECTION_RESET": "PORTAL_CONNECTION_RESET",
+        "net::ERR_NAME_NOT_RESOLVED": "PORTAL_DNS_FAILURE",
+        "net::ERR_ADDRESS_UNREACHABLE": "PORTAL_UNREACHABLE",
+        "unexpected private content": "PORTAL_UNAVAILABLE",
+    }
+    for message, expected in cases.items():
+        result = app._network_failure_code(RuntimeError(message + " private.invalid"))
+        assert result == expected
+        assert "private.invalid" not in result

@@ -19,6 +19,25 @@ MAX_PDF_BYTES = 25 * 1024 * 1024
 MAX_PAGES = 10_000
 
 
+def _network_failure_code(exc: Exception) -> str:
+    """Map browser exceptions to bounded codes; never return raw exception data."""
+    if type(exc).__name__.casefold() == "timeouterror":
+        return "PORTAL_TIMEOUT"
+    message = str(exc).upper()
+    markers = (
+        ("ERR_INTERNET_DISCONNECTED", "NETWORK_DISCONNECTED"),
+        ("ERR_NETWORK_CHANGED", "NETWORK_CHANGED"),
+        ("ERR_CONNECTION_RESET", "PORTAL_CONNECTION_RESET"),
+        ("ERR_CONNECTION_REFUSED", "PORTAL_CONNECTION_REFUSED"),
+        ("ERR_NAME_NOT_RESOLVED", "PORTAL_DNS_FAILURE"),
+        ("ERR_CONNECTION_TIMED_OUT", "PORTAL_CONNECTION_TIMEOUT"),
+        ("ERR_TIMED_OUT", "PORTAL_CONNECTION_TIMEOUT"),
+        ("ERR_ADDRESS_UNREACHABLE", "PORTAL_UNREACHABLE"),
+    )
+    return next((code for marker, code in markers if marker in message),
+                "PORTAL_UNAVAILABLE")
+
+
 def normalize(value: str) -> str:
     """Normalize typography only; retain every letter and digit for matching."""
     return "".join(char for char in unicodedata.normalize("NFD", value.casefold())
@@ -126,7 +145,6 @@ def _context(path: Path) -> dict:
 
 
 async def _download_pdf(url: str, timeout_seconds: int) -> tuple[bytes | None, str | None]:
-    from playwright.async_api import TimeoutError as PlaywrightTimeoutError
     from playwright.async_api import async_playwright
 
     async with async_playwright() as playwright:
@@ -143,10 +161,8 @@ async def _download_pdf(url: str, timeout_seconds: int) -> tuple[bytes | None, s
             page = await browser.new_page(accept_downloads=True)
             try:
                 response = await page.goto(url, wait_until="commit", timeout=timeout_seconds * 1000)
-            except PlaywrightTimeoutError:
-                return None, "PORTAL_TIMEOUT"
-            except Exception:
-                return None, "PORTAL_UNAVAILABLE"
+            except Exception as exc:
+                return None, _network_failure_code(exc)
             if response is None:
                 return None, "PDF_RESPONSE_MISSING"
             if response.status in (403, 429, 451):
@@ -202,8 +218,8 @@ async def documento_33(work, services):
             return {"kind": kind, "evidence_path": result["evidence_path"]}
         return {"kind": "RETRYABLE" if kind == "RETRYABLE" else "ERROR",
                 "reason_code": result.get("reason_code", "PDF_SEARCH_FAILED")}
-    except Exception:
-        return {"kind": "RETRYABLE", "reason_code": "PDF_SEARCH_FAILED"}
+    except Exception as exc:
+        return {"kind": "RETRYABLE", "reason_code": _network_failure_code(exc)}
 
 
 DOCUMENT_FUNCTIONS = {"documento_33": documento_33}
