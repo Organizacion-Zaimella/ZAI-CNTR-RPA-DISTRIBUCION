@@ -1,9 +1,11 @@
 # Uso anónimo desde CNTR RPA
 
-El cliente fijará el propietario `Organizacion-Zaimella` y el repositorio `ZAI-CNTR-RPA-DISTRIBUCION`. La lectura de archivos públicos y futuros assets de Releases no requerirá cuenta, token ni cookie de GitHub.
+El cliente fija el propietario `Organizacion-Zaimella` y el repositorio `ZAI-CNTR-RPA-DISTRIBUCION`. Los archivos de canal y assets de GitHub Releases se leen por HTTPS sin cuenta, token ni cookie de GitHub.
 
-Cuando exista un canal aprobado, el launcher leerá `channels/test.json` o `channels/production.json` junto con su firma `*.sig` por HTTPS. Antes de descargar o ejecutar, verificará firma con clave pública anclada, generación, caducidad, revocación, versión compatible de motor/adaptador, sistema operativo, Playwright/browser, tamaño y SHA-256 de cada asset. Solo descargará assets de Releases del propietario y repositorio fijados. Nunca instalará dependencias mediante `pip` desde Internet durante un arranque.
+El launcher solicita el canal configurado (`TEST` o `PRODUCCION`) desde la rama de distribución aprobada, valida firma Ed25519 anclada, generación, caducidad, revocación, compatibilidad, tamaño y SHA-256 antes de instalar. Descarga solo assets de Releases de este repositorio. No instala dependencias con `pip` desde Internet durante el arranque.
 
-La instalación usará staging por versión, autochequeo y activación atómica. Conservará configuración, OAuth, journal y logs; ante fallo restaurará la última versión verificada. Si la red falla, aplicará la política autorizada de caché sin ejecutar paquetes revocados ni omitir una actualización de seguridad obligatoria.
+La instalación se realiza en staging por versión y activa el paquete validado de forma atómica. Conserva configuración, OAuth, journal y logs; ante fallo mantiene o restaura la última versión verificada. Una interrupción de red no autoriza omitir firmas, ejecutar versiones revocadas ni degradar una actualización obligatoria.
 
-**Estado T01:** no hay canales, firmas ni Releases; cualquier GET a esas rutas futuras puede devolver 404 y no debe interpretarse como actualización disponible. Solo el README y este documento se usan ahora para comprobar lectura anónima.
+## Candidato TEST vigente
+
+La rama `codex/c144-sri-test` contiene el puntero firmado del canal TEST para el motor 1.0.0 y el candidato SRI 0.1.13, documentos 3 y 53. Es una publicación de pruebas para C.144. No representa aprobación ni habilitación de Producción. La rama principal no apunta a este candidato; no existe canal `PRODUCCION` en este expediente.

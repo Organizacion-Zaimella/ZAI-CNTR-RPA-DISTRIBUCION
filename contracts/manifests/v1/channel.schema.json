@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Organizacion-Zaimella/ZAI-RPA-CTRL-CAPTURA-INFORMACION-PUBLICA/blob/feature/cntr-rpa-1.0.0/contracts/manifests/v1/channel.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "owner", "repository", "channel", "generation", "published_at", "expires_at", "signing_key_id", "engine", "adapters", "revoked"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "owner": {"const": "Organizacion-Zaimella"},
+    "repository": {"const": "ZAI-CNTR-RPA-DISTRIBUCION"},
+    "channel": {"enum": ["TEST", "PRODUCCION"]},
+    "generation": {"type": "integer", "minimum": 1},
+    "published_at": {"type": "string", "format": "date-time"},
+    "expires_at": {"type": "string", "format": "date-time"},
+    "signing_key_id": {"type": "string", "minLength": 1},
+    "engine": {
+      "allOf": [
+        {"$ref": "#/$defs/asset"},
+        {
+          "type": "object",
+          "required": ["runtime"],
+          "properties": {
+            "runtime": {
+              "type": "object",
+              "required": ["python", "playwright", "browser_channels"],
+              "properties": {
+                "python": {"const": "3.13"},
+                "playwright": {"type": "string"},
+                "browser_channels": {"const": ["msedge", "chrome"]}
+              }
+            }
+          }
+        }
+      ]
+    },
+    "adapters": {"type": "array", "items": {"allOf": [{"$ref": "#/$defs/asset"}, {"type": "object", "required": ["adapter_id", "engine_major", "entrypoint"], "properties": {"adapter_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"}, "engine_major": {"type": "integer", "minimum": 1}, "entrypoint": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9/._-]*\\.py$"}}}]}},
+    "revoked": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^(engine|adapter:[A-Za-z0-9._-]+)@[0-9]+\\.[0-9]+\\.[0-9]+(-[0-9A-Za-z.-]+)?$"}}
+  },
+  "$defs": {
+    "asset": {
+      "type": "object",
+      "required": ["version", "release_tag", "asset", "sha256", "size", "signature", "platform", "contract_version", "files", "source_commit"],
+      "properties": {
+        "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(-[0-9A-Za-z.-]+)?$"},
+        "release_tag": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+        "asset": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "size": {"type": "integer", "minimum": 1, "maximum": 1000000000},
+        "signature": {"type": "string", "contentEncoding": "base64"},
+        "platform": {"const": "windows-x64"},
+        "contract_version": {"const": 1},
+        "files": {"type": "object", "minProperties": 1, "maxProperties": 500, "propertyNames": {"pattern": "^[A-Za-z0-9][A-Za-z0-9/._-]*$"}, "additionalProperties": {"type": "string", "pattern": "^[0-9a-f]{64}$"}},
+        "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
+      }
+    }
+  }
+}

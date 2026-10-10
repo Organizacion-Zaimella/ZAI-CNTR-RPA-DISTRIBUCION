@@ -1,5 +1,5 @@
-# Manifiestos de distribución — propuesta v1
+# Contratos de manifiestos
 
-El esquema futuro de canal incluirá: `schema_version`, canal, generación monotónica, publicación/caducidad, motor (versión, release, asset, tamaño, SHA-256, compatibilidad), adaptadores (ID, portal, versión, release, asset, tamaño, SHA-256, rangos de motor/contrato/OS), revocaciones y `signing_key_id`. Una firma separada cubrirá bytes canónicos del manifest.
+El esquema activo del canal se encuentra en `channel.schema.json`. El archivo `channels/test.json` y su firma detached contienen los punteros TEST vigentes; la firma Ed25519 cubre los bytes canónicos UTF-8 del JSON. La clave se selecciona mediante `signing_key_id` y debe estar anclada en el launcher; nunca se descarga de GitHub ni se toma de la configuración local.
 
-El cliente validará owner/repo fijos, firma, hash y compatibilidad antes de ejecutar. Un SHA incluido en un JSON sin firma no autentica al publicador. Los tipos, canonicalización, política de caducidad y JSON Schema son trabajo posterior. **No se publican manifiestos activos en T01.**
+Los manifiestos de release contienen procedencia, commit, activos, tamaño, hashes y firmas. Los verificadores del actualizador validan los contratos antes de instalar. El schema no contiene ni define elegibilidad de sujetos o documentos: eso corresponde a Oracle/ORDS.

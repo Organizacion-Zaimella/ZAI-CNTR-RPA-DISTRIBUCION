@@ -1,12 +1,14 @@
 # CNTR RPA — distribución pública
 
-Repositorio de distribución de software aprobado del proyecto CNTR RPA, propiedad de **Organizacion-Zaimella**. La descarga pública está prevista para clientes sin cuenta, token ni sesión de GitHub. El código en desarrollo, los datos operativos y las configuraciones permanecen en sus fuentes privadas.
+Repositorio de distribución pública del robot CNTR RPA. El código del motor, datos operativos, configuraciones y credenciales permanecen en sus fuentes privadas.
 
-**Estado actual:** estructura inicial. **No hay releases certificados, ejecutables, adaptadores, manifiestos de canal ni actualizaciones disponibles.** La presencia de este repositorio no autoriza instalar o ejecutar software.
+El canal TEST contiene actualmente un candidato firmado del adaptador del portal SRI para documentos 3 y 53. Esta publicación es únicamente para pruebas internas TEST; no aprueba una instalación productiva. La rama principal conserva la documentación estable; las pruebas de actualización utilizan una rama de canal TEST identificada y versionada.
 
 - [Arquitectura de distribución](docs/ARQUITECTURA_DISTRIBUCION.md)
 - [Publicación y aprobación](docs/PUBLICACION.md)
 - [Uso desde el RPA](docs/USO_DESDE_RPA.md)
+- [Contrato de canal](contracts/manifests/v1/channel.schema.json)
+- [Canal TEST](channels/test.json)
 - [Reporte privado de seguridad](SECURITY.md)
 
-El acceso de lectura del repositorio es anónimo. La publicación de software requiere revisión, firma, compatibilidad y aprobación del canal correspondiente. No se alojan datos de sujetos, documentos, evidencias ni secretos.
+No alojamos sujetos, documentos, capturas, tokens ni credenciales.

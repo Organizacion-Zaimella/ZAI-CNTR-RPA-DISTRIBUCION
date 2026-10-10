@@ -1,10 +1,10 @@
 # Política de publicación
 
-1. Desarrollar y revisar el cambio en su repositorio privado, con commit exacto y pruebas de contrato.
-2. Verificar que el contenido público no incluya datos personales, evidencias, cookies, tokens, URLs internas ni claves privadas. Confirmar derechos de publicación antes de copiar un adaptador.
-3. Construir desde fuente aprobada con dependencias bloqueadas, registrar SBOM, compatibilidad y SHA-256; firmar manifest y artefactos mediante una clave custodiada fuera de este repositorio.
-4. Publicar assets en un GitHub Release inmutable, sin sobrescribir tags ni assets existentes. Un build no equivale a release aprobada.
-5. Promover canal TEST y luego Producción mediante PR revisado y checks definidos. El puntero firmado se actualiza solo después de que el asset existe y pasa los gates del canal.
-6. Documentar revocación y reversión. Una versión retirada no debe ejecutarse por estar en caché.
+1. Desarrollar y revisar cambios en su repositorio fuente, registrando commit y pruebas.
+2. Revisar contenido publicable: datos personales, evidencias, cookies, URLs internas y claves privadas no se incluyen.
+3. Construir desde fuente versionada con dependencias bloqueadas y SBOM; firmar manifest y artefactos con una clave custodiada fuera del repositorio.
+4. Publicar assets como releases inmutables; nunca sobrescribir tags ni assets.
+5. Promover un candidato a un puntero del canal correspondiente solo tras sus gates. Un canal TEST no autoriza Producción.
+6. Registrar revocación, rollback, commit fuente, firma y SHA-256.
 
-La rama `main` albergará documentación y, en el futuro, manifest públicos revisados. El control de branch y aprobadores se comprueba por separado; este documento no afirma que estén configurados. No existe un release publicable en el estado inicial.
+Las ramas de prueba no modifican `main` ni el canal Producción. La existencia de un candidato no equivale a certificación para Producción.
