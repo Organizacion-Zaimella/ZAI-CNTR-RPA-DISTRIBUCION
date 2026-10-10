@@ -12,7 +12,7 @@ import unicodedata
 from pathlib import Path
 from urllib.parse import urlsplit
 
-PORTAL_ID = 134
+PORTAL_ID = 5
 DOCUMENT_ID = 33
 ALLOWED_HOST = "www.treasury.gov"
 ALLOWED_PATH = "/ofac/downloads/sdnlist.pdf"
@@ -21,7 +21,7 @@ MAX_PAGES = 10_000
 NAVIGATION_START_TIMEOUT_SECONDS = 30
 PDF_TRANSFER_TIMEOUT_SECONDS = 60
 PDF_TOTAL_TIMEOUT_SECONDS = NAVIGATION_START_TIMEOUT_SECONDS + PDF_TRANSFER_TIMEOUT_SECONDS
-ADAPTER_VERSION = "0.1.2-candidate"
+ADAPTER_VERSION = "0.1.3-candidate"
 PDF_REQUEST_INTERVAL_SECONDS = 5.0
 _PDF_REQUEST_LOCK = asyncio.Lock()
 _LAST_PDF_REQUEST_AT: float | None = None

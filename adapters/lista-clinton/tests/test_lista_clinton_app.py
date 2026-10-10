@@ -24,7 +24,7 @@ def pdf_bytes(pages: tuple[str, ...]) -> bytes:
     return content
 
 
-def work(*, portal=134, document=33, name="ÁCME, Holdings"):
+def work(*, portal=5, document=33, name="ÁCME, Holdings"):
     return SimpleNamespace(portal_id=portal, document_id=document, detail_id=731,
                            entry_url="https://www.treasury.gov/ofac/downloads/sdnlist.pdf",
                            subject=SimpleNamespace(display_name=name))
@@ -124,6 +124,22 @@ def test_sidecar_rejects_wrong_pair_without_download(tmp_path, monkeypatch):
     result = asyncio.run(app.documento_33(
         work(document=5), {"browser": SimpleNamespace(), "evidence_root": tmp_path}))
 
+    assert result == {"kind": "ERROR", "reason_code": "UNSUPPORTED_DOCUMENT"}
+    assert requests == []
+
+
+def test_current_oracle_portal_id_is_required_for_document_33(tmp_path, monkeypatch):
+    requests = []
+
+    async def download(url, timeout):
+        requests.append(url)
+        return pdf_bytes(("ACME Holdings",)), None
+
+    monkeypatch.setattr(app, "_download_pdf", download)
+    result = asyncio.run(app.documento_33(
+        work(portal=134), {"browser": SimpleNamespace(), "evidence_root": tmp_path}))
+
+    assert app.PORTAL_ID == 5
     assert result == {"kind": "ERROR", "reason_code": "UNSUPPORTED_DOCUMENT"}
     assert requests == []
 

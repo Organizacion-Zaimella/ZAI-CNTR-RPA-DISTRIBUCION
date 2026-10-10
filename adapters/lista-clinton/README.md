@@ -1,6 +1,6 @@
-# Lista Clinton adapter candidate 0.1.2
+# Lista Clinton adapter candidate 0.1.3
 
-Portal 134, Oracle document 33. The standalone Playwright application downloads
+Portal 5 (OFAC), Oracle document 33. The standalone Playwright application downloads
 the configured public Treasury SDN PDF and searches all extractable text pages
 using the legacy workflow's normalized full-name match. A `NO_MATCH` result is
 only conclusive when every PDF page has searchable text; OCR is not used. The
@@ -30,3 +30,7 @@ requests; a subject-free binary check retrieved the 16,539,778-byte PDF with a
 valid signature. This verifies transport only: no subject was searched. There
 is no current eligible ORDS pair, signed release, or ACK, so this is not a live
 document certification.
+
+Candidate 0.1.3 aligns the portal ID with the current TEST catalogue:
+`id_portal=5`, `id_documento=33`. The earlier candidate's portal ID `134` did
+not match Oracle and could not have been selected by the robot contract.
