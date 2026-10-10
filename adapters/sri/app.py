@@ -22,7 +22,7 @@ from playwright.async_api import async_playwright
 
 
 ADAPTER_ID = "sri"
-ADAPTER_VERSION = "0.1.11-candidate"
+ADAPTER_VERSION = "0.1.12-candidate"
 MIN_PACING_SECONDS = 5.0
 NAVIGATION_TIMEOUT_SECONDS = 30.0
 ELEMENT_TIMEOUT_SECONDS = 15.0
@@ -122,6 +122,11 @@ def _navigation_failure(exc: Exception) -> str:
     """Return a stable, sanitized reason for navigation/network failures."""
     if isinstance(exc, PlaywrightTimeoutError):
         return "PORTAL_NAVIGATION_TIMEOUT"
+    exception_name = type(exc).__name__.casefold()
+    if "targetclosed" in exception_name:
+        return "BROWSER_TARGET_CLOSED"
+    if "browsercontextclosed" in exception_name:
+        return "BROWSER_CONTEXT_CLOSED"
     message = str(exc).upper()
     markers = (
         ("ERR_INTERNET_DISCONNECTED", "NETWORK_DISCONNECTED"),
@@ -400,9 +405,22 @@ async def run_many(contexts: list[WorkContext]) -> list[dict[str, str | int | No
         if browser is None:
             return [_result(context, "ERROR", "NO_SUPPORTED_BROWSER") for context in contexts]
         try:
-            page = await browser.new_page()
+            # Keep one context across documents so cookies/session state survives.
+            # A navigation-level network failure can leave Chromium on an error
+            # document even though the browser context remains usable. Continue
+            # from a fresh page in that same context; do not restart the browser
+            # or repeat the failed document query.
+            browser_context = await browser.new_context()
+            page = await browser_context.new_page()
             results = []
-            for context in contexts:
+            recoverable_navigation = {
+                "NETWORK_DISCONNECTED", "NETWORK_CHANGED", "PORTAL_CONNECTION_RESET",
+                "PORTAL_CONNECTION_REFUSED", "PORTAL_DNS_FAILURE",
+                "PORTAL_CONNECTION_TIMEOUT", "PORTAL_UNREACHABLE",
+                "BROWSER_TARGET_CLOSED", "BROWSER_CONTEXT_CLOSED",
+                "PORTAL_OR_BROWSER_ERROR",
+            }
+            for index, context in enumerate(contexts):
                 try:
                     result = await _run_on_page(context, page)
                 except PlaywrightTimeoutError:
@@ -410,6 +428,12 @@ async def run_many(contexts: list[WorkContext]) -> list[dict[str, str | int | No
                 except Exception as exc:
                     result = _result(context, "RETRYABLE", _navigation_failure(exc))
                 results.append(result)
+                if index + 1 < len(contexts) and (
+                    page.is_closed() or result.get("reason_code") in recoverable_navigation
+                ):
+                    # Reuse the same browser context and cookies, replacing only
+                    # the unusable/error page for the next ORDS-ordered document.
+                    page = await browser_context.new_page()
             return results
         finally:
             await browser.close()

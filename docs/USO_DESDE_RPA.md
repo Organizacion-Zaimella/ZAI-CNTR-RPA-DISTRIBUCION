@@ -7,3 +7,12 @@ La rama candidata `codex/sri-0.1.3-test12` contiene un canal TEST firmado de gen
 La instalación usará staging por versión, autochequeo y activación atómica. Conservará configuración, OAuth, journal y logs; ante fallo restaurará la última versión verificada. Si la red falla, aplicará la política autorizada de caché sin ejecutar paquetes revocados ni omitir una actualización de seguridad obligatoria.
 
 No existe canal `production.json`; ningún candidato de TEST autoriza ejecución o actualización en Producción. Los adaptadores de generación 7 siguen pendientes de QA E2E por versión instalada, evidencia y ACK.
+# SRI 0.1.12 — uso del candidato TEST
+
+La release firmada `cntr-rpa-sri-0.1.12-test20` se publicó como candidato TEST
+y la generación 20 incorpora esa versión. La ejecución autónoma validada fue
+standalone; no es una instrucción para forzarla desde el robot. Antes de usar el
+canal, confirmar que el plan ORDS de TEST entrega exactamente la misma versión.
+La lectura vigente todavía devuelve `sri@0.1.8-candidate`, por lo que la
+integración del candidato queda pendiente y esta versión no debe desplegarse en
+Producción.

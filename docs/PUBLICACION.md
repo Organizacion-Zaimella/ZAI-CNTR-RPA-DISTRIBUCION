@@ -40,3 +40,16 @@ Esto es una publicación candidata para QA, no certificación integrada. El pin 
 La rama `codex/sri-0.1.3-test12` agrega `sri@0.1.3-candidate` y el prerelease firmado `cntr-rpa-1.0.0-test.12` sobre la generación 9. El cambio aplica la pausa mínima entre navegación y clic del modo de búsqueda; la suite local terminó 11/11. No hubo una consulta pública nueva después de observar `ERR_CONNECTION_RESET`, así que el paquete queda como candidato para QA, sin afirmar que el cambio resuelva ese resultado.
 
 ORDS conserva el pin SRI `0.1.0-candidate`. Esta publicación no cambia elegibilidad ni reglas, no ejecuta el adaptador desde el robot y no cambia `main` ni Producción.
+# SRI 0.1.12 — TEST candidate
+
+RPA source commit `4290c2edb6f774268b5541be57808dc69650ea71` builds signed TEST
+release `cntr-rpa-sri-0.1.12-test20`; channel generation 20 is derived from the
+verified generation 19 channel. The package includes the standalone Playwright
+app and motor ABI entrypoint. Independent headed TEST returned `MATCH` for docs
+3 and 53 in ORDS order, with private PNG evidence. Distribution tests: 26
+passed.
+
+This is a TEST prerelease, not Production approval. Current ORDS TEST assigns
+`sri@0.1.8-candidate`; no assignment was changed. Do not run the robot/updater
+against this channel as a substitute for an exact compatible assignment. Gate B
+and ACK for 0.1.12 remain pending.

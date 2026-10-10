@@ -1,6 +1,6 @@
-# Aplicación independiente SRI — candidato 0.1.11
+# Aplicación independiente SRI — candidato 0.1.12
 
-Estado: **candidato privado 0.1.11, no certificado**. `app.py` ejecuta
+Estado: **candidato privado 0.1.12, Gate A standalone aprobado; Gate B pendiente**. `app.py` ejecuta
 documentos 3 y 53 con Playwright sin importar el motor CNTR. El motor no debe
 recompilarse por esta aplicación.
 
@@ -77,35 +77,22 @@ habilitado antes del único envío. Una barrera detectada antes o después de
 teclear se recuerda durante el lote y no se envía el formulario. Esta interfaz
 se cubre con pruebas sintéticas y aún requiere una corrida integrada positiva.
 
-## Retest TEST independiente 0.1.10
+## Candidato 0.1.12 — continuidad del lote tras error de red
 
-El 2026-10-10, la aplicación Python `0.1.10-candidate` recorrió los documentos
-3 y 53 en ese orden, con una sola sesión/página headed de Chrome, y obtuvo
-`MATCH` para ambos. Generó PNG completas privadas (67,566 bytes y 106,364
-bytes); no se incluyen en este repositorio. El intervalo entre capturas fue
-32.4 s y no representa la duración individual de cada página. El registro
-saneado de resultados está en [RUN5 del PR de integración RPA](https://github.com/Organizacion-Zaimella/ZAI-RPA-CTRL-CAPTURA-INFORMACION-PUBLICA/blob/codex/cntr-rpa-1.0.0-integration/docs/v1.0.0/tareas/P01_SRI_RETEST_20261010_RUN5.json).
-
-La ejecución identificó que Angular podía reemplazar el botón y que una
-consulta `is_enabled()` heredaba el timeout implícito de Playwright. La versión
-0.1.10 limita controles y habilitación a 30 s, con observaciones cada 250 ms;
-la suite del adaptador pasó 21 pruebas. La liberación firmada de este candidato
-está pendiente. ORDS aún pide `0.1.8-candidate`, por lo que no se ejecutó el
-robot con `0.1.10` ni se registró ACK para esta versión.
+El lote usa un único navegador y contexto para conservar cookies/sesión. Si un
+documento termina con error de red o deja la pestaña inutilizable, el adaptador
+crea una página nueva dentro del mismo contexto y continúa con el siguiente
+documento en el orden recibido; no repite la consulta fallida ni reinicia el
+navegador. Los cierres de target/contexto tienen códigos saneados. La prueba
+standalone headed recorrió documentos 3 y 53 en orden y obtuvo `MATCH` en ambos,
+con capturas PNG privadas válidas (61,472 y 106,364 bytes). Evidencia saneada:
+`P01_SRI_STANDALONE_20261010_R7.json`. La suite standalone pasó 24 pruebas.
+ORDS sigue asignando `sri@0.1.8-candidate`; no se cambió el pin, así que no se
+declara ejecución integrada ni ACK de 0.1.12.
 
 ## Estado de certificación
 
-La exploración interactiva confirmó que las pantallas de formulario públicas
-cargan. Aún faltan lectura de la configuración elegible vigente de ORDS TEST,
-consultas reales autorizadas de las rutas positivas/negativas, revisión de la
-atribución del resultado al sujeto y el ciclo con el motor instalado/ACK. Por
-ello no crear release ni promover este candidato como certificado.
-
-## Candidato 0.1.11 — perfil de espera adaptativo
-
-El código Python ahora aplica el perfil por operación indicado arriba. Una
-navegación posterior en la pestaña SRI persistente llegó a Keycloak y devolvió
-`ERR_CONNECTION_RESET` antes de mostrar el formulario; no se ingresó sujeto ni
-se volvió a enviar una consulta. El retest real de 0.1.11 queda pendiente de
-conectividad. Las ejecuciones standalone `MATCH` de 0.1.10 anteriores no se
-atribuyen a este candidato ni se invalidan por el error de navegación posterior.
+La navegación de los documentos y la app standalone tienen evidencia positiva;
+queda pendiente probar la versión 0.1.12 mediante el robot instalado. La
+asignación TEST exacta vigente es 0.1.8-candidate y no se alteró. Esta versión
+no se considera certificada para robot/ACK ni Producción.

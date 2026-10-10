@@ -6,7 +6,7 @@ import importlib.util
 from pathlib import Path
 import sys
 from types import SimpleNamespace
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, call, patch
 
 
 APP_PATH = Path(__file__).resolve().parents[1] / "app.py"
@@ -396,7 +396,12 @@ def test_run_many_keeps_browser_session_and_advances_after_network_loss():
     contexts = [context(), app.WorkContext(
         document_id=3, entry_url="https://example.invalid/next",
         identification="TEST-ONLY", evidence_dir=Path("."))]
-    browser = SimpleNamespace(new_page=AsyncMock(return_value=object()), close=AsyncMock())
+    page_one = SimpleNamespace(is_closed=lambda: False)
+    page_two = SimpleNamespace(is_closed=lambda: False)
+    browser_context = SimpleNamespace(
+        new_page=AsyncMock(side_effect=[page_one, page_two]))
+    browser = SimpleNamespace(new_context=AsyncMock(return_value=browser_context),
+                              close=AsyncMock())
     playwright = SimpleNamespace()
     manager = AsyncMock()
     manager.__aenter__ = AsyncMock(return_value=playwright)
@@ -419,5 +424,53 @@ def test_run_many_keeps_browser_session_and_advances_after_network_loss():
 
     assert [result["status"] for result in results] == ["RETRYABLE", "NO_MATCH"]
     assert calls == [53, 3]
-    browser.new_page.assert_awaited_once()
+    browser.new_context.assert_awaited_once()
+    assert browser_context.new_page.await_count == 2
     browser.close.assert_awaited_once()
+
+
+def test_navigation_reset_replaces_only_page_and_keeps_context_cookies():
+    contexts = [app.WorkContext(
+        document_id=3, entry_url="https://srienlinea.sri.gob.ec/first",
+        identification="TEST-ONLY", evidence_dir=Path(".")), app.WorkContext(
+        document_id=53, entry_url="https://srienlinea.sri.gob.ec/next",
+        identification="TEST-ONLY", evidence_dir=Path("."))]
+    page_one = SimpleNamespace(is_closed=lambda: False)
+    page_two = SimpleNamespace(is_closed=lambda: False)
+    browser_context = SimpleNamespace(
+        new_page=AsyncMock(side_effect=[page_one, page_two]))
+    browser = SimpleNamespace(new_context=AsyncMock(return_value=browser_context),
+                              close=AsyncMock())
+    manager = AsyncMock()
+    manager.__aenter__ = AsyncMock(return_value=SimpleNamespace())
+    manager.__aexit__ = AsyncMock(return_value=None)
+    observed_pages = []
+
+    async def run_item(item, page):
+        observed_pages.append(page)
+        if item.document_id == 3:
+            return app._result(item, "RETRYABLE", "PORTAL_CONNECTION_RESET")
+        return app._result(item, "NO_MATCH")
+
+    async def launch(_playwright, _headless):
+        return browser
+
+    with patch.object(app, "async_playwright", return_value=manager), \
+         patch.object(app, "_launch_browser", launch), \
+         patch.object(app, "_run_on_page", run_item):
+        results = run(app.run_many(contexts))
+
+    assert [result["reason_code"] for result in results] == [
+        "PORTAL_CONNECTION_RESET", None]
+    assert observed_pages == [page_one, page_two]
+    browser_context.new_page.assert_has_awaits([call(), call()])
+    browser.close.assert_awaited_once()
+
+
+def test_navigation_failure_classifies_closed_browser_target_without_details():
+    class TargetClosedError(Exception):
+        pass
+
+    result = app._navigation_failure(TargetClosedError("private URL and identity"))
+
+    assert result == "BROWSER_TARGET_CLOSED"
