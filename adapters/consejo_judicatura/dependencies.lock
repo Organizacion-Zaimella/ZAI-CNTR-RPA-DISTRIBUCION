@@ -1,0 +1,2 @@
+# Entorno standalone y contrato lateral: mantener fijo para reproducibilidad.
+playwright==1.60.0
