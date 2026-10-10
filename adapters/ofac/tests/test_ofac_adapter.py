@@ -1,0 +1,153 @@
+"""Pruebas sintéticas del ABI; no acceden al portal ni contienen sujetos."""
+from __future__ import annotations
+
+import asyncio
+import importlib.util
+from pathlib import Path
+from types import SimpleNamespace
+
+
+ADAPTER_DIR = Path(__file__).resolve().parents[1]
+MODULE = ADAPTER_DIR / "src" / "adapter.py"
+if not MODULE.is_file():
+    MODULE = ADAPTER_DIR / "adapter.py"
+SPEC = importlib.util.spec_from_file_location("ofac_sidecar_candidate", MODULE)
+adapter = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(adapter)
+
+
+def work(detail_id, *, url="https://sanctionssearch.ofac.treas.gov/Search.aspx"):
+    return SimpleNamespace(portal_id=5, document_id=5, detail_id=detail_id,
+                           entry_url=url, deadline_seconds=10,
+                           subject=SimpleNamespace(display_name="TEST ONLY"))
+
+
+class Browser:
+    def __init__(self):
+        self.goto_calls = 0
+        self.actions = []
+
+    async def goto(self, url):
+        self.goto_calls += 1
+        self.actions.append("goto")
+        if self.goto_calls == 1:
+            raise RuntimeError("net::ERR_INTERNET_DISCONNECTED https://private.invalid/123")
+
+    async def is_visible(self, selector):
+        return False
+
+    async def fill_role(self, *args, **kwargs):
+        self.actions.append("fill")
+
+    async def click_role(self, *args, **kwargs):
+        self.actions.append("submit")
+
+    async def text(self, selector):
+        return "Lookup Results: 0 Found"
+
+    async def screenshot(self, path, *, full_page=True):
+        Path(path).write_bytes(b"synthetic screenshot")
+
+
+def test_network_loss_is_retryable_and_following_work_uses_same_browser(tmp_path):
+    browser = Browser()
+    services = {"browser": browser, "evidence_root": tmp_path}
+
+    async def scenario():
+        await adapter.prepare(work(1), services)
+        first = await adapter.documento_5(work(1), services)
+        second = await adapter.documento_5(work(2), services)
+        return first, second
+
+    first, second = asyncio.run(scenario())
+    assert first == {"kind": "RETRYABLE", "reason_code": "NETWORK_DISCONNECTED"}
+    assert second["kind"] == "NO_MATCH"
+    assert browser.goto_calls == 2
+    assert browser.actions == ["goto", "goto", "fill", "submit"]
+    assert "private.invalid" not in str(first)
+
+
+def test_wrong_host_fails_closed_before_browser_navigation():
+    class NeverUseBrowser:
+        async def goto(self, _url):
+            raise AssertionError("unexpected navigation")
+
+    result = asyncio.run(adapter.documento_5(
+        work(1, url="https://example.invalid/Search.aspx"),
+        {"browser": NeverUseBrowser()}))
+    assert result == {"kind": "ERROR", "reason_code": "UNAUTHORIZED_ENTRY_URL"}
+
+
+def test_network_failure_codes_are_bounded_and_sanitized():
+    cases = {
+        "net::ERR_NETWORK_CHANGED https://private.invalid/x": "NETWORK_CHANGED",
+        "net::ERR_CONNECTION_RESET https://private.invalid/x": "PORTAL_CONNECTION_RESET",
+        "net::ERR_NAME_NOT_RESOLVED private.invalid": "PORTAL_DNS_FAILURE",
+        "net::ERR_ADDRESS_UNREACHABLE private.invalid": "PORTAL_UNREACHABLE",
+        "opaque failure containing private.invalid": "PORTAL_ACTION_FAILED",
+    }
+    for message, expected in cases.items():
+        result = adapter._failure_code(RuntimeError(message))
+        assert result == expected
+        assert "private.invalid" not in result
+
+
+def test_sidecar_deadline_extends_only_on_progress_and_is_capped():
+    assert adapter._extend_result_deadline(60, 120, 60, False) == 60
+    assert adapter._extend_result_deadline(60, 120, 60, True) == 90
+    assert adapter._extend_result_deadline(100, 120, 105, True) == 120
+
+
+def test_result_count_must_stabilize_before_evidence(tmp_path):
+    class ChangingResultBrowser(Browser):
+        def __init__(self):
+            super().__init__()
+            self.results = iter(["Lookup Results: 1 Found",
+                                 "Lookup Results: 0 Found",
+                                 "Lookup Results: 0 Found"])
+
+        async def goto(self, _url):
+            self.goto_calls += 1
+
+        async def text(self, selector):
+            return next(self.results)
+
+    browser = ChangingResultBrowser()
+    services = {"browser": browser, "evidence_root": tmp_path}
+
+    async def scenario():
+        await adapter.prepare(work(1), services)
+        return await adapter.documento_5(work(1), services)
+
+    result = asyncio.run(scenario())
+    assert result["kind"] == "NO_MATCH"
+    assert Path(result["evidence_path"]).is_file()
+    assert browser.goto_calls == 1
+
+
+def test_busy_result_count_is_not_classified(tmp_path):
+    class BusyBrowser(Browser):
+        async def goto(self, _url):
+            self.goto_calls += 1
+
+        async def text(self, selector):
+            return "Searching... Lookup Results: 0 Found"
+
+    browser = BusyBrowser()
+    services = {"browser": browser, "evidence_root": tmp_path}
+    test_work = work(1)
+    test_work.deadline_seconds = 0.1
+
+    async def scenario():
+        await adapter.prepare(test_work, services)
+        return await adapter.documento_5(test_work, services)
+
+    result = asyncio.run(scenario())
+    assert result == {"kind": "RETRYABLE", "reason_code": "RESULT_NOT_CONCLUSIVE"}
+    assert not list(tmp_path.glob("*.png"))
+
+
+def test_sidecar_deadline_extends_only_on_progress_and_is_capped():
+    assert adapter._extend_result_deadline(60, 120, 60, False) == 60
+    assert adapter._extend_result_deadline(60, 120, 60, True) == 90
+    assert adapter._extend_result_deadline(100, 120, 105, True) == 120

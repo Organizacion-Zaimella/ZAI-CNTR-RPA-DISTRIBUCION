@@ -8,3 +8,7 @@ Es un candidato técnico para actualizar el motor aislado y repetir el E2E. No c
 ## Candidato TEST generación 14 — motor 1.0.0-test.7 — 2026-10-10
 
 El prerelease `cntr-rpa-1.0.0-test.16` incluye el build aislado del motor `1.0.0-test.7`, commit RPA `aa2a5412dd0ae73ba344266dca8ae2a8d99db9ba`. Combina navegación SPA acotada (`wait_until="commit"`) con la solicitud explícita de bytes crudos en descargas anónimas de GitHub Release. El canal parte de generación 13, preserva los cinco adaptadores y el pin SRI `0.1.8-candidate`, y pasa a generación 14. Builder y firmas TEST verifican manifiesto/canal/ZIP. La prueba anónima del actualizador aislado aún debe confirmar instalación y E2E SRI; no es certificación. El candidato `test.15` queda supersedido por el error HTTP 404 al descargar su manifest JSON. `main` y Producción no se modifican.
+
+## Candidato TEST generación 15 — OFAC 0.1.2 — 2026-10-10
+
+El prerelease firmado `cntr-rpa-1.0.0-test.17` distribuye la app independiente `adapters/ofac/app.py` y el sidecar de OFAC `0.1.2-candidate`, desde el commit RPA `2e7b63fac89a51969a3fdbaf01f8eb7b71604692`. El canal TEST pasa de generación 14 a 15, mantiene el motor `1.0.0-test.7` y demás pines, y actualiza solo OFAC. El paquete incluye `app.py`, `adapter.py`, `dependencies.lock` y manifiesto firmado; la suite de distribución/OFAC se ejecutará antes de publicar. Candidato de TEST, no certificación: el plan ORDS actual no contiene pareja OFAC elegible y no se forzó una búsqueda ni un ACK.
