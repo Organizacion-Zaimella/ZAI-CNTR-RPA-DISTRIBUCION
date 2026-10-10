@@ -22,7 +22,7 @@ from playwright.async_api import async_playwright
 
 
 ADAPTER_ID = "sri"
-ADAPTER_VERSION = "0.1.7-candidate"
+ADAPTER_VERSION = "0.1.8-candidate"
 MIN_PACING_SECONDS = 5.0
 NAVIGATION_TIMEOUT_SECONDS = 45.0
 ELEMENT_TIMEOUT_SECONDS = 45.0

@@ -20,6 +20,7 @@ class Browser:
     def __init__(self):
         self.actions = []
         self.value = ""
+        self.controls_ready = True
         self.result_text = "Formulario listo"
         self.query_result_text = "No se encontraron resultados"
 
@@ -33,11 +34,17 @@ class Browser:
         return False
 
     async def count(self, selector):
+        if not self.controls_ready:
+            return 0
         if "Seleccionar búsqueda" in selector:
             return 1
         if selector == "#busquedaRucId":
             return 1
         return 0
+
+    async def wait_for_selector(self, selector, **options):
+        self.actions.append(("wait_for_selector", selector, options))
+        self.controls_ready = True
 
     async def click_text(self, text, *, exact=False):
         self.actions.append(("mode", text, exact))
@@ -100,6 +107,30 @@ def test_sidecar_uses_document_specific_search_mode_and_selector(tmp_path):
         assert ("type", "#busquedaRucId") in browser.actions
         assert any(action[0] == "submit" for action in browser.actions)
         assert ("text", "main") in browser.actions
+
+
+def test_sidecar_waits_for_spa_controls_after_commit_before_counting(tmp_path):
+    class DelayedBrowser(Browser):
+        def __init__(self):
+            super().__init__()
+            self.controls_ready = False
+
+    async def scenario():
+        browser = DelayedBrowser()
+        services = {"browser": browser, "evidence_root": tmp_path}
+        await adapter.prepare(work(3), services)
+        result = await adapter.execute_document(work(3), services)
+        return browser, result
+
+    browser, result = asyncio.run(scenario())
+    assert result["kind"] == "NO_MATCH"
+    waits = [action for action in browser.actions if action[0] == "wait_for_selector"]
+    assert len(waits) == 2
+    assert "#busquedaRucId" in waits[0][1]
+    assert waits[0][2] == {"state": "visible", "timeout": 2000}
+    assert waits[1][1] == "#busquedaRucId"
+    mode_action = ("mode", "Seleccionar búsqueda por RUC o cédula", True)
+    assert browser.actions.index(waits[0]) < browser.actions.index(mode_action)
 
 
 def test_sidecar_fails_closed_when_search_field_is_ambiguous(tmp_path):
