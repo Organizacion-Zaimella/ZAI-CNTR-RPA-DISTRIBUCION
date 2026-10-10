@@ -32,6 +32,8 @@ class Locator:
             self.page.body = "Verify you are human"
 
     async def inner_text(self):
+        if self.page.body_sequence:
+            return self.page.body_sequence.pop(0)
         return self.page.body
 
 
@@ -43,8 +45,10 @@ class Page:
         self.status = status
         self.body = body
         self.challenge_after_search = challenge_after_search
+        self.body_sequence = []
         self.navigations = 0
         self.actions = []
+        self.waits = []
 
     async def goto(self, url, **kwargs):
         self.navigations += 1
@@ -61,6 +65,7 @@ class Page:
         return Locator(self, role)
 
     async def wait_for_timeout(self, ms):
+        self.waits.append(ms)
         return None
 
     async def screenshot(self, *, path, full_page):
@@ -228,6 +233,36 @@ def test_missing_result_count_remains_retryable_without_evidence(tmp_path, monke
     assert list(tmp_path.iterdir()) == []
 
 
+def test_loading_overlay_defers_even_when_old_result_count_is_present(tmp_path, monkeypatch):
+    page = Page(body="Please wait... Lookup Results: 0 Found")
+    browser = Browser(page)
+    playwright = PlaywrightContext(browser)
+    monkeypatch.setattr(app, "async_playwright", lambda: playwright)
+    item = context(tmp_path)
+    item["timeout"] = 0.01
+
+    results = run(app.run_many([item]))
+
+    assert results[0]["status"] == "RETRYABLE"
+    assert results[0]["reason_code"] == "RESULT_COUNT_NOT_CONCLUSIVE"
+    assert page.waits.count(500) >= 1
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_result_count_must_be_stable_across_two_observations(tmp_path, monkeypatch):
+    page = Page(body="Form ready")
+    page.body_sequence = ["Form ready", "Lookup Results: 1 Found",
+                          "Lookup Results: 0 Found", "Lookup Results: 0 Found"]
+    browser = Browser(page)
+    playwright = PlaywrightContext(browser)
+    monkeypatch.setattr(app, "async_playwright", lambda: playwright)
+
+    results = run(app.run_many([context(tmp_path)]))
+
+    assert results[0]["status"] == "NO_MATCH"
+    assert page.waits.count(500) >= 2
+
+
 def test_positive_result_saves_full_page_evidence_and_hash(tmp_path, monkeypatch):
     page = Page(body="Lookup Results: 2 Found")
     browser = Browser(page)
@@ -274,3 +309,45 @@ def test_sidecar_challenge_latch_skips_remaining_details_without_navigation(tmp_
     assert first["kind"] == "HUMAN_REQUIRED"
     assert second["kind"] == "HUMAN_REQUIRED"
     assert browser.actions == ["goto", "fill", "click"]
+
+
+def test_sidecar_waits_for_result_count_to_stabilize(tmp_path):
+    class ResultBrowser:
+        def __init__(self):
+            self.actions = []
+            self.texts = iter(["Lookup Results: 1 Found",
+                               "Lookup Results: 0 Found",
+                               "Lookup Results: 0 Found"])
+
+        async def goto(self, _url):
+            self.actions.append("goto")
+
+        async def is_visible(self, _selector):
+            return False
+
+        async def fill_role(self, *_args, **_kwargs):
+            self.actions.append("fill")
+
+        async def click_role(self, *_args, **_kwargs):
+            self.actions.append("submit")
+
+        async def text(self, _selector):
+            self.actions.append("read_result")
+            return next(self.texts)
+
+        async def screenshot(self, path, *, full_page):
+            Path(path).write_bytes(b"synthetic evidence")
+
+    async def scenario():
+        browser = ResultBrowser()
+        test_work = work(90)
+        services = {"browser": browser, "evidence_root": tmp_path}
+        await app.prepare(test_work, services)
+        result = await app.documento_5(test_work, services)
+        return browser, result
+
+    browser, result = run(scenario())
+
+    assert result["kind"] == "NO_MATCH"
+    assert browser.actions.count("read_result") == 3
+    assert Path(result["evidence_path"]).is_file()

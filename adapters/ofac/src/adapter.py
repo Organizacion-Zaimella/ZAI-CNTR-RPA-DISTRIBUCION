@@ -11,6 +11,8 @@ from urllib.parse import urlparse
 PORTAL_ID = 5
 DOCUMENT_IDS = {5}
 RESULT = re.compile(r"Lookup Results:\s*(\d+)\s*Found", re.I)
+PORTAL_BUSY = re.compile(r"please wait|searching|loading|espere por favor|\bcargando\b", re.I)
+RESULT_STABLE_SAMPLES = 2
 OFAC_HOST = "sanctionssearch.ofac.treas.gov"
 _human_barrier = False
 
@@ -56,17 +58,35 @@ async def documento_5(work, services):
                                 work.subject.display_name, exact=True)
         await browser.click_role("button", "Search", exact=True)
         deadline = time.monotonic() + min(work.deadline_seconds, 120)
+        stable_count = None
+        stable_samples = 0
         while time.monotonic() < deadline:
             if await browser.is_visible('iframe[src*="captcha"], [class*="altcha"]'):
                 _human_barrier = True
                 return {"kind": "HUMAN_REQUIRED", "checkpoint": "PORTAL_CHALLENGE",
                         "reason_code": "PORTAL_CHALLENGE"}
-            found = RESULT.search(await browser.text("body"))
+            text = await browser.text("body")
+            if PORTAL_BUSY.search(text):
+                stable_count = None
+                stable_samples = 0
+                await asyncio.sleep(0.5)
+                continue
+            found = RESULT.search(text)
             if found:
-                target = Path(services["evidence_root"]) / f"ofac-{work.detail_id}.png"
-                await browser.screenshot(str(target), full_page=True)
-                return {"kind": "MATCH" if int(found.group(1)) else "NO_MATCH",
-                        "evidence_path": str(target)}
+                observed = int(found.group(1))
+                if observed == stable_count:
+                    stable_samples += 1
+                else:
+                    stable_count = observed
+                    stable_samples = 1
+                if stable_samples >= RESULT_STABLE_SAMPLES:
+                    target = Path(services["evidence_root"]) / f"ofac-{work.detail_id}.png"
+                    await browser.screenshot(str(target), full_page=True)
+                    return {"kind": "MATCH" if observed else "NO_MATCH",
+                            "evidence_path": str(target)}
+            else:
+                stable_count = None
+                stable_samples = 0
             await asyncio.sleep(0.5)
         return {"kind": "RETRYABLE", "reason_code": "RESULT_NOT_CONCLUSIVE"}
     except Exception as exc:

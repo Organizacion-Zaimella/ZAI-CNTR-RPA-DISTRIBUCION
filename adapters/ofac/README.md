@@ -1,11 +1,11 @@
-# OFAC adapter candidate 0.1.2
+# OFAC adapter candidate 0.1.3
 
 TEST candidate for OFAC document 5. `app.py` is the independent Playwright
 entrypoint; `src/adapter.py` is the isolated motor ABI. This candidate is not
 certified and must not be promoted to Production.
 
 The standalone application searches by the authorized subject name, classifies
-only the visible `Lookup Results` count, and stores a full-page screenshot
+only a stable visible `Lookup Results` count (two equal observations), ignores explicit wait/loading states, and stores a full-page screenshot
 outside the repository. The sidecar validates the HTTPS host and returns
 sanitized retryable outcomes for network loss and timeouts. HTTP 403/429/451
 and human challenges do not trigger a repeated request. CAPTCHA is never

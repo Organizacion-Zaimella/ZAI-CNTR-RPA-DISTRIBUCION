@@ -15,10 +15,12 @@ from playwright.async_api import TimeoutError as PlaywrightTimeoutError
 from playwright.async_api import async_playwright
 
 ADAPTER_ID = "ofac"
-ADAPTER_VERSION = "0.1.2-candidate"
+ADAPTER_VERSION = "0.1.3-candidate"
 OFAC_HOST = "sanctionssearch.ofac.treas.gov"
 RESULT_COUNT = re.compile(r"Lookup Results:\s*(\d+)\s*Found", re.I)
 CHALLENGE = re.compile(r"captcha|altcha|verify you are human|no soy un robot", re.I)
+PORTAL_BUSY = re.compile(r"please wait|searching|loading|espere por favor|\bcargando\b", re.I)
+RESULT_STABLE_SAMPLES = 2
 _human_barrier = False
 
 
@@ -87,14 +89,31 @@ async def _run_on_page(ctx: dict, page) -> dict:
     await button.click(timeout=ctx["timeout"] * 1000)
     deadline = time.monotonic() + ctx["timeout"]
     count = None
+    stable_count = None
+    stable_samples = 0
     while time.monotonic() < deadline:
         text = await page.locator("body").inner_text()
         if CHALLENGE.search(text):
             return output("HUMAN_REQUIRED", "PORTAL_CHALLENGE")
+        if PORTAL_BUSY.search(text):
+            stable_count = None
+            stable_samples = 0
+            await page.wait_for_timeout(500)
+            continue
         match = RESULT_COUNT.search(text)
         if match:
-            count = int(match.group(1))
-            break
+            observed = int(match.group(1))
+            if observed == stable_count:
+                stable_samples += 1
+            else:
+                stable_count = observed
+                stable_samples = 1
+            if stable_samples >= RESULT_STABLE_SAMPLES:
+                count = observed
+                break
+        else:
+            stable_count = None
+            stable_samples = 0
         await page.wait_for_timeout(500)
     if count is None:
         return output("RETRYABLE", "RESULT_COUNT_NOT_CONCLUSIVE")
@@ -170,16 +189,33 @@ async def documento_5(work, services):
                                 work.subject.display_name, exact=True)
         await browser.click_role("button", "Search", exact=True)
         deadline = time.monotonic() + min(work.deadline_seconds, 120)
+        stable_count = None
+        stable_samples = 0
         while time.monotonic() < deadline:
             if await browser.is_visible(challenge):
                 _human_barrier = True
                 return {"kind": "HUMAN_REQUIRED", "checkpoint": "PORTAL_CHALLENGE"}
             text = await browser.text("body")
+            if PORTAL_BUSY.search(text):
+                stable_count = None
+                stable_samples = 0
+                await asyncio.sleep(0.5)
+                continue
             match = RESULT_COUNT.search(text)
             if match:
-                await browser.screenshot(str(evidence), full_page=True)
-                return {"kind": "MATCH" if int(match.group(1)) else "NO_MATCH",
-                        "evidence_path": str(evidence)}
+                observed = int(match.group(1))
+                if observed == stable_count:
+                    stable_samples += 1
+                else:
+                    stable_count = observed
+                    stable_samples = 1
+                if stable_samples >= RESULT_STABLE_SAMPLES:
+                    await browser.screenshot(str(evidence), full_page=True)
+                    return {"kind": "MATCH" if observed else "NO_MATCH",
+                            "evidence_path": str(evidence)}
+            else:
+                stable_count = None
+                stable_samples = 0
             await asyncio.sleep(0.5)
         return {"kind": "RETRYABLE", "reason_code": "RESULT_COUNT_NOT_CONCLUSIVE"}
     except Exception:

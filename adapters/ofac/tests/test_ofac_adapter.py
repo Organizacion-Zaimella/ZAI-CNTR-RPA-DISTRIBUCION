@@ -87,3 +87,52 @@ def test_network_failure_codes_are_bounded_and_sanitized():
         result = adapter._failure_code(RuntimeError(message))
         assert result == expected
         assert "private.invalid" not in result
+
+
+def test_result_count_must_stabilize_before_evidence(tmp_path):
+    class ChangingResultBrowser(Browser):
+        def __init__(self):
+            super().__init__()
+            self.results = iter(["Lookup Results: 1 Found",
+                                 "Lookup Results: 0 Found",
+                                 "Lookup Results: 0 Found"])
+
+        async def goto(self, _url):
+            self.goto_calls += 1
+
+        async def text(self, selector):
+            return next(self.results)
+
+    browser = ChangingResultBrowser()
+    services = {"browser": browser, "evidence_root": tmp_path}
+
+    async def scenario():
+        await adapter.prepare(work(1), services)
+        return await adapter.documento_5(work(1), services)
+
+    result = asyncio.run(scenario())
+    assert result["kind"] == "NO_MATCH"
+    assert Path(result["evidence_path"]).is_file()
+    assert browser.goto_calls == 1
+
+
+def test_busy_result_count_is_not_classified(tmp_path):
+    class BusyBrowser(Browser):
+        async def goto(self, _url):
+            self.goto_calls += 1
+
+        async def text(self, selector):
+            return "Searching... Lookup Results: 0 Found"
+
+    browser = BusyBrowser()
+    services = {"browser": browser, "evidence_root": tmp_path}
+    test_work = work(1)
+    test_work.deadline_seconds = 0.1
+
+    async def scenario():
+        await adapter.prepare(test_work, services)
+        return await adapter.documento_5(test_work, services)
+
+    result = asyncio.run(scenario())
+    assert result == {"kind": "RETRYABLE", "reason_code": "RESULT_NOT_CONCLUSIVE"}
+    assert not list(tmp_path.glob("*.png"))
