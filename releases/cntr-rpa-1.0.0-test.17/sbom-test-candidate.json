@@ -1,0 +1,18 @@
+{
+  "channel": "TEST",
+  "components": [
+    {
+      "asset": "cntr-rpa-adapter-ofac-0.1.2-candidate-win-x64.zip",
+      "dependencies": [
+        "playwright==1.60.0"
+      ],
+      "id": "ofac",
+      "sha256": "1158338210204533c12edd76cb19701fe82956986a1755e78464c40832a6c98f",
+      "version": "0.1.2-candidate"
+    }
+  ],
+  "format": "CNTR-RPA-SBOM-1",
+  "release_tag": "cntr-rpa-1.0.0-test.17",
+  "source_commit": "2e7b63fac89a51969a3fdbaf01f8eb7b71604692",
+  "source_repository": "Organizacion-Zaimella/ZAI-RPA-CTRL-CAPTURA-INFORMACION-PUBLICA"
+}
