@@ -15,12 +15,17 @@ from playwright.async_api import TimeoutError as PlaywrightTimeoutError
 from playwright.async_api import async_playwright
 
 ADAPTER_ID = "ofac"
-ADAPTER_VERSION = "0.1.3-candidate"
+ADAPTER_VERSION = "0.1.4-candidate"
 OFAC_HOST = "sanctionssearch.ofac.treas.gov"
 RESULT_COUNT = re.compile(r"Lookup Results:\s*(\d+)\s*Found", re.I)
 CHALLENGE = re.compile(r"captcha|altcha|verify you are human|no soy un robot", re.I)
 PORTAL_BUSY = re.compile(r"please wait|searching|loading|espere por favor|\bcargando\b", re.I)
 RESULT_STABLE_SAMPLES = 2
+NAVIGATION_TIMEOUT_SECONDS = 30
+ELEMENT_TIMEOUT_SECONDS = 15
+RESULT_INITIAL_SECONDS = 45
+RESULT_EXTENSION_SECONDS = 15
+RESULT_MAX_SECONDS = 120
 _human_barrier = False
 
 
@@ -39,7 +44,9 @@ def load_context(path: Path) -> dict:
         raise ValueError("contexto y evidencia deben quedar fuera del repositorio")
     return {"url": str(raw["entry_url"]), "name": str(raw["display_name"]).strip(),
             "evidence_dir": evidence_dir,
-            "timeout": min(120, max(20, int(raw.get("timeout_seconds", 60)))),
+            "timeout": min(RESULT_MAX_SECONDS,
+                           max(RESULT_INITIAL_SECONDS,
+                               int(raw.get("timeout_seconds", RESULT_MAX_SECONDS)))),
             "pacing": max(5.0, float(raw.get("pacing_seconds", 5)))}
 
 
@@ -72,7 +79,8 @@ def _navigation_failure(exc: Exception) -> str:
 async def _run_on_page(ctx: dict, page) -> dict:
     ctx["evidence_dir"].mkdir(parents=True, exist_ok=True)
     try:
-        response = await page.goto(ctx["url"], wait_until="domcontentloaded", timeout=ctx["timeout"] * 1000)
+        response = await page.goto(ctx["url"], wait_until="domcontentloaded",
+                                   timeout=NAVIGATION_TIMEOUT_SECONDS * 1000)
     except Exception as exc:
         return output("RETRYABLE", _navigation_failure(exc))
     if response and response.status in (403, 429, 451):
@@ -84,10 +92,12 @@ async def _run_on_page(ctx: dict, page) -> dict:
     if await field.count() != 1 or await button.count() != 1:
         return output("RETRYABLE", "SEARCH_CONTROLS_NOT_UNIQUE")
     await page.wait_for_timeout(round(ctx["pacing"] * 1000))
-    await field.fill(ctx["name"], timeout=ctx["timeout"] * 1000)
+    await field.fill(ctx["name"], timeout=ELEMENT_TIMEOUT_SECONDS * 1000)
     await page.wait_for_timeout(round(ctx["pacing"] * 1000))
-    await button.click(timeout=ctx["timeout"] * 1000)
-    deadline = time.monotonic() + ctx["timeout"]
+    await button.click(timeout=ELEMENT_TIMEOUT_SECONDS * 1000)
+    started = time.monotonic()
+    absolute_deadline = started + min(ctx["timeout"], RESULT_MAX_SECONDS)
+    deadline = min(absolute_deadline, started + RESULT_INITIAL_SECONDS)
     count = None
     stable_count = None
     stable_samples = 0
@@ -95,9 +105,14 @@ async def _run_on_page(ctx: dict, page) -> dict:
         text = await page.locator("body").inner_text()
         if CHALLENGE.search(text):
             return output("HUMAN_REQUIRED", "PORTAL_CHALLENGE")
-        if PORTAL_BUSY.search(text):
+        busy = bool(PORTAL_BUSY.search(text))
+        if busy:
             stable_count = None
             stable_samples = 0
+            # An explicit portal loading state is progress; extend in bounded
+            # increments, never beyond the absolute per-query deadline.
+            deadline = min(absolute_deadline,
+                           max(deadline, time.monotonic() + RESULT_EXTENSION_SECONDS))
             await page.wait_for_timeout(500)
             continue
         match = RESULT_COUNT.search(text)
@@ -108,6 +123,8 @@ async def _run_on_page(ctx: dict, page) -> dict:
             else:
                 stable_count = observed
                 stable_samples = 1
+                deadline = min(absolute_deadline,
+                               max(deadline, time.monotonic() + RESULT_EXTENSION_SECONDS))
             if stable_samples >= RESULT_STABLE_SAMPLES:
                 count = observed
                 break

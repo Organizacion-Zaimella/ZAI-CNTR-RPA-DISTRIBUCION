@@ -1,4 +1,4 @@
-# OFAC adapter candidate 0.1.3
+# OFAC adapter candidate 0.1.4
 
 TEST candidate for OFAC document 5. `app.py` is the independent Playwright
 entrypoint; `src/adapter.py` is the isolated motor ABI. This candidate is not
@@ -17,6 +17,13 @@ and 429, challenges before and after sending, network loss with ordered
 continuation, evidence hashing, and inconclusive results without evidence. Real
 TEST certification still requires an authorized browser run, signed
 distribution and evidence plus ACK from the installed motor.
+
+The standalone timeout profile uses 30 seconds for navigation, 15 seconds for
+controls, 45 seconds for the initial results window, and extensions of 15 seconds
+only while an explicit loading state or result-count change is observed; the
+absolute result ceiling is 120 seconds. Network waits are event/state driven;
+the application does not sleep for five minutes or turn a timeout into a
+negative match.
 
 Read-only browser inspection (2026-10-09): the public Sanctions List Search page
 loaded and exposed the name textbox (`Enter name as search criteria.`) and

@@ -1,6 +1,6 @@
 {
   "adapter_id": "ofac",
-  "version": "0.1.3-candidate",
+  "version": "0.1.4-candidate",
   "adapter_contract": 1,
   "portal_id": 5,
   "document_ids": [

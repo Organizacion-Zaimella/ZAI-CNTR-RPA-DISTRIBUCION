@@ -47,11 +47,13 @@ class Page:
         self.challenge_after_search = challenge_after_search
         self.body_sequence = []
         self.navigations = 0
+        self.navigation_kwargs = []
         self.actions = []
         self.waits = []
 
     async def goto(self, url, **kwargs):
         self.navigations += 1
+        self.navigation_kwargs.append(kwargs)
         if self.first_navigation_timeout and self.navigations == 1:
             raise app.PlaywrightTimeoutError("synthetic timeout")
         if self.first_navigation_error and self.navigations == 1:
@@ -351,3 +353,14 @@ def test_sidecar_waits_for_result_count_to_stabilize(tmp_path):
     assert result["kind"] == "NO_MATCH"
     assert browser.actions.count("read_result") == 3
     assert Path(result["evidence_path"]).is_file()
+
+
+def test_navigation_and_query_wait_budgets_are_adaptive_and_bounded(tmp_path):
+    page = Page()
+    result = run(app._run_on_page(context(tmp_path), page))
+
+    assert result["status"] == "NO_MATCH"
+    assert page.navigation_kwargs == [{"wait_until": "domcontentloaded", "timeout": 30_000}]
+    assert app.RESULT_INITIAL_SECONDS == 45
+    assert app.RESULT_EXTENSION_SECONDS == 15
+    assert app.RESULT_MAX_SECONDS == 120
