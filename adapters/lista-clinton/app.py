@@ -7,6 +7,7 @@ import hashlib
 import json
 import re
 import sys
+import time
 import unicodedata
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -20,7 +21,22 @@ MAX_PAGES = 10_000
 NAVIGATION_START_TIMEOUT_SECONDS = 30
 PDF_TRANSFER_TIMEOUT_SECONDS = 60
 PDF_TOTAL_TIMEOUT_SECONDS = NAVIGATION_START_TIMEOUT_SECONDS + PDF_TRANSFER_TIMEOUT_SECONDS
-ADAPTER_VERSION = "0.1.1-candidate"
+ADAPTER_VERSION = "0.1.2-candidate"
+PDF_REQUEST_INTERVAL_SECONDS = 5.0
+_PDF_REQUEST_LOCK = asyncio.Lock()
+_LAST_PDF_REQUEST_AT: float | None = None
+
+
+async def _pace_pdf_request() -> None:
+    """Keep at least five seconds between document-feed requests in one batch."""
+    global _LAST_PDF_REQUEST_AT
+    async with _PDF_REQUEST_LOCK:
+        now = time.monotonic()
+        if _LAST_PDF_REQUEST_AT is not None:
+            wait = PDF_REQUEST_INTERVAL_SECONDS - (now - _LAST_PDF_REQUEST_AT)
+            if wait > 0:
+                await asyncio.sleep(wait)
+        _LAST_PDF_REQUEST_AT = time.monotonic()
 
 
 def _network_failure_code(exc: Exception) -> str:
@@ -154,41 +170,47 @@ async def _download_pdf(url: str, timeout_seconds: int) -> tuple[bytes | None, s
     from playwright.async_api import async_playwright
 
     async with async_playwright() as playwright:
-        browser = None
-        for channel in ("msedge", "chrome"):
-            try:
-                browser = await playwright.chromium.launch(channel=channel, headless=True)
-                break
-            except Exception:
-                continue
-        if browser is None:
-            return None, "NO_SUPPORTED_BROWSER"
+        request = await playwright.request.new_context(
+            timeout=min(PDF_TOTAL_TIMEOUT_SECONDS,
+                        max(NAVIGATION_START_TIMEOUT_SECONDS, int(timeout_seconds))) * 1000)
         try:
-            page = await browser.new_page(accept_downloads=True)
-            try:
-                total_budget = min(PDF_TOTAL_TIMEOUT_SECONDS,
-                                   max(NAVIGATION_START_TIMEOUT_SECONDS, int(timeout_seconds)))
-                navigation_budget = min(NAVIGATION_START_TIMEOUT_SECONDS, total_budget)
-                response = await page.goto(url, wait_until="commit",
-                                           timeout=navigation_budget * 1000)
-            except Exception as exc:
-                return None, _network_failure_code(exc)
+            await _pace_pdf_request()
+            total_budget = min(PDF_TOTAL_TIMEOUT_SECONDS,
+                               max(NAVIGATION_START_TIMEOUT_SECONDS, int(timeout_seconds)))
+            response = await request.get(url, max_redirects=0,
+                                         timeout=total_budget * 1000)
             if response is None:
                 return None, "PDF_RESPONSE_MISSING"
             if response.status in (403, 429, 451):
                 return None, f"HTTP_{response.status}"
+            if 300 <= response.status < 400:
+                return None, "PDF_REDIRECT_NOT_ALLOWED"
             if response.status != 200:
                 return None, "PDF_HTTP_RESPONSE_INVALID"
-            transfer_budget = min(PDF_TRANSFER_TIMEOUT_SECONDS,
-                                  max(1, total_budget - navigation_budget))
-            body, body_failure = await _read_pdf_body(response, transfer_budget)
-            if body_failure:
-                return None, body_failure
+            try:
+                validate_url(response.url)
+            except ValueError:
+                return None, "PDF_REDIRECT_NOT_ALLOWED"
+            mime = response.headers.get("content-type", "").split(";", 1)[0].strip().casefold()
+            if mime != "application/pdf":
+                return None, "PDF_MIME_INVALID"
+            length = response.headers.get("content-length")
+            if length:
+                try:
+                    if int(length) > MAX_PDF_BYTES:
+                        return None, "PDF_SIZE_INVALID"
+                except ValueError:
+                    return None, "PDF_LENGTH_INVALID"
+            body = await response.body()
+            if len(body) > MAX_PDF_BYTES:
+                return None, "PDF_SIZE_INVALID"
             if not body.startswith(b"%PDF-"):
                 return None, "PDF_SIGNATURE_INVALID"
             return body, None
+        except Exception as exc:
+            return None, _network_failure_code(exc)
         finally:
-            await browser.close()
+            await request.dispose()
 
 
 async def _read_pdf_body(response, timeout_seconds: int) -> tuple[bytes | None, str | None]:
@@ -223,16 +245,8 @@ async def documento_33(work, services):
         url = validate_url(work.entry_url)
     except ValueError:
         return {"kind": "ERROR", "reason_code": "ENTRY_URL_NOT_ALLOWED"}
-    browser = services["browser"]
     try:
-        response = await browser.goto(url, wait_until="commit")
-        if response is None:
-            return {"kind": "RETRYABLE", "reason_code": "PDF_RESPONSE_MISSING"}
-        if response.status in (403, 429, 451):
-            return {"kind": "RETRYABLE", "reason_code": f"HTTP_{response.status}"}
-        if response.status != 200:
-            return {"kind": "RETRYABLE", "reason_code": "PDF_HTTP_RESPONSE_INVALID"}
-        body, body_failure = await _read_pdf_body(response, PDF_TRANSFER_TIMEOUT_SECONDS)
+        body, body_failure = await _download_pdf(url, PDF_TOTAL_TIMEOUT_SECONDS)
         if body_failure:
             return {"kind": "RETRYABLE", "reason_code": body_failure}
         result = search_and_bundle(body, work.subject.display_name,

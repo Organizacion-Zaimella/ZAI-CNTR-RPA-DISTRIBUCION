@@ -24,24 +24,6 @@ def pdf_bytes(pages: tuple[str, ...]) -> bytes:
     return content
 
 
-class Response:
-    def __init__(self, body: bytes, status: int = 200):
-        self._body, self.status = body, status
-
-    async def body(self):
-        return self._body
-
-
-class Browser:
-    def __init__(self, response):
-        self.response = response
-        self.calls = []
-
-    async def goto(self, url, **kwargs):
-        self.calls.append((url, kwargs))
-        return self.response
-
-
 def work(*, portal=134, document=33, name="ÁCME, Holdings"):
     return SimpleNamespace(portal_id=portal, document_id=document, detail_id=731,
                            entry_url="https://www.treasury.gov/ofac/downloads/sdnlist.pdf",
@@ -113,53 +95,71 @@ def test_historical_3229_page_register_completes_and_keeps_bundle_bounded(tmp_pa
     assert Path(result["evidence_path"]).stat().st_size <= app.MAX_PDF_BYTES
 
 
-def test_sidecar_uses_ords_ordered_identity_and_native_response(tmp_path):
-    browser = Browser(Response(pdf_bytes(("ACME Holdings",))))
+def test_sidecar_uses_ords_ordered_identity_and_binary_pdf_request(tmp_path, monkeypatch):
+    expected_pdf = pdf_bytes(("ACME Holdings",))
+    requests = []
+
+    async def download(url, timeout):
+        requests.append((url, timeout))
+        return expected_pdf, None
+
+    monkeypatch.setattr(app, "_download_pdf", download)
+    browser = SimpleNamespace()
     result = asyncio.run(app.documento_33(
         work(), {"browser": browser, "evidence_root": tmp_path}))
 
     assert result["kind"] == "MATCH"
-    assert browser.calls == [(work().entry_url, {"wait_until": "commit"})]
+    assert requests == [(work().entry_url, app.PDF_TOTAL_TIMEOUT_SECONDS)]
     assert Path(result["evidence_path"]).is_file()
 
 
-def test_sidecar_rejects_wrong_pair_without_navigation(tmp_path):
-    browser = Browser(Response(pdf_bytes(("ACME Holdings",))))
+def test_sidecar_rejects_wrong_pair_without_download(tmp_path, monkeypatch):
+    requests = []
+
+    async def download(url, timeout):
+        requests.append(url)
+        return pdf_bytes(("ACME Holdings",)), None
+
+    monkeypatch.setattr(app, "_download_pdf", download)
     result = asyncio.run(app.documento_33(
-        work(document=5), {"browser": browser, "evidence_root": tmp_path}))
+        work(document=5), {"browser": SimpleNamespace(), "evidence_root": tmp_path}))
 
     assert result == {"kind": "ERROR", "reason_code": "UNSUPPORTED_DOCUMENT"}
-    assert browser.calls == []
+    assert requests == []
 
 
-def test_sidecar_classifies_403_without_retrying_or_bypassing(tmp_path):
-    browser = Browser(Response(b"", status=403))
+def test_sidecar_classifies_403_without_retrying_or_bypassing(tmp_path, monkeypatch):
+    requests = []
+
+    async def download(url, timeout):
+        requests.append(url)
+        return None, "HTTP_403"
+
+    monkeypatch.setattr(app, "_download_pdf", download)
     result = asyncio.run(app.documento_33(
-        work(), {"browser": browser, "evidence_root": tmp_path}))
+        work(), {"browser": SimpleNamespace(), "evidence_root": tmp_path}))
 
     assert result == {"kind": "RETRYABLE", "reason_code": "HTTP_403"}
-    assert len(browser.calls) == 1
+    assert requests == [work().entry_url]
 
 
-def test_network_disconnect_is_sanitized_and_next_work_uses_same_browser(tmp_path):
-    class SequenceBrowser:
-        def __init__(self):
-            self.calls = []
+def test_network_disconnect_is_sanitized_and_next_work_continues(tmp_path, monkeypatch):
+    calls = []
 
-        async def goto(self, url, **kwargs):
-            self.calls.append((url, kwargs))
-            if len(self.calls) == 1:
-                raise RuntimeError("net::ERR_INTERNET_DISCONNECTED https://private.invalid/subject")
-            return Response(pdf_bytes(("ACME Holdings",)))
+    async def sequence(url, timeout):
+        calls.append(url)
+        if len(calls) == 1:
+            return None, "NETWORK_DISCONNECTED"
+        return pdf_bytes(("ACME Holdings",)), None
 
-    browser = SequenceBrowser()
-    services = {"browser": browser, "evidence_root": tmp_path}
+    monkeypatch.setattr(app, "_download_pdf", sequence)
+    services = {"browser": SimpleNamespace(), "evidence_root": tmp_path}
     first = asyncio.run(app.documento_33(work(), services))
     second = asyncio.run(app.documento_33(work(), services))
 
     assert first == {"kind": "RETRYABLE", "reason_code": "NETWORK_DISCONNECTED"}
     assert second["kind"] == "MATCH"
-    assert len(browser.calls) == 2
+    assert len(calls) == 2
     assert "private.invalid" not in repr(first)
     assert "subject" not in repr(first)
 
@@ -190,3 +190,51 @@ def test_pdf_wait_budget_is_bounded_and_transfer_timeout_is_retryable():
     body, failure = asyncio.run(app._read_pdf_body(SlowResponse(), 0.01))
     assert body is None
     assert failure == "PDF_TRANSFER_TIMEOUT"
+
+
+def test_binary_fetch_uses_playwright_api_context_not_chromium_pdf_viewer(monkeypatch):
+    source = pdf_bytes(("PDF binary response",))
+    calls = []
+
+    class ApiResponse:
+        status = 200
+        url = "https://www.treasury.gov/ofac/downloads/sdnlist.pdf"
+        headers = {"content-type": "application/pdf", "content-length": str(len(source))}
+
+        async def body(self):
+            return source
+
+    class RequestContext:
+        async def get(self, url, **kwargs):
+            calls.append((url, kwargs))
+            return ApiResponse()
+
+        async def dispose(self):
+            pass
+
+    class RequestFactory:
+        async def new_context(self, **kwargs):
+            calls.append(("new_context", kwargs))
+            return RequestContext()
+
+    class PlaywrightContext:
+        request = RequestFactory()
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *_):
+            return False
+
+    import playwright.async_api
+    monkeypatch.setattr(playwright.async_api, "async_playwright", lambda: PlaywrightContext())
+    monkeypatch.setattr(app, "_pace_pdf_request", lambda: asyncio.sleep(0))
+
+    body, failure = asyncio.run(app._download_pdf(
+        "https://www.treasury.gov/ofac/downloads/sdnlist.pdf", app.PDF_TOTAL_TIMEOUT_SECONDS))
+
+    assert failure is None
+    assert body == source
+    assert calls[0] == ("new_context", {"timeout": app.PDF_TOTAL_TIMEOUT_SECONDS * 1000})
+    assert calls[1][1] == {"max_redirects": 0,
+                            "timeout": app.PDF_TOTAL_TIMEOUT_SECONDS * 1000}

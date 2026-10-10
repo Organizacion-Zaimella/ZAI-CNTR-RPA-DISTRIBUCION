@@ -1,6 +1,6 @@
 {
   "adapter_id": "lista-clinton",
-  "version": "0.1.1-candidate",
+  "version": "0.1.2-candidate",
   "adapter_contract": 1,
   "portal_id": 134,
   "document_ids": [33],
