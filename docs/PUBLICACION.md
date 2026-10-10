@@ -26,3 +26,9 @@ La compatibilidad corregida pasó pruebas sintéticas del adaptador y standalone
 La rama `codex/iess-0.1.3-candidate` incorpora `iess@0.1.3-candidate` al canal firmado generación 9 y al prerelease `cntr-rpa-1.0.0-test.11`. El paquete incluye la aplicación independiente y el punto de entrada sidecar. El sidecar delega en esa aplicación para mantener una sola implementación de adquisición y validación PDF. La aplicación standalone obtuvo `MATCH` con PDF nativo estructuralmente válido en una corrida TEST desde el inicio; la suite local terminó 8/8.
 
 Esto es una publicación candidata para QA, no certificación integrada. El pin ORDS vigente continúa en `iess@0.1.0-candidate`; la ejecución del paquete desde el motor instalado con evidencia y ACK ORDS sigue pendiente. `main`, elegibilidad, reglas y Producción no se modifican.
+
+## Candidato TEST generación 10 — SRI 0.1.3 — 2026-10-10
+
+La rama `codex/sri-0.1.3-test12` agrega `sri@0.1.3-candidate` y el prerelease firmado `cntr-rpa-1.0.0-test.12` sobre la generación 9. El cambio aplica la pausa mínima entre navegación y clic del modo de búsqueda; la suite local terminó 11/11. No hubo una consulta pública nueva después de observar `ERR_CONNECTION_RESET`, así que el paquete queda como candidato para QA, sin afirmar que el cambio resuelva ese resultado.
+
+ORDS conserva el pin SRI `0.1.0-candidate`. Esta publicación no cambia elegibilidad ni reglas, no ejecuta el adaptador desde el robot y no cambia `main` ni Producción.
