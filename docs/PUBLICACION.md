@@ -14,3 +14,9 @@ La rama `main` alberga la documentación base. La rama draft de T07 incorpora un
 La rama `codex/sri-0.1.1-test9` prepara el prerelease firmado `cntr-rpa-1.0.0-test.9` desde el canal TEST verificado de generación 6. El canal resultante conserva el motor `1.0.0-test.5` y añade `sri@0.1.1-candidate`; conserva además los candidatos IESS `0.1.2` y OFAC `0.1.1`. El asset SRI incluye `app.py`, `adapter.py`, `dependencies.lock` y manifiesto con punto de entrada standalone declarado, SBOM, firma y hash.
 
 Este candidato corrige la clasificación local de desconexión de red y pasa pruebas sintéticas. La versión ORDS vigente continúa fijada a `sri@0.1.0-candidate`, por lo que la generación 7 no se activa ni prueba su descarga por el robot. La publicación TEST no certifica resultado real del portal, PDF/ACK en ORDS ni Producción. `main` y los canales de Producción no se modifican.
+
+## Candidato TEST generación 8 — SRI 0.1.2 — 2026-10-09
+
+La rama `codex/sri-0.1.2-test10` parte del canal firmado generación 7 y crea generación 8, manteniendo el motor `1.0.0-test.5`, IESS `0.1.2-candidate` y OFAC `0.1.1-candidate`; SRI `0.1.1` se sustituye por `0.1.2-candidate` en este canal inactivo. El nuevo `adapter.py` usa el `type_text` pausado del motor, valida la persistencia del campo y espera a que el botón quede habilitado antes de una sola consulta. Conserva CAPTCHA/ALTCHA como intervención humana. El prerelease `cntr-rpa-1.0.0-test.10` contiene app, sidecar, dependencia fijada, manifiesto, SBOM, hash y firmas TEST.
+
+La compatibilidad corregida pasó pruebas sintéticas del adaptador y standalone. No se hizo E2E de navegación en esta versión ni se produjo evidencia/ACK de esta versión. ORDS sigue fijado a `sri@0.1.0-candidate`; el canal generación 8 no es seleccionable y no se activó. La generación 7 y `sri@0.1.1` permanecen en la rama/historial anterior y no se declara certificación. `main`, ORDS y Producción no se modifican.
