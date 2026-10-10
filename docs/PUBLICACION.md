@@ -20,3 +20,9 @@ Este candidato corrige la clasificación local de desconexión de red y pasa pru
 La rama `codex/sri-0.1.2-test10` parte del canal firmado generación 7 y crea generación 8, manteniendo el motor `1.0.0-test.5`, IESS `0.1.2-candidate` y OFAC `0.1.1-candidate`; SRI `0.1.1` se sustituye por `0.1.2-candidate` en este canal inactivo. El nuevo `adapter.py` usa el `type_text` pausado del motor, valida la persistencia del campo y espera a que el botón quede habilitado antes de una sola consulta. Conserva CAPTCHA/ALTCHA como intervención humana. El prerelease `cntr-rpa-1.0.0-test.10` contiene app, sidecar, dependencia fijada, manifiesto, SBOM, hash y firmas TEST.
 
 La compatibilidad corregida pasó pruebas sintéticas del adaptador y standalone. No se hizo E2E de navegación en esta versión ni se produjo evidencia/ACK de esta versión. ORDS sigue fijado a `sri@0.1.0-candidate`; el canal generación 8 no es seleccionable y no se activó. La generación 7 y `sri@0.1.1` permanecen en la rama/historial anterior y no se declara certificación. `main`, ORDS y Producción no se modifican.
+
+## Candidato TEST generación 9 — IESS 0.1.3 — 2026-10-10
+
+La rama `codex/iess-0.1.3-candidate` incorpora `iess@0.1.3-candidate` al canal firmado generación 9 y al prerelease `cntr-rpa-1.0.0-test.11`. El paquete incluye la aplicación independiente y el punto de entrada sidecar. El sidecar delega en esa aplicación para mantener una sola implementación de adquisición y validación PDF. La aplicación standalone obtuvo `MATCH` con PDF nativo estructuralmente válido en una corrida TEST desde el inicio; la suite local terminó 8/8.
+
+Esto es una publicación candidata para QA, no certificación integrada. El pin ORDS vigente continúa en `iess@0.1.0-candidate`; la ejecución del paquete desde el motor instalado con evidencia y ACK ORDS sigue pendiente. `main`, elegibilidad, reglas y Producción no se modifican.
