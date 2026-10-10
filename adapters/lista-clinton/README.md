@@ -11,7 +11,7 @@ not certification of this independent adapter. No current ORDS eligible pair
 was present in the latest snapshot. This candidate has not queried a subject,
 has no signed release, and remains `NOT_APPROVED`.
 
-`app.py` runs independently with a private JSON context. `src/adapter.py` is
+`app.py` runs independently with a private JSON context. `adapter.py` is
 the motor ABI entrypoint. `dependencies.lock` pins Playwright and PyMuPDF.
 The Playwright `APIRequestContext` retrieves original PDF bytes directly:
 `page.goto()` on a PDF URL returns Chromium's internal HTML viewer wrapper, not
