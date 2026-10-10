@@ -21,6 +21,10 @@ La rama `codex/sri-0.1.2-test10` parte del canal firmado generación 7 y crea ge
 
 La compatibilidad corregida pasó pruebas sintéticas del adaptador y standalone. No se hizo E2E de navegación en esta versión ni se produjo evidencia/ACK de esta versión. ORDS sigue fijado a `sri@0.1.0-candidate`; el canal generación 8 no es seleccionable y no se activó. La generación 7 y `sri@0.1.1` permanecen en la rama/historial anterior y no se declara certificación. `main`, ORDS y Producción no se modifican.
 
+## Candidato TEST generación 11 — SRI 0.1.7 — 2026-10-10
+
+El candidato `cntr-rpa-1.0.0-test.13` se construyó desde el commit RPA `298a0e77ca39af58e089187706817ee736fbb66c`. Incluye `app.py`, `adapter.py` y dependencias bloqueadas. El canal TEST parte de la generación 10 de `cntr-rpa-1.0.0-test.12`; la generación 11 conserva los demás pines y actualiza únicamente SRI a `0.1.7-candidate`. El builder verificó las firmas TEST y hashes del paquete y el manifiesto; las pruebas del paquete pasaron. Es un candidato de QA, no certificación: falta validar descarga desde el canal de QA, ejecución integrada, evidencia y ACK de esta versión.
+
 ## Candidato TEST generación 9 — IESS 0.1.3 — 2026-10-10
 
 La rama `codex/iess-0.1.3-candidate` incorpora `iess@0.1.3-candidate` al canal firmado generación 9 y al prerelease `cntr-rpa-1.0.0-test.11`. El paquete incluye la aplicación independiente y el punto de entrada sidecar. El sidecar delega en esa aplicación para mantener una sola implementación de adquisición y validación PDF. La aplicación standalone obtuvo `MATCH` con PDF nativo estructuralmente válido en una corrida TEST desde el inicio; la suite local terminó 8/8.
