@@ -1,0 +1,10 @@
+{
+  "adapter_id": "supercias",
+  "version": "0.1.0-candidate",
+  "adapter_contract": 1,
+  "portal_id": 1,
+  "document_ids": [13, 14, 15, 16, 17, 18, 19],
+  "document_functions": {"13": "documento_13", "14": "documento_14", "15": "documento_15", "16": "documento_16", "17": "documento_17", "18": "documento_18", "19": "documento_19"},
+  "entrypoint": "adapter.py",
+  "status": "NOT_APPROVED"
+}

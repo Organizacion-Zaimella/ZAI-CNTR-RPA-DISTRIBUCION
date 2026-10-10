@@ -1,0 +1,10 @@
+{
+  "adapter_id": "interpol",
+  "version": "0.1.0-candidate",
+  "adapter_contract": 1,
+  "portal_id": 12,
+  "document_ids": [12],
+  "document_functions": {"12": "documento_12"},
+  "entrypoint": "adapter.py",
+  "status": "NOT_APPROVED"
+}
