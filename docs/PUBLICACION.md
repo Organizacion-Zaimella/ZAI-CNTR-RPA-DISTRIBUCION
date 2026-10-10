@@ -25,6 +25,10 @@ La compatibilidad corregida pasó pruebas sintéticas del adaptador y standalone
 
 El candidato `cntr-rpa-1.0.0-test.13` se construyó desde el commit RPA `298a0e77ca39af58e089187706817ee736fbb66c`. Incluye `app.py`, `adapter.py` y dependencias bloqueadas. El canal TEST parte de la generación 10 de `cntr-rpa-1.0.0-test.12`; la generación 11 conserva los demás pines y actualiza únicamente SRI a `0.1.7-candidate`. El builder verificó las firmas TEST y hashes del paquete y el manifiesto; las pruebas del paquete pasaron. Es un candidato de QA, no certificación: falta validar descarga desde el canal de QA, ejecución integrada, evidencia y ACK de esta versión.
 
+## Candidato TEST generación 12 — SRI 0.1.8 — 2026-10-10
+
+El candidato `cntr-rpa-1.0.0-test.14` se construyó desde el commit RPA `92915997b0a235f182787d4ba3440a81e7e2efbe`. Corrige el sidecar para esperar los controles visibles de la aplicación Angular después de la navegación `commit`, antes de consultar el DOM. El canal TEST parte de la generación 11 de `cntr-rpa-1.0.0-test.13` y actualiza únicamente el pin SRI a `0.1.8-candidate`. Las 20 pruebas del paquete pasan y el builder verifica firma y hashes. Es candidato, no certificación; falta integración instalada y ACK de esta versión.
+
 ## Candidato TEST generación 9 — IESS 0.1.3 — 2026-10-10
 
 La rama `codex/iess-0.1.3-candidate` incorpora `iess@0.1.3-candidate` al canal firmado generación 9 y al prerelease `cntr-rpa-1.0.0-test.11`. El paquete incluye la aplicación independiente y el punto de entrada sidecar. El sidecar delega en esa aplicación para mantener una sola implementación de adquisición y validación PDF. La aplicación standalone obtuvo `MATCH` con PDF nativo estructuralmente válido en una corrida TEST desde el inicio; la suite local terminó 8/8.

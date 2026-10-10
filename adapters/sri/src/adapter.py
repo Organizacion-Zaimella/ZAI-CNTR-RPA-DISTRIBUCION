@@ -72,8 +72,16 @@ async def _execute_document(work, services, expected_document_id):
     field = "#busquedaRucId"
     search_mode = ("Seleccionar búsqueda por RUC o cédula" if work.document_id == 3
                    else "Seleccionar búsqueda por RUC")
-    if await browser.count(f'button:has-text("{search_mode}")') == 1:
+    mode_selector = f'button:has-text("{search_mode}")'
+    # `goto(..., wait_until="commit")` returns before Angular renders its
+    # controls. Wait for either the optional mode control or the input before
+    # counting/clicking; an immediate count can falsely report an absent form.
+    control_timeout_ms = int(min(work.deadline_seconds, 30) * 1000)
+    await browser.wait_for_selector(f'{field}, {mode_selector}', state="visible",
+                                    timeout=control_timeout_ms)
+    if await browser.count(mode_selector) == 1:
         await browser.click_text(search_mode, exact=True)
+    await browser.wait_for_selector(field, state="visible", timeout=control_timeout_ms)
     if await browser.count(field) != 1:
         return {"kind": "RETRYABLE", "reason_code": "EXPECTED_FIELD_NOT_UNIQUE"}
     await browser.fill(field, "")
