@@ -2,8 +2,28 @@
 from __future__ import annotations
 
 from pathlib import Path
+from playwright.async_api import TimeoutError as PlaywrightTimeoutError
 
 MAX_PDF_BYTES = 25 * 1024 * 1024
+
+
+def classify_portal_error(exc: Exception) -> str:
+    """Return a bounded technical code; never persist exception text or URLs."""
+    if isinstance(exc, (TimeoutError, PlaywrightTimeoutError)):
+        return "PORTAL_TIMEOUT"
+    message = str(exc).upper()
+    markers = (
+        ("ERR_INTERNET_DISCONNECTED", "NETWORK_DISCONNECTED"),
+        ("ERR_NETWORK_CHANGED", "NETWORK_CHANGED"),
+        ("ERR_CONNECTION_RESET", "PORTAL_CONNECTION_RESET"),
+        ("ERR_CONNECTION_REFUSED", "PORTAL_CONNECTION_REFUSED"),
+        ("ERR_NAME_NOT_RESOLVED", "PORTAL_DNS_FAILURE"),
+        ("ERR_CONNECTION_TIMED_OUT", "PORTAL_CONNECTION_TIMEOUT"),
+        ("ERR_TIMED_OUT", "PORTAL_CONNECTION_TIMEOUT"),
+        ("ERR_ADDRESS_UNREACHABLE", "PORTAL_UNREACHABLE"),
+    )
+    return next((code for marker, code in markers if marker in message),
+                "PORTAL_ACTION_FAILED")
 
 
 def valid_pdf_for_ords(path: Path) -> bool:
@@ -48,9 +68,9 @@ async def documento_2(work, services):
             target.unlink(missing_ok=True)
             return {"kind": "RETRYABLE", "reason_code": "NATIVE_PDF_STRUCTURE_INVALID"}
         return {"kind": "MATCH", "evidence_path": str(target)}
-    except Exception:
+    except Exception as exc:
         target.unlink(missing_ok=True)
-        return {"kind": "RETRYABLE", "reason_code": "NATIVE_PDF_NOT_ACQUIRED"}
+        return {"kind": "RETRYABLE", "reason_code": classify_portal_error(exc)}
 
 
 DOCUMENT_FUNCTIONS = {"documento_2": documento_2}

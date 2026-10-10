@@ -92,7 +92,7 @@ def test_sidecar_adapter_sanitizes_timeout_as_retryable(tmp_path):
     browser = Browser(timeout=True)
     result = run(adapter.documento_2(work(), {"browser": browser, "evidence_root": tmp_path}))
 
-    assert result == {"kind": "RETRYABLE", "reason_code": "NATIVE_PDF_NOT_ACQUIRED"}
+    assert result == {"kind": "RETRYABLE", "reason_code": "PORTAL_TIMEOUT"}
     assert "private URL" not in repr(result)
 
 
@@ -100,10 +100,36 @@ def test_download_timeout_is_retryable_and_does_not_resubmit(tmp_path):
     browser = Browser(download_timeout=True)
     result = run(adapter.documento_2(work(), {"browser": browser, "evidence_root": tmp_path}))
 
-    assert result == {"kind": "RETRYABLE", "reason_code": "NATIVE_PDF_NOT_ACQUIRED"}
+    assert result == {"kind": "RETRYABLE", "reason_code": "PORTAL_TIMEOUT"}
     assert [action[0] for action in browser.actions].count("download") == 1
     assert not (tmp_path / "iess-991.pdf").exists()
     assert "private URL" not in repr(result)
+
+
+def test_network_disconnect_is_sanitized_and_keeps_portal_error_code(tmp_path):
+    browser = Browser()
+
+    async def disconnect(_selector, _destination, **_kwargs):
+        raise RuntimeError("net::ERR_INTERNET_DISCONNECTED https://private.example/subject")
+
+    browser.download_by_click = disconnect
+    result = run(adapter.documento_2(work(), {"browser": browser, "evidence_root": tmp_path}))
+
+    assert result == {"kind": "RETRYABLE", "reason_code": "NETWORK_DISCONNECTED"}
+    assert "private.example" not in repr(result)
+    assert "subject" not in repr(result)
+
+
+def test_portal_error_classifier_uses_only_bounded_codes():
+    cases = {
+        "net::ERR_NETWORK_CHANGED https://private.example/a": "NETWORK_CHANGED",
+        "net::ERR_CONNECTION_RESET https://private.example/b": "PORTAL_CONNECTION_RESET",
+        "net::ERR_NAME_NOT_RESOLVED private.example": "PORTAL_DNS_FAILURE",
+        "net::ERR_CONNECTION_TIMED_OUT": "PORTAL_CONNECTION_TIMEOUT",
+        "unrecognized private data": "PORTAL_ACTION_FAILED",
+    }
+    for message, expected in cases.items():
+        assert adapter.classify_portal_error(RuntimeError(message)) == expected
 
 
 def test_sidecar_adapter_rejects_wrong_document_without_navigation(tmp_path):
