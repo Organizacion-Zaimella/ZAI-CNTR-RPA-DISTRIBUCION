@@ -1,5 +1,7 @@
 # Política de publicación
 
+**Estado C.145:** el canal TEST firmado generación 36 ya está publicado. Esta sección describe las reglas de promoción, no la ausencia de releases. No hay canal PROD firmado en esta línea y un paquete candidato no equivale a certificación del portal.
+
 1. Desarrollar y revisar el cambio en su repositorio privado, con commit exacto y pruebas de contrato.
 2. Verificar que el contenido público no incluya datos personales, evidencias, cookies, tokens, URLs internas ni claves privadas. Confirmar derechos de publicación antes de copiar un adaptador.
 3. Construir desde fuente aprobada con dependencias bloqueadas, registrar SBOM, compatibilidad y SHA-256; firmar manifest y artefactos mediante una clave custodiada fuera de este repositorio.

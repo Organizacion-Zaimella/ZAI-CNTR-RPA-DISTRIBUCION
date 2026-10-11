@@ -4,7 +4,9 @@ Repositorio público de distribución de software aprobado del proyecto CNTR RPA
 
 **Canal TEST de esta rama:** generación 36 firmada. El manifiesto es la referencia de versiones para esta integración: motor `1.0.0-test.13` y ocho adaptadores TEST. [Inventario exacto](channels/VERSIONES_TEST.md).
 
-La versión firmada anterior 0.1.3 valida la descarga del PDF, el paquete y la carga dinámica. El candidato 0.1.4 acota la salida cuando una frase aparece en muchas páginas; el procesamiento local del PDF completo dio un bundle PDF válido. No se ejecutó búsqueda de sujetos porque el plan ORDS no contiene pares elegibles ni asignación para doc. 33; no existe ACK ni certificación funcional integral.
+**Continuidad C.145:** este repositorio distribuye artefactos; ORDS decide qué asociación adaptador/función recibe cada trabajo. Los candidatos TEST requieren sus gates propios y no son autorización de Producción. Para continuar, verificar firma de `channels/test.json`, PR/rama/SHA y el expediente [C.145](https://github.com/Organizacion-Zaimella/ZAI-PRJ-CTRL-CAPTURA-INFORMACION-PUBLICA/tree/codex/c145-cierre-rpa-portales/docs/tareas/C.145). OpenClaw, workflows y Discovery son legado y no intervienen en la distribución ni ejecución 1.0.0.
+
+INTERPOL 0.1.1 es un candidato técnico basado en workflow histórico 61/v2. Solo está probado con fixtures locales/sidecar; las URLs externas están bloqueadas por la política de autorización. No existe consulta real ni ACK ORDS para INTERPOL. La versión `lista-clinton@0.1.4-candidate` también permanece sujeta al estado y asignación que muestra el plan ORDS; la presencia en este canal no certifica por sí sola su ejecución integral.
 
 La presencia de una versión en el canal permite su descarga firmada; la certificación documental requiere resultado, evidencia y ACK por trabajo real de ORDS.
 
