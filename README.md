@@ -2,7 +2,7 @@
 
 Repositorio público de distribución de software aprobado del proyecto CNTR RPA. El canal TEST permite validar paquetes firmados y compatibles; su presencia no certifica la captura integral de un documento ni habilita Producción.
 
-**Canal TEST de esta rama:** generación 34 firmada. El manifiesto es la referencia de versiones para esta integración: motor `1.0.0-test.12` y siete adaptadores TEST. [Inventario exacto](channels/VERSIONES_TEST.md).
+**Canal TEST de esta rama:** generación 35 firmada. El manifiesto es la referencia de versiones para esta integración: motor `1.0.0-test.13` y siete adaptadores TEST. [Inventario exacto](channels/VERSIONES_TEST.md).
 
 La versión firmada anterior 0.1.3 valida la descarga del PDF, el paquete y la carga dinámica. El candidato 0.1.4 acota la salida cuando una frase aparece en muchas páginas; el procesamiento local del PDF completo dio un bundle PDF válido. No se ejecutó búsqueda de sujetos porque el plan ORDS no contiene pares elegibles ni asignación para doc. 33; no existe ACK ni certificación funcional integral.
 
