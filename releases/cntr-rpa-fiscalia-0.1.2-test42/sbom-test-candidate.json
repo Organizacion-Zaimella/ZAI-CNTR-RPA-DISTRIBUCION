@@ -1,0 +1,18 @@
+{
+  "channel": "TEST",
+  "components": [
+    {
+      "asset": "cntr-rpa-adapter-fiscalia-0.1.2-candidate-win-x64.zip",
+      "dependencies": [
+        "playwright==1.60.0"
+      ],
+      "id": "fiscalia",
+      "sha256": "e50882890b99903eac30c268e6eda2a0d9849dc997e104fe44ef2058e82b943a",
+      "version": "0.1.2-candidate"
+    }
+  ],
+  "format": "CNTR-RPA-SBOM-1",
+  "release_tag": "cntr-rpa-fiscalia-0.1.2-test42",
+  "source_commit": "4200678488f8008a45ed81b39df116d0545d0d5c",
+  "source_repository": "Organizacion-Zaimella/ZAI-RPA-CTRL-CAPTURA-INFORMACION-PUBLICA"
+}
