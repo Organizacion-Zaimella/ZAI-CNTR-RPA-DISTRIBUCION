@@ -56,20 +56,44 @@ async def _state(browser) -> str | None:
 async def _search_idle(browser) -> bool:
     """Detectar cola JSF inactiva antes de la única recuperación histórica."""
     check = getattr(browser, "search_idle", None)
-    if check is None:
+    if check is not None:
+        return bool(await check())
+    evaluate = getattr(browser, "evaluate_readonly", None)
+    if evaluate is None:
         return False
-    return bool(await check())
+    return bool(await evaluate("""() => {
+        const queue = window.PrimeFaces?.ajax?.Queue;
+        return Boolean(queue && queue.isEmpty());
+    }"""))
+
+
+async def _progress_token(browser) -> str | None:
+    check = getattr(browser, "progress_token", None)
+    if check is not None:
+        return await check()
+    evaluate = getattr(browser, "evaluate_readonly", None)
+    if evaluate is None:
+        return None
+    return await evaluate("""() => {
+        const entries = performance.getEntriesByType('resource');
+        return JSON.stringify({
+            url: location.href,
+            textLength: document.body?.innerText?.length || 0,
+            rows: document.querySelectorAll('table tr').length,
+            resources: entries.length,
+            transfer: entries.reduce((sum, item) => sum + (item.transferSize || 0), 0)
+        });
+    }""")
 
 
 async def _wait_form_reset(browser, field: str) -> bool:
     """Wait for PrimeFaces to finish replacing fields after LIMPIAR."""
-    check = getattr(browser, "search_idle", None)
-    if check is None:
+    if getattr(browser, "search_idle", None) is None and getattr(browser, "evaluate_readonly", None) is None:
         return True
     stable = 0
     for _ in range(30):
         try:
-            ready = bool(await check()) and await browser.input_value(field) == ""
+            ready = await _search_idle(browser) and await browser.input_value(field) == ""
         except Exception:
             ready = False  # JSF may replace the input node during AJAX.
         stable = stable + 1 if ready else 0
@@ -134,7 +158,7 @@ async def _execute_document(work, services, expected_document_id):
         maximum_wait = min(work.deadline_seconds, 120)
         deadline = loop.time() + initial_wait
         wait_started = loop.time()
-        progress_token = getattr(browser, "progress_token", None)
+        progress_token = lambda: _progress_token(browser)
         last_progress_at = wait_started
         last_progress_check = wait_started
         last_progress_value = await progress_token() if progress_token else None

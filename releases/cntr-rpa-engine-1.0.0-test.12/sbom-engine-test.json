@@ -1,0 +1,15 @@
+{
+  "asset": "cntr-rpa-engine-1.0.0-test.12-win-x64.zip",
+  "asset_sha256": "c3c88946f6ed897d0380239c441456f14cff8d6ef63ac820d9a3afed17e74176",
+  "channel": "TEST",
+  "component": "engine",
+  "format": "CNTR-RPA-SBOM-1",
+  "runtime": {
+    "platform": "windows-x64",
+    "playwright": "1.60.0",
+    "python": "3.13"
+  },
+  "source_commit": "287c09e6fc0bdb77587f354d64b502f5809c5296",
+  "source_repository": "Organizacion-Zaimella/ZAI-RPA-CTRL-CAPTURA-INFORMACION-PUBLICA",
+  "version": "1.0.0-test.12"
+}
