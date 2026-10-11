@@ -1,0 +1,18 @@
+{
+  "channel": "TEST",
+  "components": [
+    {
+      "asset": "cntr-rpa-adapter-interpol-0.1.1-candidate-win-x64.zip",
+      "dependencies": [
+        "playwright==1.60.0"
+      ],
+      "id": "interpol",
+      "sha256": "17ae605edf0265ae25db5974c2cdc43b2642449f91d4d63a72240abc50582539",
+      "version": "0.1.1-candidate"
+    }
+  ],
+  "format": "CNTR-RPA-SBOM-1",
+  "release_tag": "cntr-rpa-interpol-0.1.1-test36",
+  "source_commit": "6e2afbc6d1b655409ed462fac9779e140a68c1ff",
+  "source_repository": "Organizacion-Zaimella/ZAI-RPA-CTRL-CAPTURA-INFORMACION-PUBLICA"
+}
