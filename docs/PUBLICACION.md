@@ -1,6 +1,6 @@
 # Política de publicación
 
-**Estado C.145:** TEST generación 36 está disponible en su rama candidata. El canal PROD generación 1 ya está firmado como candidato local, con cinco adaptadores para los diez documentos exitosos; INTERPOL queda excluido. La publicación estable y promoción a `main` se completan después de validar públicamente los releases firmados y revisar los PR de RPA, Oracle y distribución. La autorización del usuario para el pase y el instalador está registrada en el expediente C.145.
+**Estado C.145:** TEST generación 36 está disponible en su rama candidata. El canal PROD generación 2 está firmado con motor 1.0.1 y cinco adaptadores para los diez documentos exitosos; INTERPOL queda excluido. El motor 1.0.0 está revocado para evitar retroceder a una versión que no ejecutaba Producción. La autorización del usuario para el pase y el instalador está registrada en el expediente C.145.
 
 1. Desarrollar y revisar el cambio en su repositorio privado, con commit exacto y pruebas de contrato.
 2. Verificar que el contenido público no incluya datos personales, evidencias, cookies, tokens, URLs internas ni claves privadas. Confirmar derechos de publicación antes de copiar un adaptador.
@@ -9,7 +9,7 @@
 5. Promover canal TEST y luego Producción mediante PR revisado y checks definidos. El puntero firmado se actualiza solo después de que el asset existe y pasa los gates del canal.
 6. Documentar revocación y reversión. Una versión retirada no debe ejecutarse por estar en caché.
 
-El canal TEST generación 36 y sus Releases están en la rama candidata C.145. El estado “sin release publicable” de T01 es histórico y no representa la rama candidata actual. El canal PROD firmado generación 1 contiene el motor y cinco adaptadores requeridos por los diez documentos probados; no incluye INTERPOL. La publicación final sigue condicionada a que los assets coincidan con los manifiestos y el puntero publicado sea verificable.
+El canal TEST generación 36 y sus Releases están en la rama candidata C.145. El estado “sin release publicable” de T01 es histórico y no representa la rama candidata actual. El canal PROD firmado generación 2 contiene motor 1.0.1 y los cinco adaptadores requeridos por los diez documentos probados; no incluye INTERPOL. Cada promoción se comprueba con descarga pública, firma, hash y preflight antes de entregar el instalador.
 
 ## Lista Clinton 0.1.4 — candidato TEST
 
