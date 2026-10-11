@@ -8,6 +8,10 @@ La instalación usará staging por versión, autochequeo y activación atómica.
 
 **Registro histórico T01:** en la creación inicial no existían canales, firmas ni Releases; ese estado no representa las ramas candidatas posteriores. El canal vigente depende de la rama/release TEST seleccionada explícitamente.
 
+## Versión efectiva de una instalación 1.0.0
+
+El `distribution_ref` de la configuración local identifica la rama del canal TEST. El actualizador valida su manifiesto firmado y escribe `state/test/active.json`. El motor efectivo es `engine.path/CNTR-RPA-100.exe` de ese estado, tras comprobar su hash; un EXE de bootstrap o una copia antigua en la raíz no representa la versión activa. El plan ORDS selecciona las versiones exactas de adaptadores y el actualizador exige que figuren en el mismo canal firmado. Para la integración actual, usar [el inventario de la generación 23](../channels/VERSIONES_TEST.md) y registrar la generación activa antes de ejecutar.
+
 ## Lista Clinton 0.1.4 TEST
 
 La rama candidata distribuye la generación 21 con `lista_clinton@0.1.4-candidate`.
