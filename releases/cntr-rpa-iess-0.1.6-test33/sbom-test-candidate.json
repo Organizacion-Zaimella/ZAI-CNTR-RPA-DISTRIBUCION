@@ -1,0 +1,18 @@
+{
+  "channel": "TEST",
+  "components": [
+    {
+      "asset": "cntr-rpa-adapter-iess-0.1.6-candidate-win-x64.zip",
+      "dependencies": [
+        "playwright==1.60.0"
+      ],
+      "id": "iess",
+      "sha256": "919c0c796dac36e27254c8c1cfce822febad660bcffbfcc69fc2422b1bceaf3c",
+      "version": "0.1.6-candidate"
+    }
+  ],
+  "format": "CNTR-RPA-SBOM-1",
+  "release_tag": "cntr-rpa-iess-0.1.6-test33",
+  "source_commit": "b079040098a125369f23a4c802e622975e9a5020",
+  "source_repository": "Organizacion-Zaimella/ZAI-RPA-CTRL-CAPTURA-INFORMACION-PUBLICA"
+}
