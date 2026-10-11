@@ -9,7 +9,7 @@
 5. Promover canal TEST y luego Producción mediante PR revisado y checks definidos. El puntero firmado se actualiza solo después de que el asset existe y pasa los gates del canal.
 6. Documentar revocación y reversión. Una versión retirada no debe ejecutarse por estar en caché.
 
-La rama `main` albergará documentación y, en el futuro, manifest públicos revisados. El control de branch y aprobadores se comprueba por separado; este documento no afirma que estén configurados. No existe un release publicable en el estado inicial.
+El canal TEST generación 36 y sus Releases están en la rama candidata C.145; no se han promovido a `main` mediante esta tarea. El control de branch y aprobadores se comprueba por separado. El estado “sin release publicable” de T01 es histórico y no representa la rama candidata actual. No hay canal PROD firmado ni release productiva.
 
 ## Lista Clinton 0.1.4 — candidato TEST
 
