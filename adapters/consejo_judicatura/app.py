@@ -113,6 +113,9 @@ class BrowserFacade:
         return await self.pacer.act(lambda: self.page.goto(
             url, wait_until="domcontentloaded", **kwargs))
 
+    async def current_url(self) -> str:
+        return self.page.url
+
     async def wait_for_selector(self, selector: str, **kwargs):
         return await self.locator(selector).wait_for(**kwargs)
 
@@ -160,7 +163,8 @@ class BrowserFacade:
 
 
 async def run_context(works: list[SimpleNamespace], evidence_root: Path,
-                      *, headless: bool = True) -> list[dict]:
+                      *, headless: bool = True, repair_mode: bool = False) -> list[dict]:
+    global adapter
     async with async_playwright() as playwright:
         browser = None
         for channel in ("msedge", "chrome"):
@@ -178,10 +182,29 @@ async def run_context(works: list[SimpleNamespace], evidence_root: Path,
             await adapter.prepare(works[0], services)
             results = []
             for work in works:  # ORDS order is preserved; no sorting or regrouping.
-                try:
-                    result = await adapter.execute_document(work, services)
-                except Exception:
-                    result = {"kind": "RETRYABLE", "reason_code": "PORTAL_INTERACTION_FAILED"}
+                while True:
+                    try:
+                        result = await adapter.execute_document(work, services)
+                    except Exception:
+                        result = {"kind": "RETRYABLE", "reason_code": "PORTAL_INTERACTION_FAILED"}
+                    if not repair_mode or result["kind"] != "RETRYABLE":
+                        break
+                    print(json.dumps({"document_id": work.document_id,
+                                      "status": "WAITING_FOR_CODE_FIX",
+                                      "reason_code": result.get("reason_code"),
+                                      "checkpoint": "JUDICIAL_SEARCH"}), flush=True)
+                    previous_mtime = ADAPTER_PATH.stat().st_mtime_ns
+                    while ADAPTER_PATH.stat().st_mtime_ns == previous_mtime:
+                        await asyncio.sleep(1)
+                    # Reload only the portal module. Keep the current Page and
+                    # retry from the still-valid search form checkpoint.
+                    spec = importlib.util.spec_from_file_location(
+                        "judicatura_standalone_adapter_repaired", ADAPTER_PATH)
+                    if spec is None or spec.loader is None:
+                        continue
+                    repaired = importlib.util.module_from_spec(spec)
+                    spec.loader.exec_module(repaired)
+                    adapter = repaired
                 item = {"document_id": work.document_id, "status": result["kind"],
                         "reason_code": result.get("reason_code"),
                         "recovery_click_used": result.get("recovery_click_used", False)}
@@ -199,10 +222,13 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Consejo de la Judicatura standalone TEST")
     parser.add_argument("--context", required=True, type=Path)
     parser.add_argument("--headed", action="store_true")
+    parser.add_argument("--repair-mode", action="store_true")
     args = parser.parse_args()
     try:
         works, evidence_root = load_context(args.context)
-        results = asyncio.run(run_context(works, evidence_root, headless=not args.headed))
+        results = asyncio.run(run_context(works, evidence_root,
+                                         headless=not args.headed,
+                                         repair_mode=args.repair_mode))
         print(json.dumps({"portal_id": 6, "results": results}, separators=(",", ":")))
         return 0 if all(item["status"] in {"MATCH", "NO_MATCH", "HUMAN_REQUIRED", "RETRYABLE"}
                         for item in results) else 1

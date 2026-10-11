@@ -20,6 +20,7 @@ FIELDS = {
     76: ('[id="form1:txtDemandadoApellido"]', "display_name"),
 }
 SEARCH = '[id="form1:butBuscarJuicios"]'
+CLEAR = '[id="form1:butLimpiar"]'
 CHALLENGE = 'iframe[src*="recaptcha/api2/bframe"]'
 ROWS = 'table:has(th:has-text("No. proceso")) tbody tr:has(td:nth-child(4))'
 NO_MATCH = re.compile(r"no se (?:encuentran|encontraron) (?:resultados|registros|coincidencias)", re.I)
@@ -87,7 +88,14 @@ async def _execute_document(work, services, expected_document_id):
             await _state(browser)
             return {"kind": "HUMAN_REQUIRED", "checkpoint": "JUDICIAL_SEARCH",
                     "reason_code": "PORTAL_CHALLENGE"}
-        await browser.goto(entry, timeout=45000)
+        current_url = getattr(browser, "current_url", None)
+        at_entry = callable(current_url) and await current_url() == entry
+        if not at_entry or not await browser.is_visible(field):
+            await browser.goto(entry, timeout=45000)
+        else:
+            # ORDS groups all subjects of a document in one portal session.
+            # Reset the JSF form without discarding browser cookies/context.
+            await browser.click(CLEAR)
         await browser.wait_for_selector(field, state="visible", timeout=15000)
         await browser.fill(field, value.strip())
         if await browser.input_value(field) != value.strip():
