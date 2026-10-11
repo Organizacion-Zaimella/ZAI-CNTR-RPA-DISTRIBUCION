@@ -10,7 +10,7 @@ La instalación usará staging por versión, autochequeo y activación atómica.
 
 ## Versión efectiva de una instalación 1.0.0
 
-El `distribution_ref` de la configuración local identifica la rama del canal TEST. El actualizador valida su manifiesto firmado y escribe `state/test/active.json`. El motor efectivo es `engine.path/CNTR-RPA-100.exe` de ese estado, tras comprobar su hash; un EXE de bootstrap o una copia antigua en la raíz no representa la versión activa. El plan ORDS selecciona las versiones exactas de adaptadores y el actualizador exige que figuren en el mismo canal firmado. Para la integración actual, usar [el inventario de la generación 25](../channels/VERSIONES_TEST.md) y registrar la generación activa antes de ejecutar.
+El `distribution_ref` de la configuración local identifica la rama del canal TEST. El actualizador valida su manifiesto firmado y escribe `state/test/active.json`. El motor efectivo es `engine.path/CNTR-RPA-100.exe` de ese estado, tras comprobar su hash; un EXE de bootstrap o una copia antigua en la raíz no representa la versión activa. El plan ORDS selecciona las versiones exactas de adaptadores y el actualizador exige que figuren en el mismo canal firmado. Para la integración actual, usar [el inventario de la generación 26](../channels/VERSIONES_TEST.md) y registrar la generación activa antes de ejecutar.
 
 ## Lista Clinton 0.1.4 TEST
 
@@ -19,4 +19,3 @@ El motor solo puede seleccionarla cuando el plan ORDS requiera esa identidad y
 versión exactas. El snapshot TEST actual no asigna adaptador ni entrega un par
 elegible para documento 33; no se debe forzar la instalación/ejecución. La
 versión es TEST y no está aprobada para Producción.
-

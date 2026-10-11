@@ -122,6 +122,9 @@ class BrowserFacade:
     async def fill(self, selector: str, value: str):
         return await self.pacer.act(lambda: self.locator(selector).fill(value))
 
+    async def press(self, selector: str, key: str):
+        return await self.pacer.act(lambda: self.locator(selector).press(key))
+
     async def input_value(self, selector: str):
         return await self.locator(selector).input_value()
 

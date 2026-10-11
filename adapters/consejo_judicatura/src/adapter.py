@@ -61,6 +61,24 @@ async def _search_idle(browser) -> bool:
     return bool(await check())
 
 
+async def _wait_form_reset(browser, field: str) -> bool:
+    """Wait for PrimeFaces to finish replacing fields after LIMPIAR."""
+    check = getattr(browser, "search_idle", None)
+    if check is None:
+        return True
+    stable = 0
+    for _ in range(30):
+        try:
+            ready = bool(await check()) and await browser.input_value(field) == ""
+        except Exception:
+            ready = False  # JSF may replace the input node during AJAX.
+        stable = stable + 1 if ready else 0
+        if stable >= 3:
+            return True
+        await asyncio.sleep(.5)
+    return False
+
+
 async def prepare(_work, _services):
     """Reset the portal barrier once for a new sidecar batch/session."""
     global _human_barrier
@@ -97,7 +115,13 @@ async def _execute_document(work, services, expected_document_id):
             # Reset the JSF form without discarding browser cookies/context.
             await browser.click(CLEAR)
         await browser.wait_for_selector(field, state="visible", timeout=15000)
+        if at_entry and not await _wait_form_reset(browser, field):
+            return {"kind": "RETRYABLE", "checkpoint": "JUDICIAL_SEARCH",
+                    "reason_code": "FORM_RESET_TIMEOUT"}
         await browser.fill(field, value.strip())
+        blur = getattr(browser, "press", None)
+        if callable(blur):
+            await blur(field, "Tab")
         if await browser.input_value(field) != value.strip():
             return {"kind": "RETRYABLE", "reason_code": "INPUT_NOT_PERSISTED"}
         if await browser.is_visible(CHALLENGE):
