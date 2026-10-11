@@ -1,0 +1,8 @@
+{
+  "algorithm": "Ed25519",
+  "channel": "PRODUCCION",
+  "key_id": "cntr-prod-63f2371d344a",
+  "public_key_base64": "dSRXY9ZoWDjns4uEkiJDbJ0bcpbgJhZ5mWWi09n1YkI=",
+  "purpose": "CNTR RPA production channel and release manifest verification",
+  "private_key_published": false
+}

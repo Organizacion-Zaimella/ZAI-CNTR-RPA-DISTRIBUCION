@@ -1,0 +1,18 @@
+{
+  "channel": "PRODUCCION",
+  "components": [
+    {
+      "asset": "cntr-rpa-adapter-sri-0.1.22-win-x64.zip",
+      "dependencies": [
+        "playwright==1.60.0"
+      ],
+      "id": "sri",
+      "sha256": "5bcc187acf9680c772c150d43576ccaacff160d027f9722ff768219b6d75a1d8",
+      "version": "0.1.22"
+    }
+  ],
+  "format": "CNTR-RPA-SBOM-1",
+  "release_tag": "cntr-rpa-sri-0.1.22",
+  "source_commit": "bb5029ff71337503c59953968d418c444540a36a",
+  "source_repository": "Organizacion-Zaimella/ZAI-RPA-CTRL-CAPTURA-INFORMACION-PUBLICA"
+}

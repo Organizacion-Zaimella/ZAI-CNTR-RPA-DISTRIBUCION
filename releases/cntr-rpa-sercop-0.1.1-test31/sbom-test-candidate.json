@@ -1,0 +1,18 @@
+{
+  "channel": "TEST",
+  "components": [
+    {
+      "asset": "cntr-rpa-adapter-sercop-0.1.1-candidate-win-x64.zip",
+      "dependencies": [
+        "playwright==1.60.0"
+      ],
+      "id": "sercop",
+      "sha256": "5a86289ef026f0a3e91adb6a221e933424944713b0a5cd408949efe6beac9aa8",
+      "version": "0.1.1-candidate"
+    }
+  ],
+  "format": "CNTR-RPA-SBOM-1",
+  "release_tag": "cntr-rpa-sercop-0.1.1-test31",
+  "source_commit": "d576c39b42b054668d561102dae8b95873815cc2",
+  "source_repository": "Organizacion-Zaimella/ZAI-RPA-CTRL-CAPTURA-INFORMACION-PUBLICA"
+}
