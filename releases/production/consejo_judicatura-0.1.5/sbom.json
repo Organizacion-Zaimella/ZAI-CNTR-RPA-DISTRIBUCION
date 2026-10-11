@@ -1,0 +1,19 @@
+{
+  "channel": "PRODUCCION",
+  "components": [
+    {
+      "asset": "cntr-rpa-adapter-consejo_judicatura-0.1.5-win-x64.zip",
+      "dependencies": [
+        "# Entorno standalone y contrato lateral: mantener fijo para reproducibilidad.",
+        "playwright==1.60.0"
+      ],
+      "id": "consejo_judicatura",
+      "sha256": "82579cee9c761c5f13608d27712777baf1c1cb3cd7eeb0bfefb9f4b7448f50cb",
+      "version": "0.1.5"
+    }
+  ],
+  "format": "CNTR-RPA-SBOM-1",
+  "release_tag": "cntr-rpa-consejo_judicatura-0.1.5",
+  "source_commit": "287c09e6fc0bdb77587f354d64b502f5809c5296",
+  "source_repository": "Organizacion-Zaimella/ZAI-RPA-CTRL-CAPTURA-INFORMACION-PUBLICA"
+}

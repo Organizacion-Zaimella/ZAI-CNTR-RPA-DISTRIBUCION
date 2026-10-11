@@ -1,6 +1,6 @@
 # Uso anónimo desde CNTR RPA
 
-**Estado C.145:** el canal TEST firmado generación 36 ya está disponible en la rama candidata. No es un canal de Producción. Verificar generación y SHA de channels/test.json antes de validar una instalación.
+**Estado C.145:** TEST generación 36 tiene campaña aprobada para diez documentos. El canal PROD generación 1 se preparó con motor 1.0.0 y cinco adaptadores estables; INTERPOL no se habilita. Antes de usar Producción, comprobar la versión firmada publicada en `main` y confirmar que cada asset coincide con el manifiesto. El instalador completo es una entrega separada del actualizador incremental y requiere la distribución PROD publicada.
 
 El cliente fijará el propietario `Organizacion-Zaimella` y el repositorio `ZAI-CNTR-RPA-DISTRIBUCION`. La lectura de archivos públicos y futuros assets de Releases no requerirá cuenta, token ni cookie de GitHub.
 

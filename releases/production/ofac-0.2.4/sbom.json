@@ -1,0 +1,19 @@
+{
+  "channel": "PRODUCCION",
+  "components": [
+    {
+      "asset": "cntr-rpa-adapter-ofac-0.2.4-win-x64.zip",
+      "dependencies": [
+        "playwright==1.60.0",
+        "PyMuPDF==1.28.0"
+      ],
+      "id": "ofac",
+      "sha256": "fff1c550363ff4c1d63f37d5e0da267fe955ceb4864a5443443060aa7e52b927",
+      "version": "0.2.4"
+    }
+  ],
+  "format": "CNTR-RPA-SBOM-1",
+  "release_tag": "cntr-rpa-ofac-0.2.4",
+  "source_commit": "8ed3a3e2c0fed06e3b148893fd030fcbfc24fd08",
+  "source_repository": "Organizacion-Zaimella/ZAI-RPA-CTRL-CAPTURA-INFORMACION-PUBLICA"
+}
