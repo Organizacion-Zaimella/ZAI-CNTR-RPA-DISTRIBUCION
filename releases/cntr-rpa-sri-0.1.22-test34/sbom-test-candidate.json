@@ -1,0 +1,18 @@
+{
+  "channel": "TEST",
+  "components": [
+    {
+      "asset": "cntr-rpa-adapter-sri-0.1.22-candidate-win-x64.zip",
+      "dependencies": [
+        "playwright==1.60.0"
+      ],
+      "id": "sri",
+      "sha256": "d9c516bca24f08282627f98441bcc52500cbd5f2e19d1ade755b116f38e47492",
+      "version": "0.1.22-candidate"
+    }
+  ],
+  "format": "CNTR-RPA-SBOM-1",
+  "release_tag": "cntr-rpa-sri-0.1.22-test34",
+  "source_commit": "bb5029ff71337503c59953968d418c444540a36a",
+  "source_repository": "Organizacion-Zaimella/ZAI-RPA-CTRL-CAPTURA-INFORMACION-PUBLICA"
+}
