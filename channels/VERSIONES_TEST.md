@@ -1,6 +1,6 @@
 # Versiones efectivas — canal TEST 62
 
-Rama candidata de distribución C.151: `codex/c151-supercias-test37`. La fuente ejecutable es [`test.json`](test.json) con su [firma](test.json.sig). Producción sigue separada y sin cambios.
+Rama candidata de distribución C.151: `codex/c151-supercias-test38`. La fuente ejecutable es [`test.json`](test.json) con su [firma](test.json.sig). Producción sigue separada y sin cambios.
 
 | Componente | Versión TEST | Release público |
 |---|---|---|
