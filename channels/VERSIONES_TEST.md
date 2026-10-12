@@ -23,3 +23,5 @@ Los tres nuevos paquetes Superintendencia, Servicios Educación y SENESCYT fuero
 Servicios Educación 0.1.0 recupera el prototipo histórico `EducationTitlesV1` para `documento_9`; SENESCYT 0.1.0 adapta `documento_10`. Sus escenarios Playwright locales verifican `MATCH`, `NO_MATCH`, estado ambiguo y PNG. Oracle TEST confirma que el paso 1 de documento 10 usa `titulos-edusuperior.minedec.gob.ec`; `www.senescyt.gob.ec` permanece como URL informativa del portal y no decide navegación.
 
 Fiscalía 8 cuenta con una corrida robot/ORDS exitosa registrada. Ministerio 4, Superintendencia 13–19 y Judicatura 6 aún requieren completar sus pruebas reales en el robot con evidencia/ACK. Ningún paquete nuevo habilita Producción. INTERPOL 12 conserva su barrera de autorización.
+
+| Superintendencia | `0.1.12-candidate` | [`cntr-rpa-supercias-0.1.12-test61`](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-supercias-0.1.12-test61) |
