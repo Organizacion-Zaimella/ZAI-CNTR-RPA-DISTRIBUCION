@@ -19,7 +19,7 @@ no certifica el documento ni modifica Producción.
 5. Promover canal TEST y luego Producción mediante PR revisado y checks definidos. El puntero firmado se actualiza solo después de que el asset existe y pasa los gates del canal.
 6. Documentar revocación y reversión. Una versión retirada no debe ejecutarse por estar en caché.
 
-El canal TEST generación 60 y sus Releases están en la rama candidata C.151. El canal PROD firmado generación 2 conserva su estado independiente; cada promoción TEST se comprueba con firma, hash y preflight antes de habilitarla para pruebas. Servicios Educación, SENESCYT y Superintendencia 0.1.11 son candidatos no certificados, a la espera de prueba atendida, asignación ORDS y ACK.
+El canal TEST generación 60 y sus Releases están en la rama candidata C.151. El canal PROD firmado generación 2 conserva su estado independiente; cada promoción TEST se comprueba con firma, hash y preflight antes de habilitarla para pruebas. Servicios Educación, SENESCYT y Superintendencia 0.1.11 son candidatos no certificados, a la espera de prueba atendida, ejecución integrada y ACK. Los adaptadores educativos ya están asignados en Oracle TEST; no se ejecutaron consultas de portal.
 
 ## Lista Clinton 0.1.4 — candidato TEST
 
