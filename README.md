@@ -2,7 +2,7 @@
 
 Repositorio público de distribución de software aprobado del proyecto CNTR RPA. El canal TEST permite validar paquetes firmados y compatibles; su presencia no certifica la captura integral de un documento ni habilita Producción.
 
-**Canal TEST de esta rama:** generación 55 firmada. Incluye motor `1.0.0-test.16` y diez adaptadores, incluida Superintendencia `0.1.8-candidate`. La versión actualiza el recorrido del documento 16 a los pasos vigentes `Administradores actuales` > fila `RL` > PDF; la captura PDF compartida se conserva. El fixture local pasa; la validación integrada real sigue pendiente. [Inventario exacto](channels/VERSIONES_TEST.md). Los candidatos requieren validación por documento en TEST y no habilitan Producción.
+**Canal TEST de esta rama:** generación 56 firmada. Incluye motor `1.0.0-test.16` y diez adaptadores, incluida Superintendencia `0.1.9-candidate`. La versión selecciona el PDF de la fila `RL` desde `Administradores actuales` y mantiene el procesamiento PDF existente. Las pruebas locales pasan; la nueva integración robot de Superintendencia está pendiente. [Inventario exacto](channels/VERSIONES_TEST.md). Los candidatos requieren validación por documento en TEST y no habilitan Producción.
 
 **Continuidad C.145:** este repositorio distribuye artefactos; ORDS decide qué asociación adaptador/función recibe cada trabajo. Los candidatos TEST requieren sus gates propios y no son autorización de Producción. Para continuar, verificar firma de `channels/test.json`, PR/rama/SHA y el expediente [C.145](https://github.com/Organizacion-Zaimella/ZAI-PRJ-CTRL-CAPTURA-INFORMACION-PUBLICA/tree/codex/c145-cierre-rpa-portales/docs/tareas/C.145). OpenClaw, workflows y Discovery son legado y no intervienen en la distribución ni ejecución 1.0.0.
 
