@@ -1,0 +1,19 @@
+{
+  "channel": "TEST",
+  "components": [
+    {
+      "asset": "cntr-rpa-adapter-supercias-0.1.8-candidate-win-x64.zip",
+      "dependencies": [
+        "playwright==1.60.0",
+        "pypdf==5.9.0"
+      ],
+      "id": "supercias",
+      "sha256": "34845d9ada73e7abb567783a13b9a5feca2d3dee2043ce3c683aa36550acdab4",
+      "version": "0.1.8-candidate"
+    }
+  ],
+  "format": "CNTR-RPA-SBOM-1",
+  "release_tag": "cntr-rpa-supercias-0.1.8-test55",
+  "source_commit": "1bfc366c7a2540558737b83c67982f3e2e276357",
+  "source_repository": "Organizacion-Zaimella/ZAI-RPA-CTRL-CAPTURA-INFORMACION-PUBLICA"
+}

@@ -1,0 +1,18 @@
+{
+  "channel": "TEST",
+  "components": [
+    {
+      "asset": "cntr-rpa-adapter-servicios_educacion-0.1.0-candidate-win-x64.zip",
+      "dependencies": [
+        "playwright==1.60.0"
+      ],
+      "id": "servicios_educacion",
+      "sha256": "1d506f0ca5f09b3e86fd480958e8d19dbec64f9d761600a6ae3aea5b6bea75e7",
+      "version": "0.1.0-candidate"
+    }
+  ],
+  "format": "CNTR-RPA-SBOM-1",
+  "release_tag": "cntr-rpa-servicios-educacion-0.1.0-test58",
+  "source_commit": "5bdb16f51bfc04f9330c38397a26e94511be70cc",
+  "source_repository": "Organizacion-Zaimella/ZAI-RPA-CTRL-CAPTURA-INFORMACION-PUBLICA"
+}

@@ -1,6 +1,6 @@
 # Arquitectura de distribución
 
-**Estado vigente C.145:** la infraestructura no está en estado inicial. El canal TEST y su firma publican la generación 36; el inventario y SHA están en [VERSIONES_TEST](../channels/VERSIONES_TEST.md). No existe canal de Producción en esta línea. Confirmar rama/SHA y firma antes de promover. El motor actual es genérico Python + Playwright; OpenClaw/workflows son legado.
+**Estado candidato C.151:** la infraestructura no está en estado inicial. La rama candidata `codex/c151-supercias-test37` publica el canal TEST firmado generación 60; el inventario y SHA están en [VERSIONES_TEST](../channels/VERSIONES_TEST.md). El canal de Producción generación 2 permanece separado y sin cambios. Confirmar rama/SHA y firma antes de usar. El motor es genérico Python + Playwright; OpenClaw/workflows son legado.
 
 ## Responsabilidades
 
