@@ -1,6 +1,6 @@
 # Política de publicación
 
-**Estado de canales:** el canal TEST generación 53 está en la rama candidata C.151 `codex/c151-supercias-test37`; el canal PROD generación 2 permanece sin cambios. C.151 no autoriza ni ejecuta un pase productivo. La elegibilidad de un candidato TEST no equivale a certificación de consulta real.
+**Estado de canales:** el canal TEST generación 54 está en la rama candidata C.151 `codex/c151-supercias-test37`; el canal PROD generación 2 permanece sin cambios. C.151 no autoriza ni ejecuta un pase productivo. La elegibilidad de un candidato TEST no equivale a certificación de consulta real.
 
 1. Desarrollar y revisar el cambio en su repositorio privado, con commit exacto y pruebas de contrato.
 2. Verificar que el contenido público no incluya datos personales, evidencias, cookies, tokens, URLs internas ni claves privadas. Confirmar derechos de publicación antes de copiar un adaptador.
@@ -9,7 +9,7 @@
 5. Promover canal TEST y luego Producción mediante PR revisado y checks definidos. El puntero firmado se actualiza solo después de que el asset existe y pasa los gates del canal.
 6. Documentar revocación y reversión. Una versión retirada no debe ejecutarse por estar en caché.
 
-El canal TEST generación 53 y sus Releases están en la rama candidata C.151. El canal PROD firmado generación 2 conserva su estado independiente; cada promoción TEST se comprueba con firma, hash y preflight antes de habilitarla para pruebas.
+El canal TEST generación 54 y sus Releases están en la rama candidata C.151. El canal PROD firmado generación 2 conserva su estado independiente; cada promoción TEST se comprueba con firma, hash y preflight antes de habilitarla para pruebas.
 
 ## Lista Clinton 0.1.4 — candidato TEST
 
