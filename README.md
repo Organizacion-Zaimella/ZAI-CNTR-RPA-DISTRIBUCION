@@ -8,9 +8,9 @@ Repositorio público de distribución de software aprobado del proyecto CNTR RPA
 
 INTERPOL 0.1.1 es un candidato técnico basado en workflow histórico 61/v2. Solo está probado con fixtures locales/sidecar; las URLs externas están bloqueadas por la política de autorización. No existe consulta real ni ACK ORDS para INTERPOL. La versión `lista-clinton@0.1.4-candidate` también permanece sujeta al estado y asignación que muestra el plan ORDS; la presencia en este canal no certifica por sí sola su ejecución integral.
 
-**Canal PRODUCCION propuesto por C.152:** generación 4 firmada con motor `1.0.3` y los diez adaptadores de la generación 3 aprobada. El cambio de motor muestra progreso y resumen y clasifica los timeouts transitorios sin atribuirlos a caída del portal. INTERPOL permanece excluido.
+**Candidato de canal PRODUCCION C.153:** generación 6 firmada con motor `1.0.4` y SRI `0.1.23`; conserva las demás asignaciones de la generación 4 y revoca `engine@1.0.3` y `adapter:sri@0.1.22`. El motor aísla fallos del adaptador y continúa el plan en el orden ORDS. SRI 0.1.23 proviene del candidato TEST 0.1.23-candidate, probado con documentos 3/53, evidencias y ACK en TEST. INTERPOL permanece excluido. El canal solo se activa al integrar el PR de distribución.
 
-La generación 3 de C.151 ya está integrada en `main`. El release productivo `1.0.2` preexistente tiene bytes distintos; C.152 publica `1.0.3` sin reutilizar ese nombre. La firma de `channels/production.json` y el asset `1.0.3` son el par de promoción de esta rama.
+Releases preparados: [motor 1.0.4](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-engine-1.0.4) y [adaptador SRI 0.1.23](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-sri-0.1.23). Los dos paquetes y manifiestos se verifican con firma/hash; los punteros permanecen en el PR hasta su integración.
 
 La presencia de una versión en el canal permite su descarga firmada; la certificación documental requiere resultado, evidencia y ACK por trabajo real de ORDS.
 
