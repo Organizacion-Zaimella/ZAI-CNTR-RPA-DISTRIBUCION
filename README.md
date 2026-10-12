@@ -8,9 +8,9 @@ Repositorio público de distribución de software aprobado del proyecto CNTR RPA
 
 INTERPOL 0.1.1 es un candidato técnico basado en workflow histórico 61/v2. Solo está probado con fixtures locales/sidecar; las URLs externas están bloqueadas por la política de autorización. No existe consulta real ni ACK ORDS para INTERPOL. La versión `lista-clinton@0.1.4-candidate` también permanece sujeta al estado y asignación que muestra el plan ORDS; la presencia en este canal no certifica por sí sola su ejecución integral.
 
-**Candidato de canal PRODUCCION C.153:** generación 6 firmada con motor `1.0.4` y SRI `0.1.23`; conserva las demás asignaciones de la generación 4 y revoca `engine@1.0.3` y `adapter:sri@0.1.22`. El motor aísla fallos del adaptador y continúa el plan en el orden ORDS. SRI 0.1.23 proviene del candidato TEST 0.1.23-candidate, probado con documentos 3/53, evidencias y ACK en TEST. INTERPOL permanece excluido. El canal solo se activa al integrar el PR de distribución.
+**Canal PRODUCCION vigente:** generación 6 firmada con motor `1.0.4` y SRI `0.1.23`. **Candidato C.153 de estabilidad:** generación 7 firmada con motor `1.0.5` y las mismas diez versiones de adaptadores. ORDS conserva el plan, orden y función; el canal firmado decide la versión ejecutable del adaptador compatible. Una referencia de versión atrasada en ORDS no detiene todos los documentos. El motor aísla fallos por lote y deja constancia en el detalle. INTERPOL permanece excluido. La generación 7 se activa únicamente al integrar este PR.
 
-Releases preparados: [motor 1.0.4](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-engine-1.0.4) y [adaptador SRI 0.1.23](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-sri-0.1.23). Los dos paquetes y manifiestos se verifican con firma/hash; los punteros permanecen en el PR hasta su integración.
+Releases publicados: [motor 1.0.5](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-engine-1.0.5) y [adaptador SRI 0.1.23](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-sri-0.1.23). La generación 7 se mantiene en el PR hasta su integración.
 
 La presencia de una versión en el canal permite su descarga firmada; la certificación documental requiere resultado, evidencia y ACK por trabajo real de ORDS.
 
@@ -20,6 +20,7 @@ La presencia de una versión en el canal permite su descarga firmada; la certifi
 - [Uso desde el RPA](docs/USO_DESDE_RPA.md)
 - [Canal TEST firmado](channels/test.json)
 - [Canal PRODUCCION firmado](channels/production.json)
+- [Contrato de versión, disponibilidad de assets y continuidad](docs/C153_VERSION_Y_CONTINUIDAD.md)
 - [Reporte privado de seguridad](SECURITY.md)
 
 No se alojan datos de sujetos, documentos obtenidos, evidencias ni secretos. Los assets se publican en Releases y se autentican mediante firmas de canal separadas para TEST y Producción.
