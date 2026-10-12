@@ -1,0 +1,16 @@
+{
+  "channel": "PRODUCCION",
+  "components": [
+    {
+      "asset": "cntr-rpa-engine-1.0.3-win-x64.zip",
+      "dependencies": [],
+      "id": "engine",
+      "sha256": "1a3f5ce039dcea7df233d98197e0db9c19d5e26ffe8d3155ad54188b60dca667",
+      "version": "1.0.3"
+    }
+  ],
+  "format": "CNTR-RPA-SBOM-1",
+  "release_tag": "cntr-rpa-engine-1.0.3",
+  "source_commit": "b903320d388f3fc2895c9227417770575a601e67",
+  "source_repository": "Organizacion-Zaimella/ZAI-RPA-CTRL-CAPTURA-INFORMACION-PUBLICA"
+}
