@@ -2,7 +2,7 @@
 
 Repositorio público de distribución de software aprobado del proyecto CNTR RPA. El canal TEST permite validar paquetes firmados y compatibles; su presencia no certifica la captura integral de un documento ni habilita Producción.
 
-**Canal TEST de esta rama:** generación 65 firmada, motor `1.0.2-test.1` y doce adaptadores publicados. ORDS asigna solo los necesarios para cada plan. C.152 verificó desde la instalación existente la actualización independiente de `sri@0.1.22-candidate` a `sri@0.1.23-candidate`, con evidencias y ACK para los documentos 3 y 53.
+**Canal TEST de `main`:** generación 65 firmada, motor `1.0.2-test.1` y doce adaptadores publicados. La rama candidata C.154 `codex/c154-visible-retry` propone generación 66 con motor `1.0.6-test.1`, manteniendo las doce asignaciones. El cambio reintenta una sola vez en primer plano un trabajo automático que falló oculto por `PORTAL_UNAVAILABLE` o `ACTION_TIMEOUT`; no cambia Producción ni certifica documentos por sí solo. ORDS asigna solo los adaptadores requeridos por cada plan.
 
 **Continuidad C.145:** este repositorio distribuye artefactos; ORDS decide qué asociación adaptador/función recibe cada trabajo. Los candidatos TEST requieren sus gates propios y no son autorización de Producción. Para continuar, verificar firma de `channels/test.json`, PR/rama/SHA y el expediente [C.145](https://github.com/Organizacion-Zaimella/ZAI-PRJ-CTRL-CAPTURA-INFORMACION-PUBLICA/tree/codex/c145-cierre-rpa-portales/docs/tareas/C.145). OpenClaw, workflows y Discovery son legado y no intervienen en la distribución ni ejecución 1.0.0.
 
@@ -21,6 +21,7 @@ La presencia de una versión en el canal permite su descarga firmada; la certifi
 - [Canal TEST firmado](channels/test.json)
 - [Canal PRODUCCION firmado](channels/production.json)
 - [Contrato de versión, disponibilidad de assets y continuidad](docs/C153_VERSION_Y_CONTINUIDAD.md)
+- [C.154 motor 1.0.6 TEST: reintento visible](docs/C154_ENGINE_1.0.6_VISIBLE_RETRY_TEST.md)
 - [Reporte privado de seguridad](SECURITY.md)
 
 No se alojan datos de sujetos, documentos obtenidos, evidencias ni secretos. Los assets se publican en Releases y se autentican mediante firmas de canal separadas para TEST y Producción.
