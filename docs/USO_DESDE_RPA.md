@@ -1,6 +1,6 @@
 # Uso anónimo desde CNTR RPA
 
-**Estado de canales:** TEST generación 55 está en la rama candidata C.151 `codex/c151-supercias-test37`; PROD generación 2 permanece sin cambios en este trabajo. El launcher verifica y descarga la versión firmada de la rama configurada antes de ejecutar. El instalador completo es una entrega separada del actualizador incremental.
+**Estado de canales:** TEST generación 60 está en la rama candidata C.151 `codex/c151-supercias-test37`; PROD generación 2 permanece sin cambios. El launcher verifica y descarga la versión firmada de la rama configurada antes de ejecutar. El instalador completo es una entrega separada del actualizador incremental.
 
 El cliente fijará el propietario `Organizacion-Zaimella` y el repositorio `ZAI-CNTR-RPA-DISTRIBUCION`. La lectura de archivos públicos y futuros assets de Releases no requerirá cuenta, token ni cookie de GitHub.
 
@@ -12,7 +12,7 @@ La instalación usará staging por versión, autochequeo y activación atómica.
 
 ## Versión efectiva de una instalación 1.0.0
 
-El `distribution_ref` de la configuración local identifica la rama del canal TEST. El actualizador valida su manifiesto firmado y escribe `state/test/active.json`. El motor efectivo es `engine.path/CNTR-RPA-100.exe` de ese estado, tras comprobar su hash; un EXE de bootstrap o una copia antigua en la raíz no representa la versión activa. El plan ORDS selecciona las versiones exactas de adaptadores y el actualizador exige que figuren en el mismo canal firmado. Para la integración C.151, usar [el inventario de la generación 55](../channels/VERSIONES_TEST.md) desde la rama candidata `codex/c151-supercias-test37`, y registrar la generación activa antes de ejecutar.
+El `distribution_ref` de la configuración local identifica la rama del canal TEST. El actualizador valida su manifiesto firmado y escribe `state/test/active.json`. El motor efectivo es `engine.path/CNTR-RPA-100.exe` de ese estado, tras comprobar su hash; un EXE de bootstrap o una copia antigua en la raíz no representa la versión activa. El plan ORDS selecciona las versiones exactas de adaptadores y el actualizador exige que figuren en el mismo canal firmado. Para la integración C.151, usar [el inventario de la generación 60](../channels/VERSIONES_TEST.md) desde la rama candidata `codex/c151-supercias-test37`, y registrar la generación activa antes de ejecutar.
 
 ## Lista Clinton 0.1.4 TEST
 

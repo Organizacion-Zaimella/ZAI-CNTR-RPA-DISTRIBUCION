@@ -1,0 +1,18 @@
+{
+  "channel": "TEST",
+  "components": [
+    {
+      "asset": "cntr-rpa-adapter-senescyt-0.1.0-candidate-win-x64.zip",
+      "dependencies": [
+        "playwright==1.60.0"
+      ],
+      "id": "senescyt",
+      "sha256": "472a0a7c1c92cbb38bccbcfdb0dad52ddbdc903f88a077939139287442139846",
+      "version": "0.1.0-candidate"
+    }
+  ],
+  "format": "CNTR-RPA-SBOM-1",
+  "release_tag": "cntr-rpa-senescyt-0.1.0-test59",
+  "source_commit": "5bdb16f51bfc04f9330c38397a26e94511be70cc",
+  "source_repository": "Organizacion-Zaimella/ZAI-RPA-CTRL-CAPTURA-INFORMACION-PUBLICA"
+}
