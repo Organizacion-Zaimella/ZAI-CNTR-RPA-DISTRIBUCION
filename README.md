@@ -10,10 +10,13 @@ INTERPOL 0.1.1 es un candidato técnico basado en workflow histórico 61/v2. Sol
 
 **Canal PRODUCCION:** generación 2 firmada con la raíz `cntr-prod-63f2371d344a`; contiene motor `1.0.1` y cinco adaptadores estables (Judicatura, IESS, OFAC, SERCOP y SRI). El motor 1.0.0 se revocó porque su entrada de ejecución solo admitía TEST; la actualización 1.0.1 habilita el ambiente productivo sin lógica específica de portal. INTERPOL se excluye. Los diez documentos constan con resultado, evidencia y ACK en la campaña TEST 1699 (28/28). La autorización para pase a Producción e instalador está registrada en C.145.
 
+**C.151 — promoción preparada:** seis Releases firmados para Producción ya están publicados. La generación 3 del canal, que los añade sin recompilar el motor, está propuesta en [PR de promoción C.151](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/pull/18). La revisión requerida por la protección de `main` sigue pendiente; por eso la generación 2 continúa activa hasta que se apruebe y se integre el PR. La publicación no certifica ejecución real: evidencia de portal, ACK ORDS y pruebas desde el robot instalado continúan pendientes.
+
 La presencia de una versión en el canal permite su descarga firmada; la certificación documental requiere resultado, evidencia y ACK por trabajo real de ORDS.
 
 - [Arquitectura de distribución](docs/ARQUITECTURA_DISTRIBUCION.md)
 - [Publicación y aprobación](docs/PUBLICACION.md)
+- [Preparación de promoción C.151](docs/C151_PREPARACION_PRODUCCION.md)
 - [Uso desde el RPA](docs/USO_DESDE_RPA.md)
 - [Canal TEST firmado](channels/test.json)
 - [Canal PRODUCCION firmado](channels/production.json)
