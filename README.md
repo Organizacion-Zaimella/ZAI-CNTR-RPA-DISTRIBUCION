@@ -2,7 +2,7 @@
 
 Repositorio público de distribución de software aprobado del proyecto CNTR RPA. El canal TEST permite validar paquetes firmados y compatibles; su presencia no certifica la captura integral de un documento ni habilita Producción.
 
-**Candidato C.155 de TEST:** generación 75, motor `1.0.10-test.1`, Ministerio del Interior `0.1.4-candidate` y Fiscalía `0.1.6-candidate`; Superintendencia conserva su versión anterior por indisponibilidad del portal durante esta validación. Véase [estado y límites de las pruebas C.155](docs/C155_TEST_CANDIDATES.md). El canal productivo no cambia con este candidato.
+**Candidato C.155 de TEST:** generación 76, motor `1.0.10-test.1`, Ministerio del Interior `0.1.4-candidate` y Fiscalía `0.1.7-candidate`; Superintendencia conserva su versión anterior por indisponibilidad del portal durante esta validación. Véase [estado y límites de las pruebas C.155](docs/C155_TEST_CANDIDATES.md). El canal productivo no cambia con este candidato.
 
 **Canal TEST de `main` al abrir C.155:** generación 67 firmada, motor `1.0.7-test.1` y doce adaptadores publicados. El motor conserva el reintento visible acotado para fallos ocultos `PORTAL_UNAVAILABLE` o `ACTION_TIMEOUT` y procesa configuraciones mixtas. ORDS asigna solo los adaptadores requeridos por cada plan.
 
