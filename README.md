@@ -23,6 +23,7 @@ La presencia de una versión en el canal permite su descarga firmada; la certifi
 - [Contrato de versión, disponibilidad de assets y continuidad](docs/C153_VERSION_Y_CONTINUIDAD.md)
 - [C.154 motor 1.0.6 TEST: reintento visible](docs/C154_ENGINE_1.0.6_VISIBLE_RETRY_TEST.md)
 - [C.154 motor 1.0.7 TEST: configuraciones mixtas](docs/C154_ENGINE_1.0.7_CONFIGURACIONES_MIXTAS_TEST.md)
+- [C.154 motor 1.0.7 Producción: configuraciones mixtas](docs/C154_ENGINE_1.0.7_PRODUCCION.md)
 - [Reporte privado de seguridad](SECURITY.md)
 
 No se alojan datos de sujetos, documentos obtenidos, evidencias ni secretos. Los assets se publican en Releases y se autentican mediante firmas de canal separadas para TEST y Producción.
