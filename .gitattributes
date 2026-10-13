@@ -1,0 +1,6 @@
+# Signed bytes and their referenced hashes must not change on checkout.
+channels/*.json -text
+channels/*.json.sig -text
+releases/**/release-manifest.json -text
+releases/**/release-manifest.json.sig -text
+releases/**/sbom-test-candidate.json -text
