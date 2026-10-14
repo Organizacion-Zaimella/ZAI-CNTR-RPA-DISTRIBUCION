@@ -1,21 +1,29 @@
-# Versiones efectivas — canal TEST 36
+# Versiones efectivas — canal TEST
 
-Rama de distribución: `codex/cntr-rpa-1.0.0-c145`. La fuente de verdad ejecutable es [`test.json`](test.json) con su [firma](test.json.sig); este inventario describe su contenido. Producción queda fuera de esta promoción.
+La fuente de verdad ejecutable es [test.json](test.json) y su [firma](test.json.sig). Este inventario corresponde a la generación 87.
 
-| Componente | Versión TEST | Release público |
+| Componente | Versión | Release |
 |---|---|---|
-| Motor | `1.0.0-test.13` | [`cntr-rpa-engine-1.0.0-test.13`](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-engine-1.0.0-test.13) |
-| Judicatura | `0.1.5-candidate` | [`cntr-rpa-judicatura-0.1.5-test28`](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-judicatura-0.1.5-test28) |
-| IESS | `0.1.6-candidate` | [`cntr-rpa-iess-0.1.6-test33`](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-iess-0.1.6-test33) |
-| INTERPOL | `0.1.1-candidate` | [`cntr-rpa-interpol-0.1.1-test36`](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-interpol-0.1.1-test36) |
-| Lista Clinton | `0.1.4-candidate` | [`cntr-rpa-lista-clinton-0.1.4-test21`](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-lista-clinton-0.1.4-test21) |
-| OFAC | `0.2.4-candidate` | [`cntr-rpa-ofac-0.2.4-test30`](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-ofac-0.2.4-test30) |
-| SERCOP | `0.1.1-candidate` | [`cntr-rpa-sercop-0.1.1-test31`](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-sercop-0.1.1-test31) |
-| SRI | `0.1.22-candidate` | [`cntr-rpa-sri-0.1.22-test34`](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-sri-0.1.22-test34) |
+| Motor | `
+1.0.10-test.1
+` | [
+cntr-rpa-engine-1.0.10-test1
+](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/
+cntr-rpa-engine-1.0.10-test1
+) |
+| consejo_judicatura | `0.1.7-candidate` | [cntr-rpa-judicatura-0.1.7-test49](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-judicatura-0.1.7-test49) |
+| fiscalia | `0.1.9-candidate` | [cntr-rpa-fiscalia-0.1.9-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-fiscalia-0.1.9-test1) |
+| iess | `0.1.6-candidate` | [cntr-rpa-iess-0.1.6-test33](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-iess-0.1.6-test33) |
+| interpol | `0.1.1-candidate` | [cntr-rpa-interpol-0.1.1-test36](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-interpol-0.1.1-test36) |
+| lista_clinton | `0.1.4-candidate` | [cntr-rpa-lista-clinton-0.1.4-test21](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-lista-clinton-0.1.4-test21) |
+| ministerio_interior | `0.1.6-candidate` | [cntr-rpa-ministerio-interior-0.1.6-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-ministerio-interior-0.1.6-test1) |
+| ofac | `0.2.4-candidate` | [cntr-rpa-ofac-0.2.4-test30](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-ofac-0.2.4-test30) |
+| senescyt | `0.1.3-candidate` | [cntr-rpa-senescyt-0.1.3-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-senescyt-0.1.3-test1) |
+| sercop | `0.1.1-candidate` | [cntr-rpa-sercop-0.1.1-test31](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-sercop-0.1.1-test31) |
+| servicios_educacion | `0.1.2-candidate` | [cntr-rpa-servicios-educacion-0.1.2-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-servicios-educacion-0.1.2-test1) |
+| sri | `0.1.23-candidate` | [cntr-rpa-sri-0.1.23-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-sri-0.1.23-test1) |
+| supercias | `0.1.16-candidate` | [cntr-rpa-supercias-0.1.16-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-supercias-0.1.16-test1) |
 
-Los Releases referenciados contienen el asset indicado y `release-manifest.json` con firma. El canal 36 se firmó con la raíz TEST registrada por el motor y se verificó con el validador del actualizador. La campaña instalada 1699 en modo `BACKGROUND` acreditó los diez documentos de SRI 3/53, IESS 2, OFAC 5/33, SERCOP 11 y Judicatura 73–76: 28 resultados concluyentes, 28 evidencias y 28 ACK. INTERPOL 12 no formó parte de esa campaña y conserva su barrera de autorización. El detalle está en el expediente C.145.
+C.156 actualiza `servicios_educacion@0.1.2-candidate` y `senescyt@0.1.3-candidate` como candidatos TEST firmados. Estas revisiones usan únicamente la fachada pública `PortalActions` del motor. SENESCYT recupera una sesión JSF vencida y limpia el formulario al cambiar de sujeto en la misma pestaña. La publicación del canal no activa documentos ni acredita por sí sola evidencia o ACK desde el robot. El motor permanece en la versión indicada y no se recompiló por estos adaptadores.
 
-Para comprobar qué binario se ejecutará, leer `state/test/active.json`, verificar `engine.files["CNTR-RPA-100.exe"]` contra el SHA-256 de `engine.path/CNTR-RPA-100.exe` y usar esa ruta. Nunca elegir un EXE por nombre o por su ubicación aparente.
-
-
-INTERPOL 0.1.1-candidate migra el workflow histórico 61/v2 para el documento 12. Su paquete y canal están firmados para TEST. La evidencia disponible es exclusivamente de páginas locales simuladas; la protección de autorización mantiene las URL externas bloqueadas y no se ejecutó consulta real ni ACK ORDS.
+La asignación efectiva de cada documento sigue siendo la versión que entregue ORDS. INTERPOL conserva su barrera de autorización para consultas externas.
