@@ -1,10 +1,10 @@
 # Versiones efectivas — canal TEST
 
-La fuente de verdad ejecutable es [test.json](test.json) y su [firma](test.json.sig). Este inventario corresponde a la generación 90.
+La fuente de verdad ejecutable es [test.json](test.json) y su [firma](test.json.sig). Este inventario corresponde a la generación 93.
 
 | Componente | Versión | Release |
 |---|---|---|
-| Motor | `1.0.11-test.1` | [cntr-rpa-engine-1.0.11-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-engine-1.0.11-test1) |
+| Motor | `1.0.13-test.1` | [cntr-rpa-engine-1.0.13-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-engine-1.0.13-test1) |
 | consejo_judicatura | `0.1.7-candidate` | [cntr-rpa-judicatura-0.1.7-test49](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-judicatura-0.1.7-test49) |
 | fiscalia | `0.1.9-candidate` | [cntr-rpa-fiscalia-0.1.9-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-fiscalia-0.1.9-test1) |
 | iess | `0.1.6-candidate` | [cntr-rpa-iess-0.1.6-test33](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-iess-0.1.6-test33) |
