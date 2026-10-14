@@ -1,6 +1,6 @@
 # Versiones efectivas — canal TEST
 
-La fuente de verdad ejecutable es [test.json](test.json) y su [firma](test.json.sig). Este inventario corresponde a la generación 89.
+La fuente de verdad ejecutable es [test.json](test.json) y su [firma](test.json.sig). Este inventario corresponde a la generación 90.
 
 | Componente | Versión | Release |
 |---|---|---|
@@ -12,7 +12,7 @@ La fuente de verdad ejecutable es [test.json](test.json) y su [firma](test.json.
 | lista_clinton | `0.1.4-candidate` | [cntr-rpa-lista-clinton-0.1.4-test21](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-lista-clinton-0.1.4-test21) |
 | ministerio_interior | `0.1.6-candidate` | [cntr-rpa-ministerio-interior-0.1.6-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-ministerio-interior-0.1.6-test1) |
 | ofac | `0.2.4-candidate` | [cntr-rpa-ofac-0.2.4-test30](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-ofac-0.2.4-test30) |
-| senescyt | `0.1.3-candidate` | [cntr-rpa-senescyt-0.1.3-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-senescyt-0.1.3-test1) |
+| senescyt | `0.1.4-candidate` | [cntr-rpa-senescyt-0.1.4-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-senescyt-0.1.4-test1) |
 | sercop | `0.1.1-candidate` | [cntr-rpa-sercop-0.1.1-test31](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-sercop-0.1.1-test31) |
 | servicios_educacion | `0.1.2-candidate` | [cntr-rpa-servicios-educacion-0.1.2-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-servicios-educacion-0.1.2-test1) |
 | sri | `0.1.23-candidate` | [cntr-rpa-sri-0.1.23-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-sri-0.1.23-test1) |
@@ -23,3 +23,5 @@ C.156 actualiza `servicios_educacion@0.1.2-candidate` y `senescyt@0.1.3-candidat
 La asignación efectiva de cada documento sigue siendo la versión que entregue ORDS. INTERPOL conserva su barrera de autorización para consultas externas.
 
 C.157 publica el motor `1.0.11-test.1` y Supercias `0.1.17-candidate`: resultado individual por sujeto, continuidad tras timeout y prioridad PDF `RL → ADM` para el documento 16. La generación 89 es un candidato de TEST; su firma y disponibilidad pública no sustituyen la prueba instalada con evidencia y ACK.
+
+La generación 90 sustituye solamente SENESCYT por `0.1.4-candidate`. La aplicación comprueba que la identificación permanezca tras la recarga JSF tardía y la repone antes de continuar con el CAPTCHA. La instalación TEST con dos sujetos y evidencia/ACK se comprueba por separado.
