@@ -1,16 +1,16 @@
 # Versiones efectivas — canal TEST
 
-La fuente de verdad ejecutable es [test.json](test.json) y su [firma](test.json.sig). Este inventario corresponde a la generación 93.
+La fuente de verdad ejecutable es [test.json](test.json) y su [firma](test.json.sig). Este inventario corresponde a la generación 95.
 
 | Componente | Versión | Release |
 |---|---|---|
-| Motor | `1.0.13-test.1` | [cntr-rpa-engine-1.0.13-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-engine-1.0.13-test1) |
+| Motor | `1.0.14-test.1` | [cntr-rpa-engine-1.0.14-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-engine-1.0.14-test1) |
 | consejo_judicatura | `0.1.7-candidate` | [cntr-rpa-judicatura-0.1.7-test49](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-judicatura-0.1.7-test49) |
 | fiscalia | `0.1.9-candidate` | [cntr-rpa-fiscalia-0.1.9-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-fiscalia-0.1.9-test1) |
 | iess | `0.1.6-candidate` | [cntr-rpa-iess-0.1.6-test33](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-iess-0.1.6-test33) |
 | interpol | `0.1.1-candidate` | [cntr-rpa-interpol-0.1.1-test36](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-interpol-0.1.1-test36) |
 | lista_clinton | `0.1.4-candidate` | [cntr-rpa-lista-clinton-0.1.4-test21](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-lista-clinton-0.1.4-test21) |
-| ministerio_interior | `0.1.6-candidate` | [cntr-rpa-ministerio-interior-0.1.6-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-ministerio-interior-0.1.6-test1) |
+| ministerio_interior | `0.1.7-candidate` | [cntr-rpa-ministerio_interior-0.1.7-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-ministerio_interior-0.1.7-test1) |
 | ofac | `0.2.4-candidate` | [cntr-rpa-ofac-0.2.4-test30](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-ofac-0.2.4-test30) |
 | senescyt | `0.1.4-candidate` | [cntr-rpa-senescyt-0.1.4-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-senescyt-0.1.4-test1) |
 | sercop | `0.1.1-candidate` | [cntr-rpa-sercop-0.1.1-test31](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-sercop-0.1.1-test31) |
@@ -25,3 +25,5 @@ La asignación efectiva de cada documento sigue siendo la versión que entregue 
 C.157 publica el motor `1.0.11-test.1` y Supercias `0.1.17-candidate`: resultado individual por sujeto, continuidad tras timeout y prioridad PDF `RL → ADM` para el documento 16. La generación 89 es un candidato de TEST; su firma y disponibilidad pública no sustituyen la prueba instalada con evidencia y ACK.
 
 La generación 90 sustituye solamente SENESCYT por `0.1.4-candidate`. La aplicación comprueba que la identificación permanezca tras la recarga JSF tardía y la repone antes de continuar con el CAPTCHA. La instalación TEST con dos sujetos y evidencia/ACK se comprueba por separado.
+
+C.159 publica como candidatos TEST el motor `1.0.14-test.1` y Ministerio `0.1.7-candidate`. El primero recupera solo la pestaña tras timeout; el segundo vincula checkpoint y PDF al sujeto actual. La generación 95 está firmada; su integración real y el pase productivo quedan sujetos al expediente C.159, sin inferirse del código o de los fixtures locales.
