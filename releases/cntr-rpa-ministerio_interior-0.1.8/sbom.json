@@ -1,0 +1,19 @@
+{
+  "channel": "PRODUCCION",
+  "components": [
+    {
+      "asset": "cntr-rpa-adapter-ministerio_interior-0.1.8-win-x64.zip",
+      "dependencies": [
+        "playwright==1.60.0",
+        "pypdf==5.9.0"
+      ],
+      "id": "ministerio_interior",
+      "sha256": "4ad34e71bfc855ae788690ee68d529120b69b4655071c43611877bd483e6c3d5",
+      "version": "0.1.8"
+    }
+  ],
+  "format": "CNTR-RPA-SBOM-1",
+  "release_tag": "cntr-rpa-ministerio_interior-0.1.8",
+  "source_commit": "dbcd57442456871ded1fd46c14201ec6525e3b0f",
+  "source_repository": "Organizacion-Zaimella/ZAI-RPA-CTRL-CAPTURA-INFORMACION-PUBLICA"
+}
