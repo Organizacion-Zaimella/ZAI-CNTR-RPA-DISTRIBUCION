@@ -1,5 +1,7 @@
 # Canales de distribución
 
+C.170 publica PRODUCCIÓN generación 18 con motor `1.0.18`; conserva los diez adaptadores de la generación 17. El launcher con diagnóstico ORDS legible se distribuye en el instalador 1.0.8. Véase [el pase y sus límites](../docs/C170_ENGINE_1018_PRODUCTION.md).
+
 C.170 propone TEST generación 99 y motor `1.0.18-test.1` con diagnóstico legible del preflight ORDS y selección de versión firmada independiente de la referencia documental de ORDS. Conserva los doce adaptadores de la generación 98. Véase [la evidencia del candidato](../docs/C170_ENGINE_1018_TEST.md).
 
 `test.json` y `test.json.sig` son el puntero y la firma vigentes del canal TEST; `production.json` y su firma cumplen el mismo papel para Producción. El [inventario TEST](VERSIONES_TEST.md) se deriva del JSON firmado. Los resúmenes históricos de otras generaciones permanecen en Git.
