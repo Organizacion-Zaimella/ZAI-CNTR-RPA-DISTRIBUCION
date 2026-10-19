@@ -9,3 +9,9 @@ La generación TEST 100 selecciona el motor `1.0.19-test.1` y conserva los doce 
 - El binario congelado escribió el log local esperado ante configuración sintética inválida y mantuvo el código de salida 3 y el protocolo de stdout del launcher anterior.
 
 La corrida documental de MRGUILLCA, la evidencia y los ACK siguen pendientes. El launcher anterior continuará mostrando su mensaje genérico si falla el preflight; el detalle legible estará en el log privado del motor.
+
+## Producción
+
+La generación 19 cambia únicamente el motor a `1.0.19`; conserva los diez adaptadores y las revocaciones de la generación 18. El ZIP de Producción contiene los mismos bytes del motor verificados en TEST y tiene SHA-256 `faef34aa009ce5a6aaf993a6708ad85c92edb1f4a98529883f35355380b4b0cc`.
+
+Antes de publicar el canal, el código del launcher anterior descargó y verificó el candidato de Producción en sandbox, consultó ORDS en modo de solo lectura y seleccionó cuatro adaptadores: `PROD_CANDIDATE_OLD_LAUNCHER_PASS 19 1.0.19 4`. El resultado no acredita una ejecución documental ni ACK de MRGUILLCA.
