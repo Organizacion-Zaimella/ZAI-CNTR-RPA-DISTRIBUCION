@@ -1,5 +1,7 @@
 # Canales de distribución
 
+C.178 activa TEST generación 108 con Judicatura 0.1.8-candidate y Lista Clinton 0.1.5-candidate. Ambos adaptadores definen y validan su URL de entrada y no dependen de `work.entry_url`. Mantiene el motor TEST 1.0.24-test.1 y no modifica el canal de Producción (motor 1.0.24). ORDS asigna actualmente el documento 33 a `ofac`; Lista Clinton no se promueve ni se asigna por esta tarea.
+
 C.170 publica PRODUCCIÓN generación 18 con motor `1.0.18`; conserva los diez adaptadores de la generación 17. El launcher con diagnóstico ORDS legible se distribuye en el instalador 1.0.8. Véase [el pase y sus límites](../docs/C170_ENGINE_1018_PRODUCTION.md).
 
 C.170 propone TEST generación 99 y motor `1.0.18-test.1` con diagnóstico legible del preflight ORDS y selección de versión firmada independiente de la referencia documental de ORDS. Conserva los doce adaptadores de la generación 98. Véase [la evidencia del candidato](../docs/C170_ENGINE_1018_TEST.md).
