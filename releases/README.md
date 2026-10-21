@@ -1,5 +1,7 @@
 # Releases
 
+C.178 publicó como pre-releases TEST `cntr-rpa-judicatura-0.1.8-test1` y `cntr-rpa-lista-clinton-0.1.5-test1`. Los ZIP son assets de GitHub Releases; sus manifiestos, firmas y SBOM están versionados en sus carpetas. No se reconstruyó el motor. Lista Clinton permanece fuera de Producción porque ORDS asigna actualmente el documento 33 al adaptador `ofac`.
+
 C.170 incorpora los Releases `cntr-rpa-engine-1.0.18` y `cntr-rpa-setup-1.0.8`. El primero alimenta el canal firmado de Producción; el segundo entrega el launcher que muestra y registra categorías seguras del preflight ORDS. El instalador posee un manifiesto externo firmado con Ed25519 y SHA-256; el EXE no posee firma Authenticode.
 
 C.156 incorpora Releases TEST candidatos para títulos educativos. Las versiones vigentes son `cntr-rpa-servicios-educacion-0.1.2-test1` y `cntr-rpa-senescyt-0.1.3-test1`; las versiones 0.1.1/0.1.2 anteriores permanecen inmutables como historial de la corrección de integración. Sus ZIP se publican como assets de GitHub Releases; los manifiestos y firmas se versionan en sus carpetas. La firma y descarga no equivalen a una ejecución documental ni a un ACK ORDS. El motor no se modifica por estas aplicaciones.

@@ -1,0 +1,19 @@
+{
+  "channel": "TEST",
+  "components": [
+    {
+      "asset": "cntr-rpa-adapter-lista_clinton-0.1.5-candidate-win-x64.zip",
+      "dependencies": [
+        "playwright==1.60.0",
+        "PyMuPDF==1.28.0"
+      ],
+      "id": "lista_clinton",
+      "sha256": "044ac58ff41c3cd1e644fe5c79e4c916f274ef91cf147390d63ec44675ced33a",
+      "version": "0.1.5-candidate"
+    }
+  ],
+  "format": "CNTR-RPA-SBOM-1",
+  "release_tag": "cntr-rpa-lista-clinton-0.1.5-test1",
+  "source_commit": "3e4e1e419845403372eabc2ecc2517839c1b4ad5",
+  "source_repository": "Organizacion-Zaimella/ZAI-RPA-CTRL-CAPTURA-INFORMACION-PUBLICA"
+}
