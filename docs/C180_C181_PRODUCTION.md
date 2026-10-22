@@ -1,7 +1,7 @@
 # Publicación C.180/C.181 — Producción
 
 - Fecha: 2026-10-21 (America/Guayaquil).
-- Resultado: QA TEST aprobado y artefactos estables firmados publicados. El canal pasa a generación 26 mediante el PR de distribución asociado; la activación se confirma después de integrar ese PR.
+- Resultado: QA TEST aprobado, artefactos estables firmados publicados y canal de Producción actualizado. El PR de distribución #61 se integró en `main` como `da14ef54d002a43e65a7cbfaece66d57c9b522bd`.
 
 ## Cambios
 
@@ -39,4 +39,4 @@ Los ZIP, manifiestos, firmas y SBOM se descargaron de GitHub sin autenticación.
 - Se conservaron las otras nueve asignaciones de adaptadores y las cuatro revocaciones de generación 25.
 - El launcher existente actualiza motor y adaptador al iniciarse; no se necesita reinstalarlo.
 
-La publicación del Release hace disponibles los assets; el robot adopta la versión nueva cuando la PR del canal firmado se integra en `main`. Después del merge se registra aquí el SHA de `main` y el resultado de la lectura pública del canal.
+Después del merge se descargó el JSON y la firma desde el commit público `da14ef54d002a43e65a7cbfaece66d57c9b522bd`. El canal respondió HTTP 200 y pasó la verificación Ed25519; confirmó generación 26, motor 1.0.25 y `ministerio_interior@0.1.9`. Los ZIP, manifiestos, firmas y SBOM también respondieron HTTP 200 y pasaron verificación de hash/procedencia. El robot puede actualizarse al abrir el launcher existente; no requiere reinstalación.
