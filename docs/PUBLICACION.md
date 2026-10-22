@@ -28,5 +28,6 @@ autoriza su ejecución desde ORDS ni Producción.
 - La verificación del motor conservó `strict=True` y filtró únicamente el aviso recuperable `Xref table not zero-indexed...`. QA PDF, suite V100, constructor, firma y actualizador aprobaron. La suite heredada completa dejó tres fallos no relacionados, registrados en el informe C.181.
 - Antes de mover el puntero, se publicaron los Releases estables firmados `cntr-rpa-engine-1.0.25` y `cntr-rpa-ministerio_interior-0.1.9`. La descarga anónima de ZIP, manifiestos, firmas y SBOM se verificó contra hashes y trust root.
 - El canal firmado PRODUCCIÓN generación 26 conserva las otras nueve asignaciones y las cuatro revocaciones de la generación 25; solo actualiza el motor y el adaptador Ministerio. El launcher instalado aplica la actualización al iniciar, sin reinstalación.
-- El puntero de Producción se activa al integrar el PR del canal. Los usuarios podrán ejecutar cuando el PR esté integrado y el canal público confirme generación 26.
-- Evidencias: `docs/C180_C181_PRODUCTION.md` y QA ORDS TEST `1927` en el expediente C.180.
+- El PR #61 se integró en `main` como `da14ef54d002a43e65a7cbfaece66d57c9b522bd`. La lectura pública del canal y su firma Ed25519 confirmaron generación 26, motor 1.0.25 y `ministerio_interior@0.1.9`; los assets públicos pasaron HTTP 200, hash y firma.
+- Los launchers instalados pueden ejecutar ahora y descargar el motor/adaptador actualizados al iniciar; no hace falta reinstalarlos.
+- Evidencias: `docs/C180_C181_PRODUCTION.md` y QA ORDS TEST `1927` en el expediente C.180. No se ejecutó QA documental en Producción.
