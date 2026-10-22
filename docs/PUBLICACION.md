@@ -21,3 +21,12 @@ local sobre un PDF público completo de 3.232 páginas validó el bundle. Esa
 comprobación no usó sujeto CNTR ni produjo ejecución/ACK. ORDS TEST aún no asigna
 función ni pareja elegible al documento 33; esta publicación es candidata y no
 autoriza su ejecución desde ORDS ni Producción.
+
+## C.180/C.181 — promoción de motor 1.0.25 y Ministerio del Interior 0.1.9
+
+- En TEST se validaron el motor `1.0.25-test.1` y `ministerio_interior@0.1.9-candidate` en una ejecución ORDS real de dos sujetos. El CAPTCHA visible fue resuelto por el operador; los dos detalles terminaron `COMPLETADO`, guardaron evidencia y recibieron ACK. El navegador mantuvo una sola sesión para los dos trabajos.
+- La verificación del motor conservó `strict=True` y filtró únicamente el aviso recuperable `Xref table not zero-indexed...`. QA PDF, suite V100, constructor, firma y actualizador aprobaron. La suite heredada completa dejó tres fallos no relacionados, registrados en el informe C.181.
+- Antes de mover el puntero, se publicaron los Releases estables firmados `cntr-rpa-engine-1.0.25` y `cntr-rpa-ministerio_interior-0.1.9`. La descarga anónima de ZIP, manifiestos, firmas y SBOM se verificó contra hashes y trust root.
+- El canal firmado PRODUCCIÓN generación 26 conserva las otras nueve asignaciones y las cuatro revocaciones de la generación 25; solo actualiza el motor y el adaptador Ministerio. El launcher instalado aplica la actualización al iniciar, sin reinstalación.
+- El puntero de Producción se activa al integrar el PR del canal. Los usuarios podrán ejecutar cuando el PR esté integrado y el canal público confirme generación 26.
+- Evidencias: `docs/C180_C181_PRODUCTION.md` y QA ORDS TEST `1927` en el expediente C.180.
