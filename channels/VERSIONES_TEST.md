@@ -29,3 +29,8 @@ C.157 publica el motor `1.0.11-test.1` y Supercias `0.1.17-candidate`: resultado
 La generación 90 sustituye solamente SENESCYT por `0.1.4-candidate`. La aplicación comprueba que la identificación permanezca tras la recarga JSF tardía y la repone antes de continuar con el CAPTCHA. La instalación TEST con dos sujetos y evidencia/ACK se comprueba por separado.
 
 C.159 publica como candidatos TEST el motor `1.0.14-test.1` y Ministerio `0.1.7-candidate`. El primero recupera solo la pestaña tras timeout; el segundo vincula checkpoint y PDF al sujeto actual. La generación 95 está firmada; su integración real y el pase productivo quedan sujetos al expediente C.159, sin inferirse del código o de los fixtures locales.
+
+## Engine 1.0.25 TEST — generación 110
+
+Publicación firmada del ejecutable 1.0.25 desde RPA commit 3bad69a37714de6f6c7596ca5e1c5f8575905e5b; conserva las 12 asignaciones de adaptadores de generación 109 e incluye Ministerio del Interior 0.1.9-candidate. La validación de la aplicación del portal con dos sujetos terminó MATCH y generó evidencia para ambos. El paso de actualización instalada se documenta tras completar la prueba del actualizador.
+
