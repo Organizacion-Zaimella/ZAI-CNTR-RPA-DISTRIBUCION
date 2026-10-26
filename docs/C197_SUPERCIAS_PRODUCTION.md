@@ -12,7 +12,7 @@ El adaptador `supercias@0.1.19` se promovió desde `supercias@0.1.19-candidate`,
 | SHA-256 del manifiesto | `26b15d9f63dc396a39c1b3b87625ab48327ff2ba9685672cfce003c91702d4b3` |
 | SHA-256 del SBOM | `807d80b7961169a46b44ce53bd5c8185c9ec4b9397a4375471715bf35e7ebd37` |
 
-El asset estable se descargó anónimamente por HTTPS; HTTP 200 y tamaño/hash coincidieron con el canal firmado. La firma del asset, manifiesto y canal se verificó con la raíz Ed25519 de Producción.
+El asset estable se descargó anónimamente por HTTPS; HTTP 200 y tamaño/hash coincidieron con el canal firmado. La firma del asset, manifiesto y canal se verificó con la raíz Ed25519 de Producción. En la primera ejecución del launcher, el manifiesto y la firma tenían solo nombres versionados y el motor reportó HTTP 404. Se añadieron a la Release como `release-manifest.json` y `release-manifest.json.sig`; se comprobó la secuencia de descarga real del actualizador y los tres componentes validaron. La guía de Releases documenta el nombre fijo requerido para evitar esta incidencia.
 
 ## Canal productivo
 

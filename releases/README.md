@@ -2,6 +2,14 @@
 
 C.197 publicó la release estable firmada [`cntr-rpa-supercias-0.1.19`](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-supercias-0.1.19), promovida desde el candidato TEST 0.1.19 probado. ZIP, manifiesto, firma y SBOM se versionan en `releases/cntr-rpa-supercias-0.1.19/`. El canal de Producción generación 30 cambia solo Supercias y conserva motor 1.0.27. Véase [registro C.197](../docs/C197_SUPERCIAS_PRODUCTION.md).
 
+## Nombres requeridos por el actualizador
+
+Al cargar assets en GitHub Releases, publicar cada archivo con el nombre que el canal y el actualizador esperan. El ZIP debe llamarse exactamente como `asset` en el canal firmado. En cada release, subir además el manifiesto con nombre fijo `release-manifest.json`, la firma con nombre fijo `release-manifest.json.sig` y el SBOM como `sbom.json`. Los nombres con versión generados localmente (por ejemplo `cntr-rpa-supercias-0.1.19.release-manifest.json`) pueden conservarse como copia histórica, pero no sustituyen los dos nombres fijos. El actualizador los solicita por URL y un nombre distinto produce HTTP 404 antes de iniciar el motor.
+
+Antes de activar un canal firmado, comprobar anónimamente con el mismo cliente del actualizador y en este orden: canal JSON y firma; `release-manifest.json`; `release-manifest.json.sig`; ZIP del `asset`. Validar firma y SHA-256 de cada archivo. Confirmar también los nombres reales en la lista de assets de la Release; una descarga autenticada con `gh` no demuestra que la URL anónima consumida por el launcher funcione.
+
+C.197 detectó que la Release estable Supercias 0.1.19 tenía el manifiesto y la firma solo con nombres versionados. Se añadieron los assets fijos requeridos; el canal generación 30 no necesitó cambios. La secuencia exacta de descarga y verificación del actualizador pasó después de corregirlos.
+
 C.197 publicó el pre-release TEST [`cntr-rpa-supercias-0.1.19-test1`](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-supercias-0.1.19-test1). El ZIP está disponible como asset público; su manifiesto, firma y SBOM se versionan en `releases/cntr-rpa-supercias-0.1.19-test1/`. La generación TEST 114 selecciona este adaptador y conserva motor y demás adaptadores. Producción permanece igual.
 
 C.178 publicó como pre-releases TEST `cntr-rpa-judicatura-0.1.8-test1` y `cntr-rpa-lista-clinton-0.1.5-test1`. Los ZIP son assets de GitHub Releases; sus manifiestos, firmas y SBOM están versionados en sus carpetas. No se reconstruyó el motor. Lista Clinton permanece fuera de Producción porque ORDS asigna actualmente el documento 33 al adaptador `ofac`.
