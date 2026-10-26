@@ -1,5 +1,7 @@
 # Releases
 
+C.197 publicó la release estable firmada [`cntr-rpa-supercias-0.1.19`](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-supercias-0.1.19), promovida desde el candidato TEST 0.1.19 probado. ZIP, manifiesto, firma y SBOM se versionan en `releases/cntr-rpa-supercias-0.1.19/`. El canal de Producción generación 30 cambia solo Supercias y conserva motor 1.0.27. Véase [registro C.197](../docs/C197_SUPERCIAS_PRODUCTION.md).
+
 C.197 publicó el pre-release TEST [`cntr-rpa-supercias-0.1.19-test1`](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-supercias-0.1.19-test1). El ZIP está disponible como asset público; su manifiesto, firma y SBOM se versionan en `releases/cntr-rpa-supercias-0.1.19-test1/`. La generación TEST 114 selecciona este adaptador y conserva motor y demás adaptadores. Producción permanece igual.
 
 C.178 publicó como pre-releases TEST `cntr-rpa-judicatura-0.1.8-test1` y `cntr-rpa-lista-clinton-0.1.5-test1`. Los ZIP son assets de GitHub Releases; sus manifiestos, firmas y SBOM están versionados en sus carpetas. No se reconstruyó el motor. Lista Clinton permanece fuera de Producción porque ORDS asigna actualmente el documento 33 al adaptador `ofac`.
