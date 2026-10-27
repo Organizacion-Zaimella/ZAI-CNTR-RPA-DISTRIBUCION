@@ -1,6 +1,6 @@
 # Versiones efectivas — canal TEST
 
-La fuente de verdad ejecutable es [test.json](test.json) y su [firma](test.json.sig). Este inventario corresponde a la generación 114.
+La fuente de verdad ejecutable es [test.json](test.json) y su [firma](test.json.sig). Este inventario corresponde a la generación 115.
 
 | Componente | Versión | Release |
 |---|---|---|
@@ -16,7 +16,7 @@ La fuente de verdad ejecutable es [test.json](test.json) y su [firma](test.json.
 | sercop | `0.1.1-candidate` | [cntr-rpa-sercop-0.1.1-test31](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-sercop-0.1.1-test31) |
 | servicios_educacion | `0.1.2-candidate` | [cntr-rpa-servicios-educacion-0.1.2-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-servicios-educacion-0.1.2-test1) |
 | sri | `0.1.23-candidate` | [cntr-rpa-sri-0.1.23-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-sri-0.1.23-test1) |
-| supercias | `0.1.19-candidate` | [cntr-rpa-supercias-0.1.19-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-supercias-0.1.19-test1) |
+| supercias | `0.1.20-candidate` | [cntr-rpa-supercias-0.1.20-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-supercias-0.1.20-test1) |
 
 C.197 incorpora `supercias@0.1.19-candidate` sin cambiar motor ni los otros adaptadores. Reconoce el aviso concluyente de RUC inexistente como `NO_MATCH` con evidencia por documento; la corrida integrada TEST 1966 confirmó tres archivos y tres ACK para ese caso, junto con tres PDFs y tres ACK de una compañía existente. El ZIP firmado se verificó con descarga pública HTTP 200 y SHA-256 correcto.
 
@@ -40,3 +40,5 @@ Publicación firmada del ejecutable 1.0.25 desde RPA commit 3bad69a37714de6f6c75
 
 La generación 111 incorpora `supercias@0.1.18-candidate` desde RPA commit `a153ff51052ba6faf3e69ca4edb773e279ddcfd7`; conserva el motor `1.0.25-test.1` y las demás asignaciones. El candidato reutiliza la ficha por sujeto para los documentos 17–19. El QA real de TEST confirmó los tres documentos con PDF y ACK en una sesión; el expediente privado de la tarea conserva el detalle de ejecución y cotejo de hashes. Esta publicación TEST no cambia el canal PRODUCCIÓN ni certifica otros documentos o configuraciones.
 
+
+C.199 incorpora `supercias@0.1.20-candidate` para el documento 19. La corrida integrada TEST 2008 / detalle 2722 terminó `COMPLETADO`, con ACK `ACKED` y un único PDF de 16 páginas que contiene los ejercicios 2025 y 2024. El paquete firmado se generó desde el commit RPA `65ab74bc7b252c031785cdab89dec4d1c48c0103`; su asset público se verificó por tamaño y SHA-256. El motor y los otros adaptadores no cambian.
