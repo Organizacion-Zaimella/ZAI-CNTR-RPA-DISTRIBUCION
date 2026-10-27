@@ -1,5 +1,7 @@
 # Canales de distribución
 
+C.199 publica Producción generación 31 con `supercias@0.1.20`, promovido desde el candidato firmado y probado en TEST generación 115. El documento 19 descarga los balances del año actual y del anterior y combina los PDF disponibles en una evidencia. Conserva el motor `1.0.27`, los demás adaptadores y las revocaciones de generación 30. Véase [registro C.199](../docs/C199_SUPERCIAS_PRODUCTION.md).
+
 C.197 publicó Producción generación 30 con `supercias@0.1.19`, promovido desde `0.1.19-candidate` probado en TEST. Mantiene el motor `1.0.27`, los demás adaptadores y revocaciones de generación 29. El adaptador registra como `NO_MATCH` el mensaje concluyente de RUC inexistente y guarda evidencia por documento. Véase [registro C.197](../docs/C197_SUPERCIAS_PRODUCTION.md).
 
 C.178 activa TEST generación 108 con Judicatura 0.1.8-candidate y Lista Clinton 0.1.5-candidate. Ambos adaptadores definen y validan su URL de entrada y no dependen de `work.entry_url`. Mantiene el motor TEST 1.0.24-test.1 y no modifica el canal de Producción (motor 1.0.24). ORDS asigna actualmente el documento 33 a `ofac`; Lista Clinton no se promueve ni se asigna por esta tarea.
