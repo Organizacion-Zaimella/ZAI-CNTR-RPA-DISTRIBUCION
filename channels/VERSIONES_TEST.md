@@ -1,6 +1,6 @@
 # Versiones efectivas — canal TEST
 
-La fuente de verdad ejecutable es [test.json](test.json) y su [firma](test.json.sig). Este inventario corresponde a la generación 120.
+La fuente de verdad ejecutable es [test.json](test.json) y su [firma](test.json.sig). Este inventario corresponde a la generación 121.
 
 | Componente | Versión | Release |
 |---|---|---|
@@ -16,7 +16,7 @@ La fuente de verdad ejecutable es [test.json](test.json) y su [firma](test.json.
 | sercop | `0.1.1-candidate` | [cntr-rpa-sercop-0.1.1-test31](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-sercop-0.1.1-test31) |
 | servicios_educacion | `0.1.2-candidate` | [cntr-rpa-servicios-educacion-0.1.2-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-servicios-educacion-0.1.2-test1) |
 | sri | `0.1.24-candidate` | [cntr-rpa-sri-0.1.24-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-sri-0.1.24-test1) |
-| supercias | `0.1.23-candidate` | [cntr-rpa-supercias-0.1.23-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-supercias-0.1.23-test1) |
+| supercias | `0.1.24-candidate` | [cntr-rpa-supercias-0.1.24-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-supercias-0.1.24-test1) |
 
 C.197 incorpora `supercias@0.1.19-candidate` sin cambiar motor ni los otros adaptadores. Reconoce el aviso concluyente de RUC inexistente como `NO_MATCH` con evidencia por documento; la corrida integrada TEST 1966 confirmó tres archivos y tres ACK para ese caso, junto con tres PDFs y tres ACK de una compañía existente. El ZIP firmado se verificó con descarga pública HTTP 200 y SHA-256 correcto.
 
