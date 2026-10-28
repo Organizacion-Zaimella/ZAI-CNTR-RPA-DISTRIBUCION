@@ -31,3 +31,5 @@ La presencia de una versión en el canal permite su descarga firmada; la certifi
 - [Reporte privado de seguridad](SECURITY.md)
 
 No se alojan datos de sujetos, documentos obtenidos, evidencias ni secretos. Los assets se publican en Releases y se autentican mediante firmas de canal separadas para TEST y Producción.
+
+**C.200 TEST candidates:** SRI 0.1.24-candidate and Supercias 0.1.21-candidate, channel generation 117. The integrated TEST run covered 6/14 pairs before the portal was temporarily blocked; this candidate is not certified. See [C.200 QA status](docs/C200_TEST_CANDIDATES.md).
