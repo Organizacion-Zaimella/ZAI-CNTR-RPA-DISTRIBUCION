@@ -25,3 +25,7 @@ C.159 publica la generación 14 de Producción con motor 1.0.14 y `ministerio_in
 C.178 propone Producción generación 25 con `consejo_judicatura@0.1.8`, desde el paquete firmado probado en TEST. Conserva el motor productivo `1.0.24`, los demás adaptadores y la lista de revocación. El puntero entra en vigor al integrar `production.json` y su firma a `main`; véase [evidencia C.178](../docs/C178_JUDICATURA_PRODUCTION.md). Lista Clinton no se agrega al canal productivo porque ORDS asigna el documento 33 a `ofac`.
 
 C.189 prepara Producción generación 27 con `supercias@0.1.18`, promovido desde el candidato TEST probado para los documentos 17–19. Conserva el motor `1.0.25`, los demás adaptadores y las revocaciones de generación 26. El canal se activa al integrar el PR de distribución; véase [el registro C.189](../docs/C189_SUPERCIAS_PRODUCTION.md).
+
+## C.200 — candidato TEST Supercias 0.1.22 y motor 1.0.28
+
+La generación TEST 119 actualiza el motor a `1.0.28-test.1` y Supercias a `0.1.22-candidate`; conserva las demás asignaciones y no modifica Producción. El candidato incorpora mayor margen para resolver CAPTCHA en sesiones visibles, diagnóstico privado por etapa y espera acotada para Acta de Constitución. La prueba integrada TEST de los siete documentos queda pendiente de ejecución; la disponibilidad en el canal no certifica por sí sola el resultado documental.

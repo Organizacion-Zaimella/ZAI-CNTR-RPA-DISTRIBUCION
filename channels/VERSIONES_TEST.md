@@ -1,10 +1,10 @@
 # Versiones efectivas — canal TEST
 
-La fuente de verdad ejecutable es [test.json](test.json) y su [firma](test.json.sig). Este inventario corresponde a la generación 115.
+La fuente de verdad ejecutable es [test.json](test.json) y su [firma](test.json.sig). Este inventario corresponde a la generación 119.
 
 | Componente | Versión | Release |
 |---|---|---|
-| Motor | `1.0.27-test.1` | [cntr-rpa-engine-1.0.27-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-engine-1.0.27-test1) |
+| Motor | `1.0.28-test.1` | [cntr-rpa-engine-1.0.28-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-engine-1.0.28-test1) |
 | consejo_judicatura | `0.1.8-candidate` | [cntr-rpa-judicatura-0.1.8-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-judicatura-0.1.8-test1) |
 | fiscalia | `0.1.9-candidate` | [cntr-rpa-fiscalia-0.1.9-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-fiscalia-0.1.9-test1) |
 | iess | `0.1.6-candidate` | [cntr-rpa-iess-0.1.6-test33](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-iess-0.1.6-test33) |
@@ -15,8 +15,8 @@ La fuente de verdad ejecutable es [test.json](test.json) y su [firma](test.json.
 | senescyt | `0.1.5-candidate` | [cntr-rpa-senescyt-0.1.5-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-senescyt-0.1.5-test1) |
 | sercop | `0.1.1-candidate` | [cntr-rpa-sercop-0.1.1-test31](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-sercop-0.1.1-test31) |
 | servicios_educacion | `0.1.2-candidate` | [cntr-rpa-servicios-educacion-0.1.2-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-servicios-educacion-0.1.2-test1) |
-| sri | `0.1.23-candidate` | [cntr-rpa-sri-0.1.23-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-sri-0.1.23-test1) |
-| supercias | `0.1.20-candidate` | [cntr-rpa-supercias-0.1.20-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-supercias-0.1.20-test1) |
+| sri | `0.1.24-candidate` | [cntr-rpa-sri-0.1.24-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-sri-0.1.24-test1) |
+| supercias | `0.1.22-candidate` | [cntr-rpa-supercias-0.1.22-test1](https://github.com/Organizacion-Zaimella/ZAI-CNTR-RPA-DISTRIBUCION/releases/tag/cntr-rpa-supercias-0.1.22-test1) |
 
 C.197 incorpora `supercias@0.1.19-candidate` sin cambiar motor ni los otros adaptadores. Reconoce el aviso concluyente de RUC inexistente como `NO_MATCH` con evidencia por documento; la corrida integrada TEST 1966 confirmó tres archivos y tres ACK para ese caso, junto con tres PDFs y tres ACK de una compañía existente. El ZIP firmado se verificó con descarga pública HTTP 200 y SHA-256 correcto.
 
