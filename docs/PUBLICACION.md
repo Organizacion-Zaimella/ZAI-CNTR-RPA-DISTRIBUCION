@@ -31,3 +31,9 @@ autoriza su ejecución desde ORDS ni Producción.
 - El PR #61 se integró en `main` como `da14ef54d002a43e65a7cbfaece66d57c9b522bd`. La lectura pública del canal y su firma Ed25519 confirmaron generación 26, motor 1.0.25 y `ministerio_interior@0.1.9`; los assets públicos pasaron HTTP 200, hash y firma.
 - Los launchers instalados pueden ejecutar ahora y descargar el motor/adaptador actualizados al iniciar; no hace falta reinstalarlos.
 - Evidencias: `docs/C180_C181_PRODUCTION.md` y QA ORDS TEST `1927` en el expediente C.180. No se ejecutó QA documental en Producción.
+
+## C.200 — verificación completa antes de promover
+
+Antes de integrar cualquier canal TEST o PRODUCCIÓN, ejecutar en Windows desde el repositorio RPA la herramienta versionada `scripts/verify_public_channel.py` con el canal candidato y su firma. El informe debe indicar `GATE PASS` para el motor y todos los adaptadores del canal, incluidos los que permanecen sin cambios. Verifica descarga anónima, manifiestos y firmas, SBOM y ZIP según el contrato firmado. Registrar el SHA del candidato y el informe en el expediente. Si falla cualquier componente, corregirlo antes de promover.
+
+Después de integrar, ejecutar nuevamente la herramienta sin archivos candidatos para verificar el canal público de `main` y conservar ese informe. La sintaxis completa está en `FLUJO_OPERATIVO_RPA.md` del repositorio RPA. La herramienta no configura automáticamente checks obligatorios en la protección de rama.
