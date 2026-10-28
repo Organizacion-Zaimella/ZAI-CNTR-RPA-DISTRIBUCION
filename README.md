@@ -35,3 +35,5 @@ No se alojan datos de sujetos, documentos obtenidos, evidencias ni secretos. Los
 **C.200 TEST candidates:** SRI 0.1.24-candidate and Supercias 0.1.23-candidate, channel generation 120. Supercias has 50 local tests passed; integrated TEST previously verified 13/14 pairs. The only pending pair is document 17, now being retried with bounded initial-navigation recovery. See [C.200 QA status](docs/C200_TEST_CANDIDATES.md).
 
 **C.200 Producción:** generación 32 promueve SRI 0.1.24 y Supercias 0.1.21. La validación integrada TEST quedó incompleta por bloqueo temporal del portal (6/14 pares); el usuario realizará la validación productiva cuando se habilite. Véase [registro C.200](docs/C200_PRODUCTION.md).
+
+**C.200 actualización Supercias:** la generación 33 incorpora `supercias@0.1.24` con continuidad tras cerrar PDF. La ejecución TEST 2037 validó dos sujetos, 14 evidencias y ACK: 13 PDF y una captura `SIN_RESULTADO`. Véase [registro de publicación](docs/C200_SUPERCIAS_0124_PRODUCTION.md).
