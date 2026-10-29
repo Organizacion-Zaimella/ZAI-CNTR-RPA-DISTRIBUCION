@@ -37,3 +37,5 @@ No se alojan datos de sujetos, documentos obtenidos, evidencias ni secretos. Los
 **C.200 Producción:** generación 32 promueve SRI 0.1.24 y Supercias 0.1.21. La validación integrada TEST quedó incompleta por bloqueo temporal del portal (6/14 pares); el usuario realizará la validación productiva cuando se habilite. Véase [registro C.200](docs/C200_PRODUCTION.md).
 
 **C.200 actualización Supercias:** la generación 33 incorpora `supercias@0.1.24` con continuidad tras cerrar PDF. La ejecución TEST 2037 validó dos sujetos, 14 evidencias y ACK: 13 PDF y una captura `SIN_RESULTADO`. Véase [registro de publicación](docs/C200_SUPERCIAS_0124_PRODUCTION.md).
+
+**C.204 — Supercias TEST:** candidato firmado `0.1.29-candidate`, generación 126; corrige empates de fecha, ausencia de balance vigente, caso de un solo balance y continuidad de PDF firmado. Gate público completo PASS; QA ORDS integrado pendiente. Véase [registro C.204](docs/C204_SUPERCIAS_0.1.29_TEST.md).
