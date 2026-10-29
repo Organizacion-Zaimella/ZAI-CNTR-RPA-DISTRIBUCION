@@ -38,4 +38,4 @@ No se alojan datos de sujetos, documentos obtenidos, evidencias ni secretos. Los
 
 **C.200 actualización Supercias:** la generación 33 incorpora `supercias@0.1.24` con continuidad tras cerrar PDF. La ejecución TEST 2037 validó dos sujetos, 14 evidencias y ACK: 13 PDF y una captura `SIN_RESULTADO`. Véase [registro de publicación](docs/C200_SUPERCIAS_0124_PRODUCTION.md).
 
-**C.204 — Supercias TEST:** candidato firmado `0.1.29-candidate`, generación 126; corrige empates de fecha, ausencia de balance vigente, caso de un solo balance y continuidad de PDF firmado. Gate público completo PASS; QA ORDS integrado pendiente. Véase [registro C.204](docs/C204_SUPERCIAS_0.1.29_TEST.md).
+**C.204 — Supercias TEST:** candidato firmado `0.1.29-candidate`, generación 126; corrige empates de fecha, ausencia de balance vigente, caso de un solo balance y continuidad de PDF firmado. Gate público completo PASS; QA integrado TEST aprobado en las ejecuciones 2057/2058 (4/4 ACK). Véase [registro C.204](docs/C204_SUPERCIAS_0.1.29_TEST.md).
