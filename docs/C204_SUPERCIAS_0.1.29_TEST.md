@@ -6,4 +6,4 @@
 - Cambio: fechas empatadas resueltas por primera fila; falta de balance vigente se informa como error aislado por detalle; si no existe el año anterior, se conserva y envía solo el balance vigente; aviso de PDF firmado permite continuar en la pestaña principal.
 - Verificación anónima del canal completo: PASS para 13 componentes, incluyendo firmas, manifiestos, SBOM y ZIP.
 - QA local: 61 pruebas de Supercias aprobadas.
-- La corrida integrada ORDS TEST aún está pendiente; esta publicación de candidato no modifica Producción ni certifica todavía el flujo real.
+- QA integrado TEST aprobado en ejecuciones 2057/2058: dos balances con evidencia y dos errores esperados por PDF firmado, cuatro ACK.
