@@ -44,3 +44,7 @@ La generación 111 incorpora `supercias@0.1.18-candidate` desde RPA commit `a153
 C.199 incorpora `supercias@0.1.20-candidate` para el documento 19. La corrida integrada TEST 2008 / detalle 2722 terminó `COMPLETADO`, con ACK `ACKED` y un único PDF de 16 páginas que contiene los ejercicios 2025 y 2024. El paquete firmado se generó desde el commit RPA `65ab74bc7b252c031785cdab89dec4d1c48c0103`; su asset público se verificó por tamaño y SHA-256. El motor y los otros adaptadores no cambian.
 
 C.204 incorpora `supercias@0.1.26-candidate` para TEST, desde el commit RPA `611c4b940dccd06e55a2a21912c63d9ad992fc18`. Añade selección del documento de constitución por las etiquetas observadas en el portal y checkpoints privados para localizar fallos al seleccionar fechas en los documentos 18–19. El motor y las demás asignaciones permanecen iguales. La ejecución real de QA queda pendiente.
+
+## C.204 — Supercias 0.1.27 TEST — generación 124
+
+La generación 124 actualiza únicamente `supercias` a `0.1.27-candidate`, desde RPA commit `94b4655f0074f1ad4b13f59b4703b63c1158d356`. El adaptador reconoce el aviso de PDF firmado del documento 17, registra un error específico y cierra solo la pestaña hija para permitir que continúe la sesión. Añade checkpoints privados para las fases de selección, descarga y unión de balances 18–19. Motor `1.0.28-test.1` y Producción sin cambios; QA integrado de esta generación pendiente.
