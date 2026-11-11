@@ -12,13 +12,19 @@ La instalación usará staging por versión, autochequeo y activación atómica.
 
 ## Versión efectiva de una instalación 1.0.0
 
-El `distribution_ref` de la configuración local identifica la rama del canal TEST. El actualizador valida su manifiesto firmado y escribe `state/test/active.json`. El motor efectivo es `engine.path/CNTR-RPA-100.exe` de ese estado, tras comprobar su hash; un EXE de bootstrap o una copia antigua en la raíz no representa la versión activa. El plan ORDS selecciona las versiones exactas de adaptadores y el actualizador exige que figuren en el mismo canal firmado. Para la integración actual, usar [el inventario de la generación 36](../channels/VERSIONES_TEST.md) y registrar la generación activa antes de ejecutar.
+El `distribution_ref` de la configuración local identifica la rama del canal TEST. El actualizador valida su manifiesto firmado y escribe `state/test/active.json`. El motor efectivo es `engine.path/CNTR-RPA-100.exe` de ese estado, tras comprobar su hash; un EXE de bootstrap o una copia antigua en la raíz no representa la versión activa.
+
+**Política de versión:** ORDS selecciona `adapter_id` y `function_id` dentro del plan ordenado; el canal firmado selecciona la versión aprobada vigente. La referencia de versión que ORDS pueda enviar es informativa o una restricción explícita únicamente cuando el contrato la marque como tal. Una versión atrasada en ORDS no debe bloquear una versión más nueva del canal si la función y el ABI siguen siendo compatibles. El motor no ignora ORDS: no cambia el trabajo ni la función asignada. No debe exigir igualdad exacta como regla general.
+
+La implementación actual de C.153 aún valida igualdad exacta entre la versión del trabajo ORDS y el canal. Por tanto, la política anterior es el objetivo de una corrección futura y no describe todavía el binario instalado. Hasta su implementación, registra esta diferencia y no presupongas que una versión ORDS atrasada será tolerada. Para verificar el comportamiento de una instalación, registra la generación firmada activa y las versiones/funciones ORDS recibidas.
 
 ## Lista Clinton 0.1.4 TEST
 
 La rama candidata distribuye la generación 21 con `lista_clinton@0.1.4-candidate`.
-El motor solo puede seleccionarla cuando el plan ORDS requiera esa identidad y
-versión exactas. El snapshot TEST actual no asigna adaptador ni entrega un par
+El motor solo puede seleccionarla cuando el plan ORDS requiera la identidad y
+función del adaptador y el canal vigente contenga una versión compatible. La
+referencia de versión de ORDS no es un pin exacto salvo restricción explícita.
+El snapshot TEST actual no asigna adaptador ni entrega un par
 elegible para documento 33; no se debe forzar la instalación/ejecución. La
 versión es TEST y no está aprobada para Producción.
 
