@@ -21,6 +21,7 @@ La presencia de una versión en el canal permite su descarga firmada; la certifi
 - [Arquitectura de distribución](docs/ARQUITECTURA_DISTRIBUCION.md)
 - [Publicación y aprobación](docs/PUBLICACION.md)
 - [Preparación de promoción C.151](docs/C151_PREPARACION_PRODUCCION.md)
+- [C.151-ST07 Servicios Educación/SENESCYT TEST](docs/C151_ST07_EDUCATION_TEST.md)
 - [Uso desde el RPA](docs/USO_DESDE_RPA.md)
 - [Canal TEST firmado](channels/test.json)
 - [Canal PRODUCCION firmado](channels/production.json)
