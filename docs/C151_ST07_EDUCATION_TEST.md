@@ -1,14 +1,19 @@
-# C.151-ST07 — candidatos educativos TEST
+# C.151-ST07 — ritmo de interacción de documentos educativos
 
-Fecha: 2026-11-16. Estado: candidatos firmados para integración y QA en TEST; no promovidos a Producción.
+Fecha: 2026-11-17. Estado: QA aprobada en TEST; canal candidato firmado generación 133. Promoción a Producción pendiente.
 
-| Adaptador | Versión | Release TEST | Función | Fuente RPA |
+| Componente | Versión | Release TEST | Función | Fuente RPA |
 |---|---|---|---|---|
-| Servicios Educación | `0.1.3-candidate` | `cntr-rpa-servicios-educacion-0.1.3-test2` | `documento_9` | `0be1b28849f93f75d7cbbcbd0ad194dcfed56119` |
-| SENESCYT | `0.1.6-candidate` | `cntr-rpa-senescyt-0.1.6-test2` | `documento_10` | `0be1b28849f93f75d7cbbcbd0ad194dcfed56119` |
+| Motor | `1.0.30-test.1` | `cntr-rpa-engine-1.0.30-test1` | allowlist de pausas | `418ad1f7ea95f420c83a16e088cc5a97ac4d7cb6` |
+| Servicios Educación | `0.1.4-candidate` | `cntr-rpa-servicios-educacion-0.1.4-test1` | `documento_9` | `418ad1f7ea95f420c83a16e088cc5a97ac4d7cb6` |
+| SENESCYT | `0.1.7-candidate` | `cntr-rpa-senescyt-0.1.7-test1` | `documento_10` | `418ad1f7ea95f420c83a16e088cc5a97ac4d7cb6` |
 
-El canal TEST candidato es generación `130` y conserva el motor `1.0.29-test.1`. El gate público `verify_public_channel.py` aprobó sus 13 componentes: descargas anónimas, manifiestos, firmas, SBOM y ZIP. El canal de Producción no fue modificado.
+El canal TEST candidato es la generación `133`; el canal de Producción sigue intacto. La pausa de 2 segundos aplica únicamente a portal 9/documento 9/adaptador `servicios_educacion` y portal 10/documento 10/adaptador `senescyt`. Todos los demás documentos conservan el mínimo de 5 segundos. La espera de CAPTCHA/operador, estabilización y resultado no cambia.
 
-La integración ORDS aún debe verificar la consulta, la evidencia y el ACK por cada trabajo elegible. El conjunto temporal de sujetos para QA no se publica en este repositorio; los identificadores, nombres y evidencias permanecen en almacenamiento privado.
+Validación local: 110 pruebas aprobadas y 4 omitidas entre el motor y las dos aplicaciones. El build del motor pasó 88 pruebas, 4 omitidas, el preflight de navegador y ejecución congelada del adaptador en sidecar. El gate público anónimo verificó los 13 componentes del canal TEST: manifiestos, firmas, SBOM y ZIP correctos; estado `PASS` para generación 133.
 
-La etiqueta `test1` de cada adaptador se conserva como Release sin referencia en el canal: el gate encontró que publicaba el SBOM con un nombre de archivo que el verificador no acepta. `test2` publica el archivo como `sbom.json`; no cambia el código del adaptador respecto del mismo commit fuente.
+## Resultado de QA integrado
+
+La corrida controlada en Oracle TEST procesó los documentos 9 y 10 y recibió cuatro trabajos elegibles: uno de Servicios Educación y tres de SENESCYT. Los cuatro terminaron con evidencia y ACK `ACKED`, incluidos los resultados `SIN_RESULTADO`. Se confirmó que el documento 10 con el caso previamente reportado también capturó evidencia. La corrida anterior 2108 queda como antecedente incompleto y no se usa como resultado de esta validación.
+
+El cambio de 2 segundos se limita a portal/documento 9/9 y 10/10; el resto del canal y de los tiempos permanece sin cambios. Los datos de sujetos y evidencias se conservan fuera de este repositorio. Este registro de QA TEST no cambia el canal ni los pins de Producción.
